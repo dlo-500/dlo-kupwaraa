@@ -1,0 +1,27 @@
+{
+  "name": "DLO Kupwara — Case Management Portal",
+  "short_name": "DLO Kupwara",
+  "description": "District Litigation Office Kupwara — Official Case Management Portal",
+  "start_url": "/dlo-kupwaraa/",
+  "scope": "/dlo-kupwaraa/",
+  "display": "standalone",
+  "background_color": "#1B2A4A",
+  "theme_color": "#1B2A4A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["government", "productivity"],
+  "lang": "en-IN"
+}

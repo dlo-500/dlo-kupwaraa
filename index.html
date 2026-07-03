@@ -1192,6 +1192,7 @@ footer{background:#060d18;border-top:1px solid rgba(201,168,76,0.15);padding:48p
 const SHEET_ID   = '1INkq81tBJV9IYYMfriGegcVc1eizeIRzHB9aAFqKPrw';
 const SHEET_NAME = 'CASE DIARY';
 const PERF_LOG_SHEET_NAME = 'PERFORMANCE_LOG';
+const AI_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxsT5TaabH1uFPQYOPu9X5iyIxGuEwF1e5H7kdmrnBQCksoVuPKWUvXQWw_gLJd/exec";
 
 function buildURL(sheetName) {
   return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(sheetName)}&tqx=out:json&rand=${Math.random()}&t=${Date.now()}`;
@@ -2826,7 +2827,35 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   });
 }
+async function askAI(prompt) {
 
+  try {
+
+    const response = await fetch(AI_WEBAPP_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "askAI",
+        prompt: prompt
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.status === "success") {
+      alert(data.answer);   // Temporary test
+    } else {
+      alert("AI Error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("Connection Failed");
+  }
+
+}
 init();
 </script>
 </body>

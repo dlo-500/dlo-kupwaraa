@@ -2838,10 +2838,10 @@ async function askAI(prompt) {
     const response = await fetch(AI_WEBAPP_URL, {
     mode: "cors",
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
+     headers: {
+    "Content-Type": "text/plain;charset=UTF-8"
+},
+body: JSON.stringify({
         action: "askAI",
         prompt: prompt
       })

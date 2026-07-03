@@ -361,6 +361,9 @@ footer{background:#060d18;border-top:1px solid rgba(201,168,76,0.15);padding:48p
 </style>
 </head>
 <body>
+  <button onclick="askAI('Hello')">
+    🤖 Test AI
+</button>
  
 <!-- TOP BAR -->
 <div class="topbar">
@@ -2843,7 +2846,10 @@ async function askAI(prompt) {
       })
     });
 
-    const data = await response.json();
+   const text = await response.text();
+console.log(text);
+
+const data = JSON.parse(text);
 
     if (data.status === "success") {
       alert(data.answer);   // Temporary test
@@ -2852,9 +2858,9 @@ async function askAI(prompt) {
     }
 
   } catch (err) {
-    console.error(err);
-    alert("Connection Failed");
-  }
+    console.error("AI Error:", err);
+    alert("AI Error: " + err.message);
+}
 
 }
 init();

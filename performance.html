@@ -245,7 +245,7 @@ async function fetchPerformanceLog() {
       .order('logged_at', { ascending: false });
     if (error) throw error;
     PERF_LOG_ROWS = (data || []).map(r => ({
-      dateLogged: r.logged_at ? new Date(r.logged_at) : null,
+      dateLogged: r.logged_at ? new Date(r.logged_at.split('T')[0] + 'T00:00:00') : null,
       caseId:     r.cnr_case_no || '',
       title:      r.case_diary ? r.case_diary.case_title : '',
       dept:       r.case_diary ? r.case_diary.department : '',
@@ -267,7 +267,7 @@ async function fetchHistoryLog() {
       .order('created_at', { ascending: false });
     if (error) throw error;
     HISTORY_ROWS = (data || []).map(r => ({
-      entryDate:  r.created_at ? new Date(r.created_at) : null,
+      entryDate: r.created_at ? new Date(r.created_at.split('T')[0] + 'T00:00:00') : null,
       title:      r.case_diary ? r.case_diary.case_title : '',
       counsel:    r.advocate_name || '',
       attendance: r.attendance || '',

@@ -550,13 +550,3 @@ html.app-mode .container{padding:0 16px}
   .live-section,.courts-section{padding:20px 0}
   .results-table{font-size:11px}
 }
-/* --- STICKY FOOTER FIX --- */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-footer {
-    margin-top: auto;
-}

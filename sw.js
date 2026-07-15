@@ -1,6 +1,6 @@
 // DLO Kupwara — Service Worker v2.0 (offline-capable)
-const STATIC_CACHE = 'dlo-kupwara-static-v2';
-const DATA_CACHE   = 'dlo-kupwara-data-v2';
+const STATIC_CACHE = 'dlo-kupwara-static-v3';
+const DATA_CACHE   = 'dlo-kupwara-data-v3';
 
 const STATIC_ASSETS = [
   '/dlo-kupwaraa/',

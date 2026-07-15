@@ -550,40 +550,22 @@ html.app-mode .container{padding:0 16px}
   .live-section,.courts-section{padding:20px 0}
   .results-table{font-size:11px}
 }
-/* --- PREMIUM APP OVERRIDES (Only applies when installed as a PWA) --- */
+/* --- PREMIUM LOOK FOR ICON TILES --- */
 @media (display-mode: standalone) {
-    
-    /* 1. Glassmorphism for App Cards & Tiles */
-    .home-icon-tile,
-    .home-stat-tile,
+    /* Target the specific container for your icon tiles */
+    .icon-tile, 
     .app-home-stats .tile {
-        background: rgba(255, 255, 255, 0.04) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px); 
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border-radius: 16px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
+        transition: transform 0.3s ease !important;
     }
 
-    /* 2. Smooth Lift on Hover/Tap */
-    .home-icon-tile:hover,
-    .home-stat-tile:hover,
-    .app-home-stats .tile:hover {
-        transform: translateY(-4px) !important;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
-        border-color: rgba(212, 175, 55, 0.4) !important;
-        background: rgba(255, 255, 255, 0.08) !important;
-    }
-
-    /* 3. Metallic Gold Gradient for highlighted app buttons */
-    .home-icon-highlight {
-        background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3) !important;
-    }
-
-    .home-icon-highlight span {
-        color: #0b1120 !important; 
-        font-weight: 700;
+    /* Add a subtle lift effect when the user touches an icon */
+    .icon-tile:active {
+        transform: scale(0.95);
     }
 }

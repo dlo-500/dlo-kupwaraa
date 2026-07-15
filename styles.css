@@ -550,38 +550,40 @@ html.app-mode .container{padding:0 16px}
   .live-section,.courts-section{padding:20px 0}
   .results-table{font-size:11px}
 }
-/* --- PREMIUM APP OVERRIDES (Only applies in PWA mode) --- */
+/* --- PREMIUM APP OVERRIDES (Only applies when installed as a PWA) --- */
+@media (display-mode: standalone) {
+    
+    /* 1. Glassmorphism for App Cards & Tiles */
+    .home-icon-tile,
+    .home-stat-tile,
+    .app-home-stats .tile {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px); 
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    }
 
-/* 1. Glassmorphism for App Cards & Tiles */
-html.app-mode .home-icon-tile,
-html.app-mode .home-stat-tile,
-html.app-mode .app-home-stats .tile {
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* For iOS support */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
-}
+    /* 2. Smooth Lift on Hover/Tap */
+    .home-icon-tile:hover,
+    .home-stat-tile:hover,
+    .app-home-stats .tile:hover {
+        transform: translateY(-4px) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+        border-color: rgba(212, 175, 55, 0.4) !important;
+        background: rgba(255, 255, 255, 0.08) !important;
+    }
 
-/* 2. Smooth Lift on Hover/Tap */
-html.app-mode .home-icon-tile:hover,
-html.app-mode .home-stat-tile:hover,
-html.app-mode .app-home-stats .tile:hover {
-    transform: translateY(-4px) !important;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
-    border-color: rgba(212, 175, 55, 0.4) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-}
+    /* 3. Metallic Gold Gradient for highlighted app buttons */
+    .home-icon-highlight {
+        background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3) !important;
+    }
 
-/* 3. Metallic Gold Gradient for highlighted app buttons */
-html.app-mode .home-icon-highlight {
-    background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3) !important;
-}
-
-html.app-mode .home-icon-highlight span {
-    color: #0b1120 !important; /* Keeps text dark and crisp against the gold */
-    font-weight: 700;
+    .home-icon-highlight span {
+        color: #0b1120 !important; 
+        font-weight: 700;
+    }
 }

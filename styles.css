@@ -550,22 +550,31 @@ html.app-mode .container{padding:0 16px}
   .live-section,.courts-section{padding:20px 0}
   .results-table{font-size:11px}
 }
-/* --- PREMIUM LOOK FOR ICON TILES --- */
+/* --- PREMIUM LOOK FOR APP TILES & ICONS --- */
 @media (display-mode: standalone) {
-    /* Target the specific container for your icon tiles */
-    .icon-tile, 
+    
+    /* 1. Glassmorphism for the Number Stats at the top */
     .app-home-stats .tile {
-        background: rgba(255, 255, 255, 0.05) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
         backdrop-filter: blur(15px) !important;
         -webkit-backdrop-filter: blur(15px) !important;
-        border-radius: 16px !important;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
-        transition: transform 0.3s ease !important;
+        border-radius: 14px !important;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* 2. Glassy glow for the colored Icon Buttons */
+    .app-home-actions a .ic {
+        /* We keep your beautiful distinct colors but add a premium frosted glow */
+        border: 1px solid rgba(255, 255, 255, 0.4) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.4) !important;
     }
 
-    /* Add a subtle lift effect when the user touches an icon */
-    .icon-tile:active {
-        transform: scale(0.95);
+    /* 3. Subtle squeeze effect when tapped */
+    .app-home-actions a:active .ic,
+    .app-home-stats .tile:active {
+        transform: scale(0.92) !important;
     }
 }

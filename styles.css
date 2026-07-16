@@ -294,7 +294,7 @@ html.app-mode .app-home{display:block;padding:18px 16px 8px}
 .app-home-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px;margin:16px 0}
 .app-home-stats .tile{background:var(--navy-mid);border-radius:12px;padding:12px 6px;text-align:center;box-shadow:0 4px 14px rgba(13,27,42,0.18)}
 .app-home-stats .tile b{display:block;font-family:'Playfair Display',serif;font-size:19px;color:var(--gold-light)}
-.app-home-stats .tile small{display:block;font-size:9px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.app-home-stats .tile small{display:block;font-size:9px;color:var(--navy-mid);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 /* HOMEPAGE: stats + icon navigation launcher */
 .home-stat-tile{background:rgba(255,255,255,0.06);border:1px solid rgba(201,168,76,0.25);border-radius:12px;padding:14px 8px;text-align:center}
 .home-stat-tile b{display:block;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold-light)}

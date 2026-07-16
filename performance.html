@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self';">
+<title>Standing Counsel Performance — District Litigation Office Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+.page-header{background:var(--navy);padding:22px 0;border-bottom:3px solid var(--gold)}
+.page-header .container{display:flex;align-items:center;gap:16px}
+.page-header a.back-link{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,0.08);border:1px solid rgba(201,168,76,0.3);color:var(--gold-light);text-decoration:none;flex-shrink:0}
+.page-header a.back-link:hover{background:rgba(255,255,255,0.16)}
+.page-header a.back-link svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+.page-header h1{font-family:'Playfair Display',serif;color:var(--white);font-size:19px;font-weight:700;margin:0}
+.page-header p{color:var(--gold-light);font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+</style>
+<style id="mobile-scroll-fix">
+/* ============================================================
+   MOBILE TABLE SCROLL FIX
+   Problem: on phones, wide tables (Department Performance,
+   Entries per Standing Counsel, Detailed Case Log, Cause List,
+   Courts table, etc.) were bleeding off the right edge of the
+   screen instead of scrolling inside their own box. Root cause:
+   these tables sit inside CSS grid/flex cards, and a grid/flex
+   item's default minimum width is "as wide as its content" —
+   so instead of the inner overflow-x:auto div doing its job,
+   the whole card (and sometimes the page) was pushed wider than
+   the viewport, which made horizontal swipe/scroll effectively
+   dead. The fix below (a) stops any container from being forced
+   wider than the viewport, (b) makes every existing
+   overflow-x:auto wrapper genuinely scrollable with proper touch
+   support, and (c) adds a visible scrollbar + fade hint so users
+   know a table can be swiped.
+   ============================================================ */
+
+html, body{
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Any element that establishes a grid/flex context must be allowed
+   to shrink below its content size, or a wide table inside it will
+   force the whole layout wider than the screen. */
+.container, .analytics-card, .hist-summary-card, .courts-table-wrap,
+.results-wrap, section, main,
+[style*="display:grid"], [style*="display: grid"],
+[style*="display:flex"], [style*="display: flex"]{
+  min-width: 0;
+}
+
+/* Every horizontal-scroll wrapper on the site (matched whether it
+   carries a class or an inline overflow-x:auto style) gets real,
+   reliable touch scrolling. */
+.results-table-scroll,
+.courts-table-wrap,
+div[style*="overflow-x:auto"],
+div[style*="overflow-x: auto"]{
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-x pan-y !important;
+  overscroll-behavior-x: contain;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Tables inside those wrappers should keep their natural width
+   (so columns stay readable) and simply scroll, rather than being
+   squeezed illegibly small. */
+.dept-table, .courts-table, #causeListTable{
+  min-width: 640px;
+}
+
+/* Visible scrollbar on touch/trackpad devices so the table doesn't
+   look "stuck" — a plain hidden overflow reads as broken, a thin
+   visible bar reads as scrollable. */
+.results-table-scroll::-webkit-scrollbar,
+.courts-table-wrap::-webkit-scrollbar,
+div[style*="overflow-x:auto"]::-webkit-scrollbar,
+div[style*="overflow-x: auto"]::-webkit-scrollbar{
+  height: 7px;
+}
+.results-table-scroll::-webkit-scrollbar-thumb,
+.courts-table-wrap::-webkit-scrollbar-thumb,
+div[style*="overflow-x:auto"]::-webkit-scrollbar-thumb,
+div[style*="overflow-x: auto"]::-webkit-scrollbar-thumb{
+  background: var(--gold, #C9A84C);
+  border-radius: 6px;
+}
+.results-table-scroll::-webkit-scrollbar-track,
+.courts-table-wrap::-webkit-scrollbar-track,
+div[style*="overflow-x:auto"]::-webkit-scrollbar-track,
+div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+}
+
+/* One-time "swipe to see more" hint, shown only on narrow screens
+   the first time a scrollable table appears, then faded out once
+   the user actually scrolls it (handled by the small script at the
+   bottom of the page). */
+.scroll-hint{
+  display: none;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--muted, #6B7280);
+  padding: 6px 2px 2px;
+  opacity: 0.85;
+  transition: opacity .3s ease;
+}
+@media (max-width: 720px){
+  .scroll-hint.is-active{ display: flex; }
+}
+.scroll-hint.is-hidden{ opacity: 0; pointer-events: none; }
+</style>
+
+</head>
+<body>
+
+<div class="page-header">
+  <div class="container">
+    <a href="index.html" class="back-link" title="Back to home">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div>
+      <h1>Standing Counsel Performance</h1>
+      <p>District Litigation Office · Kupwara</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION A: PERFORMANCE_LOG (unchanged logic, own filters) -->
+<section class="analytics-section" id="performance" style="background:var(--cream)">
+  <div class="container">
+    <div class="reveal" style="margin-bottom:36px">
+      <span class="section-eyebrow">Advocate-wise Analytics</span>
+      <h2 class="section-title">Logged Performance Activity</h2>
+      <div class="divider"></div>
+      <p style="font-size:14px;color:var(--muted)">Sourced live from the <strong>PERFORMANCE_LOG</strong> table. Select a date range (based on Date Logged) and/or a Standing Counsel to view their logged case activity for that period, or leave blank to view all entries.</p>
+    </div>
+
+    <div class="filter-box chess-bg reveal" style="margin-bottom:28px">
+      <div class="filter-title">📅 Select Date Range & Counsel</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px">
+        <div class="filter-group">
+          <label>From Date</label>
+          <input type="date" id="perfFromDate" style="width:100%;padding:10px 14px;border:1.5px solid rgba(201,168,76,0.4);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.06);color:var(--white);outline:none;color-scheme:dark">
+        </div>
+        <div class="filter-group">
+          <label>To Date</label>
+          <input type="date" id="perfToDate" style="width:100%;padding:10px 14px;border:1.5px solid rgba(201,168,76,0.4);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.06);color:var(--white);outline:none;color-scheme:dark">
+        </div>
+        <div class="filter-group">
+          <label>Standing Counsel</label>
+          <select id="counselPerfSelect">
+            <option value="">— All Standing Counsels —</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="filter-btn btn-apply" onclick="renderCounselPerformance()">Apply</button>
+        <button class="filter-btn btn-clear" onclick="clearCounselPerfFilter()">Clear All</button>
+      </div>
+    </div>
+
+    <div class="analytics-grid reveal" style="grid-template-columns:repeat(4,1fr);margin-bottom:0">
+      <div class="analytics-card" style="text-align:center">
+        <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Total Logged Entries</p>
+        <span style="font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--navy-mid)" id="perfSummaryTotal">—</span>
+      </div>
+      <div class="analytics-card" style="text-align:center">
+        <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Ex-parte Entries</p>
+        <span style="font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:#8B1A1A" id="perfSummaryExparte">—</span>
+      </div>
+      <div class="analytics-card" style="text-align:center">
+        <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Disposed / Dismissed</p>
+        <span style="font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--disposed-fg)" id="perfSummaryDisposed">—</span>
+      </div>
+      <div class="analytics-card" style="text-align:center">
+        <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Reply Filed</p>
+        <span style="font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--active-fg)" id="perfSummaryReply">—</span>
+      </div>
+    </div>
+
+    <div class="analytics-grid reveal">
+      <div class="analytics-card" style="grid-column:1/-1">
+        <h3>Entries per Standing Counsel</h3>
+        <p id="counselPerfSubtitle">Logged entries grouped by Standing Counsel — all time</p>
+        <div style="overflow-x:auto">
+          <table class="dept-table" id="counselPerfTable">
+            <thead><tr><th>#</th><th>Standing Counsel</th><th>Total Entries</th><th>Ex-parte</th><th>Disposed</th><th>Reply Filed</th></tr></thead>
+            <tbody id="counselPerfBody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">⏳ Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="analytics-grid reveal">
+      <div class="analytics-card" style="grid-column:1/-1">
+        <h3>Detailed Case Log</h3>
+        <p id="counselPerfDetailSubtitle">Full details of every matching entry from PERFORMANCE_LOG</p>
+        <div style="overflow-x:auto">
+          <table class="dept-table" id="counselPerfDetailTable">
+            <thead><tr><th>#</th><th>Date of Court Order</th><th>CNR / Case ID</th><th>Title of Case</th><th>Contesting Dept.</th><th>Standing Counsel</th><th>Judicial Forum</th><th>Next Hearing Date</th><th>Status / Proceedings</th><th>Remarks</th></tr></thead>
+            <tbody id="counselPerfDetailBody"><tr><td colspan="10" style="text-align:center;padding:20px;color:var(--muted)">⏳ Loading...</td></tr></tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn-export btn-excel" onclick="downloadCounselPerfExcel()" style="font-size:12px;padding:8px 14px">⬇ Excel (Full Details)</button>
+          <button class="btn-export btn-pdf" onclick="downloadCounselPerfPDF()" style="font-size:12px;padding:8px 14px">⬇ PDF (Full Details)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION B: CASE HISTORY — its own dedicated filter, independent of Section A -->
+<section class="analytics-section">
+  <div class="container">
+    <div class="reveal" style="margin-bottom:36px">
+      <span class="section-eyebrow">Case History Analytics</span>
+      <h2 class="section-title">Case History — Attendance Overview</h2>
+      <div class="divider"></div>
+      <p style="font-size:14px;color:var(--muted)">Sourced from the case history log. Select a Standing Counsel and/or a date range to see how many of their listed cases were attended, and how many are currently in Ex-parte or Disposed.</p>
+    </div>
+
+    <div class="filter-box chess-bg reveal" style="margin-bottom:28px">
+      <div class="filter-title">📅 Select Date Range & Counsel</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:14px">
+        <div class="filter-group">
+          <label>Start Date</label>
+          <input type="date" id="histFromDate" style="width:100%;padding:10px 14px;border:1.5px solid rgba(201,168,76,0.4);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.06);color:var(--white);outline:none;color-scheme:dark">
+        </div>
+        <div class="filter-group">
+          <label>End Date</label>
+          <input type="date" id="histToDate" style="width:100%;padding:10px 14px;border:1.5px solid rgba(201,168,76,0.4);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:rgba(255,255,255,0.06);color:var(--white);outline:none;color-scheme:dark">
+        </div>
+        <div class="filter-group">
+          <label>Standing Counsel</label>
+          <select id="histCounselSelect">
+            <option value="">— All Standing Counsels —</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="filter-btn btn-apply" onclick="renderHistoryAttendanceStats()">Apply</button>
+        <button class="filter-btn btn-clear" onclick="clearHistFilter()">Clear All</button>
+      </div>
+    </div>
+
+    <div class="analytics-grid reveal">
+      <div class="analytics-card" style="grid-column:1/-1">
+        <p id="historyStatsSubtitle" style="margin-bottom:6px">Choose a counsel and/or date range above, then click Apply.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin:18px 0 24px">
+          <div style="text-align:center">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Total Cases</p>
+            <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--navy-mid)" id="histStatTotal">—</span>
+          </div>
+          <div style="text-align:center">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Attended</p>
+            <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--active-fg)" id="histStatAttended">—</span>
+          </div>
+          <div style="text-align:center">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Not Attended</p>
+            <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#8B1A1A" id="histStatNotAttended">—</span>
+          </div>
+          <div style="text-align:center">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Ex-parte</p>
+            <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:#8B1A1A" id="histStatExparte">—</span>
+          </div>
+          <div style="text-align:center">
+            <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Disposed</p>
+            <span style="font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--disposed-fg)" id="histStatDisposed">—</span>
+          </div>
+        </div>
+        <div style="max-width:480px;margin:0 auto">
+          <canvas id="historyAttendanceChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CONFIG — same Supabase project as index.html
+// ═══════════════════════════════════════════════
+const SUPABASE_URL = 'https://ibicsdsehxlsaygjnefk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let PERF_LOG_ROWS = [];
+let HISTORY_ROWS = [];
+let COUNSEL_PERF_DATA = [];
+let COUNSEL_PERF_ROWS = [];
+let historyAttendanceChartInst = null;
+
+function escapeHtml(val) {
+  if (val === null || val === undefined) return '';
+  return String(val).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function formatDate(d) {
+  if (!d) return '—';
+  if (d instanceof Date) return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+  return String(d);
+}
+function formatDDMMYYYY(d) {
+  if (!d) return '—';
+  if (d instanceof Date && !isNaN(d)) {
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    return `${dd}/${mm}/${d.getFullYear()}`;
+  }
+  return String(d);
+}
+function logStatusIsExparte(status) {
+  if (!status) return false;
+  const v = status.toLowerCase();
+  return v.includes('ex-parte') || v.includes('exparte') || v.includes('ex parte');
+}
+function logStatusIsDisposed(status) {
+  if (!status) return false;
+  const v = status.toLowerCase();
+  return v.includes('disposed') || v.includes('dismissed');
+}
+function logStatusIsReplyFiled(status) {
+  if (!status) return false;
+  const v = status.toLowerCase();
+  return v.includes('reply filed') && !v.includes('not');
+}
+
+// ═══════════════════════════════════════════════
+//  FETCH
+// ═══════════════════════════════════════════════
+async function fetchPerformanceLog() {
+  try {
+    const { data, error } = await sb
+      .from('performance_log')
+      .select('*, case_diary(case_title, department, court_name)')
+      .order('logged_at', { ascending: false });
+    if (error) throw error;
+    PERF_LOG_ROWS = (data || []).map(r => ({
+      dateLogged: r.logged_at ? new Date(r.logged_at.split('T')[0] + 'T00:00:00') : null,
+      caseId:     r.cnr_case_no || '',
+      title:      r.case_diary ? r.case_diary.case_title : '',
+      dept:       r.case_diary ? r.case_diary.department : '',
+      counsel:    r.advocate_name || '',
+      forum:      r.case_diary ? r.case_diary.court_name : '',
+      orderDate:  r.logged_at ? new Date(r.logged_at) : null,
+      status:     r.proceedings_snapshot || '',
+      remarks:    r.proceedings_snapshot || '',
+    })).filter(r => r.title && r.title.trim() !== '');
+    return true;
+  } catch (e) { console.error('Performance log fetch error:', e); return false; }
+}
+
+async function fetchHistoryLog() {
+  try {
+    const { data, error } = await sb
+      .from('case_history')
+      .select('*, case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    HISTORY_ROWS = (data || []).map(r => ({
+      entryDate: r.created_at ? new Date(r.created_at.split('T')[0] + 'T00:00:00') : null,
+      title:      r.case_diary ? r.case_diary.case_title : '',
+      counsel:    r.advocate_name || '',
+      attendance: r.attendance || '',
+      exparte:    r.case_diary ? r.case_diary.exparte_status : '',
+      caseStatus: r.case_diary ? r.case_diary.case_status : '',
+    })).filter(r => r.title && r.title.trim() !== '');
+    return true;
+  } catch (e) { console.error('History log fetch error:', e); return false; }
+}
+
+// ═══════════════════════════════════════════════
+//  DROPDOWNS
+// ═══════════════════════════════════════════════
+function populatePerfCounselDropdown() {
+  const sel = document.getElementById('counselPerfSelect');
+  if (!sel) return;
+  const counsels = [...new Set(PERF_LOG_ROWS.map(r=>r.counsel).filter(Boolean))].sort();
+  counsels.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+function populateHistCounselDropdown() {
+  const sel = document.getElementById('histCounselSelect');
+  if (!sel) return;
+  const counsels = [...new Set(HISTORY_ROWS.map(r=>r.counsel).filter(Boolean))].sort();
+  counsels.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+}
+
+// ═══════════════════════════════════════════════
+//  SECTION A: PERFORMANCE_LOG
+// ═══════════════════════════════════════════════
+function getCounselPerfRows() {
+  const fromVal = document.getElementById('perfFromDate').value;
+  const toVal   = document.getElementById('perfToDate').value;
+  const counselVal = document.getElementById('counselPerfSelect').value;
+  const from = fromVal ? new Date(fromVal + 'T00:00:00') : null;
+  const to   = toVal   ? new Date(toVal   + 'T23:59:59') : null;
+  return PERF_LOG_ROWS.filter(r => {
+    if (counselVal && r.counsel !== counselVal) return false;
+    if (from && !(r.dateLogged instanceof Date && r.dateLogged >= from)) return false;
+    if (to   && !(r.dateLogged instanceof Date && r.dateLogged <= to))   return false;
+    return true;
+  });
+}
+
+function renderCounselPerformance() {
+  const rows = getCounselPerfRows();
+  COUNSEL_PERF_ROWS = [...rows].sort((a,b) => {
+    const ta = a.dateLogged instanceof Date ? a.dateLogged.getTime() : 0;
+    const tb = b.dateLogged instanceof Date ? b.dateLogged.getTime() : 0;
+    return tb - ta;
+  });
+
+  const fromVal = document.getElementById('perfFromDate').value;
+  const toVal   = document.getElementById('perfToDate').value;
+  const rangeText = (fromVal || toVal)
+    ? `Date Logged ${fromVal?('from '+formatDate(new Date(fromVal+'T00:00:00'))):''}${(fromVal&&toVal)?' ':''}${toVal?('to '+formatDate(new Date(toVal+'T00:00:00'))):''}`
+    : 'all time';
+
+  const subtitle = document.getElementById('counselPerfSubtitle');
+  if (subtitle) subtitle.textContent = `Logged entries grouped by Standing Counsel — ${rangeText}`;
+  const detailSubtitle = document.getElementById('counselPerfDetailSubtitle');
+  if (detailSubtitle) detailSubtitle.textContent = `Full details of every matching PERFORMANCE_LOG entry — ${rangeText} — ${rows.length} entr${rows.length===1?'y':'ies'}`;
+
+  const total    = rows.length;
+  const exparte  = rows.filter(r => logStatusIsExparte(r.status)).length;
+  const disposed = rows.filter(r => logStatusIsDisposed(r.status)).length;
+  const replied  = rows.filter(r => logStatusIsReplyFiled(r.status)).length;
+  document.getElementById('perfSummaryTotal').textContent = total;
+  document.getElementById('perfSummaryExparte').textContent = exparte;
+  document.getElementById('perfSummaryDisposed').textContent = disposed;
+  document.getElementById('perfSummaryReply').textContent = replied;
+
+  const counselMap = {};
+  rows.forEach(r => {
+    if (!r.counsel) return;
+    const c = r.counsel.trim();
+    if (!counselMap[c]) counselMap[c] = {total:0, exparte:0, disposed:0, replied:0};
+    counselMap[c].total++;
+    if (logStatusIsExparte(r.status))    counselMap[c].exparte++;
+    if (logStatusIsDisposed(r.status))   counselMap[c].disposed++;
+    if (logStatusIsReplyFiled(r.status)) counselMap[c].replied++;
+  });
+
+  COUNSEL_PERF_DATA = Object.entries(counselMap).sort((a,b)=>b[1].total-a[1].total);
+  const tbody = document.getElementById('counselPerfBody');
+  tbody.innerHTML = COUNSEL_PERF_DATA.length === 0
+    ? `<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">No entries found for the selected date range / counsel.</td></tr>`
+    : COUNSEL_PERF_DATA.map(([name,d],i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td style="font-weight:600">${escapeHtml(name)}</td>
+          <td style="text-align:center">${d.total}</td>
+          <td style="text-align:center"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;background:${d.exparte>0?'#FAD7D7':'#D4EDDA'};color:${d.exparte>0?'#8B1A1A':'#1E6B45'}">${d.exparte}</span></td>
+          <td style="text-align:center"><span style="color:var(--disposed-fg);font-weight:600">${d.disposed}</span></td>
+          <td style="text-align:center"><span style="color:var(--active-fg);font-weight:600">${d.replied}</span></td>
+        </tr>`).join('');
+
+  const dbody = document.getElementById('counselPerfDetailBody');
+  dbody.innerHTML = COUNSEL_PERF_ROWS.length === 0
+    ? `<tr><td colspan="10" style="text-align:center;padding:20px;color:var(--muted)">No entries found for the selected date range / counsel.</td></tr>`
+    : COUNSEL_PERF_ROWS.map((r,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td style="white-space:nowrap;font-size:12px">${r.dateLogged instanceof Date ? r.dateLogged.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+          <td style="white-space:nowrap;font-weight:600;color:var(--navy)">${escapeHtml(r.caseId||'—')}</td>
+          <td style="max-width:200px">${escapeHtml(r.title||'—')}</td>
+          <td>${escapeHtml(r.dept||'—')}</td>
+          <td style="white-space:nowrap">${escapeHtml(r.counsel||'—')}</td>
+          <td style="white-space:nowrap">${escapeHtml(r.forum||'—')}</td>
+          <td style="white-space:nowrap">${formatDDMMYYYY(r.orderDate)}</td>
+          <td style="max-width:220px;font-size:12px;color:${logStatusIsExparte(r.status)?'var(--disposed-fg)':'var(--text)'};font-weight:${logStatusIsExparte(r.status)?'700':'400'}">${escapeHtml(r.status||'—')}</td>
+          <td style="max-width:220px;font-size:12px">${escapeHtml(r.remarks||'—')}</td>
+        </tr>`).join('');
+}
+
+function clearCounselPerfFilter() {
+  document.getElementById('perfFromDate').value = '';
+  document.getElementById('perfToDate').value = '';
+  document.getElementById('counselPerfSelect').value = '';
+  renderCounselPerformance();
+}
+
+function downloadCounselPerfExcel() {
+  const fromVal = document.getElementById('perfFromDate').value;
+  const toVal   = document.getElementById('perfToDate').value;
+  const rangeLabel = (fromVal||toVal) ? `${fromVal||'Start'} to ${toVal||'Today'}` : 'All Time';
+  const data = [
+    ['Standing Counsel Performance Report — PERFORMANCE_LOG'],
+    ['Date Range (Date Logged)', rangeLabel],
+    ['Total Entries', COUNSEL_PERF_ROWS.length],
+    [],
+    ['#','Date of Court Order','CNR / Case ID','Title of Case','Contesting Department','Standing Counsel','Judicial Forum','Next Hearing Date','Status / Proceedings','Remarks'],
+    ...COUNSEL_PERF_ROWS.map((r,i)=>[i+1, r.dateLogged instanceof Date ? r.dateLogged.toLocaleString('en-IN') : '', r.caseId, r.title, r.dept, r.counsel, r.forum, formatDDMMYYYY(r.orderDate), r.status, r.remarks])
+  ];
+  const ws=XLSX.utils.aoa_to_sheet(data);
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Standing Counsel Log');
+  XLSX.writeFile(wb,`DLO_Standing_Counsel_Performance_${new Date().toISOString().slice(0,10)}.xlsx`);
+}
+
+function downloadCounselPerfPDF() {
+  const fromVal = document.getElementById('perfFromDate').value;
+  const toVal   = document.getElementById('perfToDate').value;
+  const rangeLabel = (fromVal||toVal) ? `${fromVal?formatDate(new Date(fromVal+'T00:00:00')):'Start'} to ${toVal?formatDate(new Date(toVal+'T00:00:00')):'Today'}` : 'All Time';
+  const win=window.open('','_blank');
+  win.document.write(`<html><head><title>Standing Counsel Performance</title>
+  <style>body{font-family:Arial;font-size:10px;padding:20px}h2{color:#1B2A4A}p{color:#6B7280}table{width:100%;border-collapse:collapse}th{background:#1B2A4A;color:#fff;padding:6px;text-align:left;font-size:9px}td{padding:6px;border-bottom:1px solid #ddd;font-size:9px}tr:nth-child(even) td{background:#f9f6ef}@media print{button{display:none}}</style></head>
+  <body><h2>DLO Kupwara — Standing Counsel Performance (PERFORMANCE_LOG)</h2>
+  <p>Date Range: ${rangeLabel} &nbsp;|&nbsp; Total Entries: ${COUNSEL_PERF_ROWS.length} &nbsp;|&nbsp; Generated: ${new Date().toLocaleDateString('en-IN')}</p>
+  <button onclick="window.print()" style="margin-bottom:12px;padding:8px 16px;background:#1B2A4A;color:#fff;border:none;border-radius:4px;cursor:pointer">Print</button>
+  <table><thead><tr><th>#</th><th>Date of Court Order</th><th>CNR/Case ID</th><th>Title</th><th>Dept.</th><th>Standing Counsel</th><th>Forum</th><th>Next Hearing Date</th><th>Status/Proceedings</th><th>Remarks</th></tr></thead>
+  <tbody>${COUNSEL_PERF_ROWS.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dateLogged instanceof Date ? r.dateLogged.toLocaleString('en-IN') : ''}</td><td>${r.caseId||''}</td><td>${r.title||''}</td><td>${r.dept||''}</td><td>${r.counsel||''}</td><td>${r.forum||''}</td><td>${formatDDMMYYYY(r.orderDate)}</td><td>${r.status||''}</td><td>${r.remarks||''}</td></tr>`).join('')}</tbody></table>
+  </body></html>`);
+  win.document.close();
+}
+
+// ═══════════════════════════════════════════════
+//  SECTION B: CASE HISTORY — independent filter
+// ═══════════════════════════════════════════════
+function renderHistoryAttendanceStats() {
+  const fromVal = document.getElementById('histFromDate').value;
+  const toVal   = document.getElementById('histToDate').value;
+  const counselVal = document.getElementById('histCounselSelect').value;
+  const from = fromVal ? new Date(fromVal + 'T00:00:00') : null;
+  const to   = toVal   ? new Date(toVal   + 'T23:59:59') : null;
+
+  const rows = HISTORY_ROWS.filter(r => {
+    if (counselVal && r.counsel !== counselVal) return false;
+    if (from && !(r.entryDate instanceof Date && r.entryDate >= from)) return false;
+    if (to   && !(r.entryDate instanceof Date && r.entryDate <= to))   return false;
+    return true;
+  });
+
+  const total = rows.length;
+  const attended = rows.filter(r => r.attendance === 'Attended').length;
+  const notAttended = rows.filter(r => r.attendance === 'Not Attended').length;
+  const exparteCt = rows.filter(r => r.exparte === 'Ex-parte').length;
+  const disposedCt = rows.filter(r => r.caseStatus === 'Disposed/Dismissed').length;
+
+  const rangeText = (fromVal || toVal)
+    ? `${fromVal ? 'from ' + formatDate(new Date(fromVal + 'T00:00:00')) : ''}${(fromVal && toVal) ? ' ' : ''}${toVal ? 'to ' + formatDate(new Date(toVal + 'T00:00:00')) : ''}`
+    : 'all time';
+  document.getElementById('historyStatsSubtitle').textContent = `Case history entries ${counselVal ? 'for ' + counselVal : 'for all counsels'} — ${rangeText}`;
+
+  document.getElementById('histStatTotal').textContent = total;
+  document.getElementById('histStatAttended').textContent = attended;
+  document.getElementById('histStatNotAttended').textContent = notAttended;
+  document.getElementById('histStatExparte').textContent = exparteCt;
+  document.getElementById('histStatDisposed').textContent = disposedCt;
+
+  const canvas = document.getElementById('historyAttendanceChart');
+  if (historyAttendanceChartInst) historyAttendanceChartInst.destroy();
+  historyAttendanceChartInst = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: ['Attended', 'Not Attended'],
+      datasets: [{
+        data: [attended, notAttended],
+        backgroundColor: ['rgba(30,107,69,0.8)', 'rgba(139,26,26,0.8)'],
+        borderColor: ['#1E6B45', '#8B1A1A'],
+        borderWidth: 1,
+        borderRadius: 6
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+}
+
+function clearHistFilter() {
+  document.getElementById('histFromDate').value = '';
+  document.getElementById('histToDate').value = '';
+  document.getElementById('histCounselSelect').value = '';
+  renderHistoryAttendanceStats();
+}
+
+// ═══════════════════════════════════════════════
+//  SCROLL REVEAL (same as index.html)
+// ═══════════════════════════════════════════════
+function initReveal() {
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{ if(e.isIntersecting) setTimeout(()=>e.target.classList.add('visible'),i*80); });
+  },{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+async function init() {
+  initReveal();
+  const [perfOk, histOk] = await Promise.all([fetchPerformanceLog(), fetchHistoryLog()]);
+  if (perfOk) { populatePerfCounselDropdown(); renderCounselPerformance(); }
+  if (histOk) { populateHistCounselDropdown(); renderHistoryAttendanceStats(); }
+}
+init();
+</script>
+<script>
+// Adds a small "⇆ Swipe to see more" hint above tables that are wider
+// than the screen, so users know they can scroll them sideways. Hint
+// fades away the first time that particular table is actually scrolled.
+(function(){
+  function initScrollHints(){
+    var wraps = document.querySelectorAll(
+      '.results-table-scroll, .courts-table-wrap, div[style*="overflow-x:auto"], div[style*="overflow-x: auto"]'
+    );
+    wraps.forEach(function(wrap){
+      if (wrap.dataset.scrollHintInit) return;
+      wrap.dataset.scrollHintInit = '1';
+      function check(){
+        var needsScroll = wrap.scrollWidth > wrap.clientWidth + 4;
+        if (needsScroll && !wrap._scrollHintEl){
+          var hint = document.createElement('div');
+          hint.className = 'scroll-hint is-active';
+          hint.innerHTML = '<span>⇆</span><span>Swipe to see more</span>';
+          wrap.parentNode.insertBefore(hint, wrap);
+          wrap._scrollHintEl = hint;
+          wrap.addEventListener('scroll', function onScroll(){
+            hint.classList.add('is-hidden');
+            wrap.removeEventListener('scroll', onScroll);
+          }, {passive:true});
+        } else if (!needsScroll && wrap._scrollHintEl){
+          wrap._scrollHintEl.remove();
+          wrap._scrollHintEl = null;
+        }
+      }
+      check();
+      window.addEventListener('resize', check, {passive:true});
+      // Data in these tables often loads asynchronously after the
+      // page renders, so re-check shortly after load too.
+      setTimeout(check, 800);
+      setTimeout(check, 2000);
+    });
+  }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', initScrollHints);
+  } else {
+    initScrollHints();
+  }
+  // Re-scan periodically for the first few seconds to catch tables
+  // that are (re)built by app.js after fetching data from Supabase.
+  var scans = 0;
+  var scanTimer = setInterval(function(){
+    initScrollHints();
+    scans++;
+    if (scans > 8) clearInterval(scanTimer);
+  }, 1000);
+})();
+</script>
+
+</body>
+</html>

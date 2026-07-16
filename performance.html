@@ -168,7 +168,7 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
       </div>
     </div>
 
-    <div class="analytics-grid reveal" style="grid-template-columns:repeat(4,1fr);margin-bottom:0">
+    <div class="analytics-grid reveal" style="grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:14px; margin-bottom:0">
       <div class="analytics-card" style="text-align:center">
         <p style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)">Total Logged Entries</p>
         <span style="font-family:'Playfair Display',serif;font-size:34px;font-weight:700;color:var(--navy-mid)" id="perfSummaryTotal">—</span>
@@ -193,8 +193,16 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
         <p id="counselPerfSubtitle">Logged entries grouped by Standing Counsel — all time</p>
         <div style="overflow-x:auto">
           <table class="dept-table" id="counselPerfTable">
-            <thead><tr><th>#</th><th>Standing Counsel</th><th>Total Entries</th><th>Ex-parte</th><th>Disposed</th><th>Reply Filed</th></tr></thead>
-            <tbody id="counselPerfBody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">⏳ Loading...</td></tr></tbody>
+            <thead>
+    <tr>
+        <th>#</th>
+        <th style="text-align:left;">Standing Counsel</th>
+        <th style="text-align:center;">Total Entries</th>
+        <th style="text-align:center;">Ex-parte</th>
+        <th style="text-align:center;">Disposed</th>
+        <th style="text-align:center;">Reply Filed</th>
+    </tr>
+</thead>            <tbody id="counselPerfBody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">⏳ Loading...</td></tr></tbody>
           </table>
         </div>
       </div>

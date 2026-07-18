@@ -300,7 +300,7 @@ function todayISO() { return new Date().toISOString().slice(0, 10); }
 // ═══════════════════════════════════════════════
 //  AUTH SCREENS (Supabase Auth) — login, sign up, forgot/reset password
 // ═══════════════════════════════════════════════
-function renderLoginForm() {
+ffunction renderLoginForm() {
   document.getElementById('authHeading').textContent = 'Sign In';
   document.getElementById('authSubheading').textContent = 'Operator & Admin Access';
   document.getElementById('authBody').innerHTML = `
@@ -314,13 +314,18 @@ function renderLoginForm() {
       <label>Password</label>
       <input type="password" id="loginPassword" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
     </div>
+    
+    <!-- Cloudflare Turnstile Container -->
+    <div class="field" style="display: flex; justify-content: center; margin-bottom: 16px;">
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAD38NcE80jDBylNv"></div>
+    </div>
+
     <button class="btn-primary" id="loginBtn" onclick="login()">Sign In</button>
     <div class="auth-links">
       <a onclick="renderForgotPasswordForm()">Forgot password?</a>
       <a onclick="renderSignUpForm()">Create account</a>
     </div>`;
 }
-
 function renderSignUpForm() {
   document.getElementById('authHeading').textContent = 'Create Account';
   document.getElementById('authSubheading').textContent = 'Only pre-approved emails can sign in';

@@ -300,7 +300,7 @@ function todayISO() { return new Date().toISOString().slice(0, 10); }
 // ═══════════════════════════════════════════════
 //  AUTH SCREENS (Supabase Auth) — login, sign up, forgot/reset password
 // ═══════════════════════════════════════════════
-ffunction renderLoginForm() {
+function renderLoginForm() {
   document.getElementById('authHeading').textContent = 'Sign In';
   document.getElementById('authSubheading').textContent = 'Operator & Admin Access';
   document.getElementById('authBody').innerHTML = `

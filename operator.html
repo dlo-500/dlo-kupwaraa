@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline'; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co; script-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com 'unsafe-inline'; frame-src https://challenges.cloudflare.com;">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta name="robots" content="noindex, nofollow">
@@ -402,7 +402,16 @@ async function login() {
   if (!email || !password) { showAuthError('Please enter both email and password.'); return; }
 
   btn.disabled = true; btn.textContent = 'Signing in...';
-  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  // Updated code inside operator.html
+const token = await turnstile.getResponse(); // 1. Get the token from the widget
+
+await sb.auth.signInWithPassword({
+  email: email,
+  password: password,
+  options: { 
+    captchaToken: token // 2. Pass the token to Supabase
+  }
+});
   btn.disabled = false; btn.textContent = 'Sign In';
 
   if (error) { showAuthError('Invalid email or password.'); return; }

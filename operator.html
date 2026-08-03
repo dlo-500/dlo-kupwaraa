@@ -85,8 +85,19 @@ body{font-family:var(--font-body);background:
 .card.overdue .num{color:var(--seal-red-ink)}
 .overdue-badge{font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:4px 10px;border-radius:3px;background:rgba(161,58,46,0.1);color:var(--seal-red-ink);border:1.5px solid rgba(161,58,46,0.35);white-space:nowrap}
 .search-box{background:var(--surface);border-radius:4px;border:1px solid var(--line);padding:16px 18px;margin-bottom:26px;display:flex;gap:10px;flex-wrap:wrap}
-.search-box input{flex:1;min-width:220px;padding:10px 14px;border:1.5px solid var(--line);border-radius:5px;font-size:14px;font-family:var(--font-body);background:var(--paper)}
+.search-box input {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 5px;
+    color: var(--text) !important;            /* Adds visible text color (#1E293B) */
+    background-color: var(--paper) !important; /* Ensures readable light background */
+}
 .search-box input:focus{outline:none;border-color:var(--brass)}
+.search-box input::placeholder {
+    color: var(--muted) !important;
+}
 .search-box button{background:var(--ink);color:var(--white);border:1.5px solid var(--ink);padding:10px 20px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:background .15s}
 .search-box button:hover{background:var(--ink-3)}
 .btn-add-case{background:var(--seal-green-ink);border-color:var(--seal-green-ink)}

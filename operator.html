@@ -731,13 +731,12 @@ async function loadDashboard() {
   let exparteQuery = sb.from('case_diary').select('id', { count: 'exact', head: true }).eq('exparte_status', 'Ex-parte');
 
   if (!isAdmin && SESSION.courtName) {
-    // Operators only ever see their own court's cases. (This mirrors the
-    // RLS policy on the database — this client-side filter is just so the
-    // UI/counts feel instant; the real enforcement lives in Supabase.)
-    overdueQuery = overdueQuery.eq('court_name', SESSION.courtName);
-    causeQuery = causeQuery.eq('court_name', SESSION.courtName);
-    totalQuery = totalQuery.eq('court_name', SESSION.courtName);
-    exparteQuery = exparteQuery.eq('court_name', SESSION.courtName);
+    // Operators only ever see their own court's cases.
+    const courts = Array.isArray(SESSION.courtName) ? SESSION.courtName : [SESSION.courtName];
+    overdueQuery = overdueQuery.in('court_name', courts);
+    causeQuery   = causeQuery.in('court_name', courts);
+    totalQuery   = totalQuery.in('court_name', courts);
+    exparteQuery = exparteQuery.in('court_name', courts);
   } else if (isAdmin && ADMIN_COURT_FILTER) {
     // Admin has picked a specific court from the dropdown to inspect.
     overdueQuery = overdueQuery.eq('court_name', ADMIN_COURT_FILTER);

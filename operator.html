@@ -640,7 +640,8 @@ function enterDashboard() {
   document.getElementById('logoutBtn').classList.add('visible');
   const badge = document.getElementById('roleBadge');
   badge.style.display = 'inline-block';
-  badge.textContent = SESSION.courtName ? `${SESSION.role} · ${SESSION.courtName}` : SESSION.role;
+  const courtLabel = Array.isArray(SESSION.courtName) ? SESSION.courtName.join(', ') : SESSION.courtName;
+badge.textContent = courtLabel ? `${SESSION.role} · ${courtLabel}` : SESSION.role;
   if (SESSION.role === 'admin') {
     document.getElementById('addCaseBtn').style.display = 'inline-block';
     document.getElementById('activityLogBtn').style.display = 'inline-block';
@@ -841,7 +842,8 @@ async function runSearch() {
     .or(`case_title.ilike.%${q}%,cnr_case_no.ilike.%${q}%,department.ilike.%${q}%,court_name.ilike.%${q}%`)
     .limit(25);
   if (SESSION.role !== 'admin' && SESSION.courtName) {
-    searchQuery = searchQuery.eq('court_name', SESSION.courtName);
+    const courts = Array.isArray(SESSION.courtName) ? SESSION.courtName : [SESSION.courtName];
+    searchQuery = searchQuery.in('court_name', courts);
   }
   const { data, error } = await searchQuery;
 

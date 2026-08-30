@@ -1272,9 +1272,80 @@ async function removeApprovedEmail(email) {
 document.getElementById('updateOverlay').addEventListener('click', e => {
   if (e.target.id === 'updateOverlay') closeModal();
 });
+  // --- Recovery & Password Update Logic ---
+function renderNewPasswordForm() {
+  const card = document.querySelector('.auth-card') || document.querySelector('.card') || document.getElementById('authCard');
+  if (!card) return;
 
-renderLoginForm();
-checkExistingSession();
+  card.innerHTML = `
+    <div style="text-align: center; margin-bottom: 20px;">
+      <h2>Create New Password</h2>
+      <p style="color: #8fa0b5; font-size: 0.85rem;">ENTER YOUR NEW ACCESS CREDENTIALS</p>
+    </div>
+    
+    <form id="new-password-form" onsubmit="handleSetNewPassword(event)">
+      <div style="margin-bottom: 15px; text-align: left;">
+        <label style="font-size: 0.75rem; font-weight: bold; color: #8fa0b5; display: block; margin-bottom: 5px;">NEW PASSWORD</label>
+        <input type="password" id="new_pwd_input" minlength="8" required placeholder="Minimum 8 characters" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #2d3748; background: #eef2f6; color: #111;" />
+      </div>
+      <div style="margin-bottom: 20px; text-align: left;">
+        <label style="font-size: 0.75rem; font-weight: bold; color: #8fa0b5; display: block; margin-bottom: 5px;">CONFIRM PASSWORD</label>
+        <input type="password" id="confirm_pwd_input" minlength="8" required placeholder="Re-enter password" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #2d3748; background: #eef2f6; color: #111;" />
+      </div>
+      
+      <div class="error-msg" id="newPwdError" style="margin-bottom: 12px;"></div>
+
+      <button type="submit" id="newPwdBtn" class="btn-primary" style="width: 100%; padding: 12px;">Update Password</button>
+    </form>
+  `;
+}
+
+async function handleSetNewPassword(e) {
+  e.preventDefault();
+  const pwd = document.getElementById('new_pwd_input').value;
+  const confirmPwd = document.getElementById('confirm_pwd_input').value;
+  const errEl = document.getElementById('newPwdError');
+  const btn = document.getElementById('newPwdBtn');
+
+  errEl.classList.remove('show');
+
+  if (pwd !== confirmPwd) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Updating...';
+
+  const { error } = await sb.auth.updateUser({ password: pwd });
+
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Update Password';
+    errEl.textContent = error.message;
+    errEl.classList.add('show');
+  } else {
+    showToast('Password updated successfully! Redirecting...');
+    setTimeout(async () => {
+      await sb.auth.signOut();
+      window.location.href = 'operator.html';
+    }, 1800);
+  }
+}
+
+// Listen for the password recovery redirect event
+sb.auth.onAuthStateChange(async (event) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    renderNewPasswordForm();
+  }
+});
+if (window.location.hash && window.location.hash.includes('type=recovery')) {
+  renderNewPasswordForm();
+} else {
+  renderLoginForm();
+  checkExistingSession();
+}
 </script>
 </body>
 </html>

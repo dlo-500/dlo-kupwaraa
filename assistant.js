@@ -356,7 +356,60 @@
   });
 
   // ─── 5. HIGH-ACCURACY NLP QUERY PROCESSOR (300+ PERMUTATIONS) ─────────────
-  function processUserText(text) {
+  function processUserText(text) 
+  // ── Check for Case Search (Names, Numbers, CNR, or "next date") ────────
+    const isSearchIntent = q.includes("next date") || q.includes("case of") || q.includes("hearing of") || q.includes("jkkw") || q.includes(" vs ") || q.includes(" v/s ") || words.length <= 4;
+    
+    // Ignore pure menu or generic keyword queries
+    const isGenericKeyword = ["active", "total", "stats", "office", "login", "sop", "contempt", "ex-parte", "departments"].some(k => q === k);
+
+    if (isSearchIntent && !isGenericKeyword) {
+      const searchData = searchCases(text);
+
+      if (searchData && searchData.results.length > 0) {
+        const count = searchData.results.length;
+        let reply = `🔍 Found ${count} matching case(s) for "${searchData.query}"`;
+        if (searchData.courtFiltered) reply += ` in ${searchData.courtFiltered}`:
+        reply += `:\n\n`;
+
+        searchData.results.slice(0, 4).forEach((item, idx) => {
+          const num = item.case_number || item.cnr || "Case";
+          const title = item.title || item.case_title || "State Matter";
+          const court = item.court || "Judicial Forum Kupwara";
+          const date = item.hearing_date || item.next_date || "Date Awaited";
+          const status = item.status || "Active";
+
+          reply += `${idx + 1}. ${title}\n` +
+                   `   • Case No: ${num}\n` +
+                   `   • Court: ${court}\n` +
+                   `   • Next Hearing: 📅 ${date}\n` +
+                   `   • Status: ${status}\n\n`;
+        });
+
+        if (count > 4) {
+          reply += `...and ${count - 4} more matching cases found.`;
+        }
+
+        return {
+          customReply: reply.trim(),
+          customLink: { url: "search-filter-cases.html", text: "Open Full Case Filter" },
+          customOptions: [
+            { label: "🔍 Search Another Case", next: "start" },
+            { label: "« Main Menu", next: "start" }
+          ]
+        };
+      } else if (searchData && searchTokens.length > 0) {
+        return {
+          customReply: `🔍 No records found matching "${searchData.query}"${searchData.courtFiltered ? ` in ${searchData.courtFiltered}` : ""}.\n\nSuggestions:\n• Verify the spelling of the party's name.\n• Search using the CNR / Case number (e.g. JKKW02...).\n• Or use the full portal filter.`,
+          customLink: { url: "search-filter-cases.html", text: "Search in Full Registry" },
+          customOptions: [
+            { label: "📅 View Today's Cause List", next: "choose_court" },
+            { label: "« Main Menu", next: "start" }
+          ]
+        };
+      }
+    }
+  {
     const q = text.toLowerCase().trim().replace(/[?!.,;]/g, " ");
     const words = q.split(/\s+/);
 

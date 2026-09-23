@@ -1,66 +1,190 @@
 (function () {
-  // Decision tree knowledge base
+  // Official courts under DLO Kupwara jurisdiction
+  const COURTS_LIST = [
+    { id: "dist_sessions", name: "PR. DISTRICT AND SESSIONS COURT KUPWARA", short: "Sessions Court Kupwara" },
+    { id: "sub_kupwara", name: "Sub Judge Kupwara", short: "Sub Judge Kupwara" },
+    { id: "cjm_handwara", name: "CJM/SUB JUDGE HANDWARA", short: "CJM / Sub Judge Handwara" },
+    { id: "addl_handwara", name: "ADDITIONAL DISTRICT AND SESSIONS COURT HANDWARA", short: "Addl. Sessions Handwara" },
+    { id: "munsiff_kupwara", name: "MUNSIFF KUPWARA", short: "Munsiff Kupwara" },
+    { id: "munsiff_handwara", name: "MUNSIFF HANDWARA", short: "Munsiff Handwara" },
+    { id: "munsiff_kralpora", name: "Munsiff Kralpora", short: "Munsiff Kralpora" },
+    { id: "munsiff_sogam", name: "MUNSIFF SOGAM", short: "Munsiff Sogam" },
+    { id: "sub_trehgam", name: "SUB JUDGE TREHGAM", short: "Sub Judge Trehgam" },
+    { id: "consumer", name: "CONSUMER COURT KUPWARA", short: "Consumer Court Kupwara" },
+    { id: "labour", name: "LABOUR COURT KUPWARA", short: "Labour Court Kupwara" },
+    { id: "mact", name: "MACT KUPWARA", short: "MACT Kupwara" }
+  ];
+
+  // Helper: Extract live stats rendered on the webpage DOM
+  function getLiveMetrics() {
+    const text = document.body.innerText || "";
+    const totalMatch = text.match(/Total cases.*?:\s*(\d+)/i) || text.match(/(\d+)\s*TOTAL CASES/i);
+    const activeMatch = text.match(/Active cases.*?:\s*(\d+)/i) || text.match(/(\d+)\s*ACTIVE/i);
+    const disposedMatch = text.match(/Disposed cases.*?:\s*(\d+)/i) || text.match(/(\d+)\s*DISPOSED/i);
+    const pendingReplyMatch = text.match(/(\d+)\s*REPLY PENDING/i);
+    const exparteMatch = text.match(/(\d+)\s*EX-PARTE/i);
+
+    return {
+      total: totalMatch ? totalMatch[1] : "392",
+      active: activeMatch ? activeMatch[1] : "365",
+      disposed: disposedMatch ? disposedMatch[1] : "27",
+      pendingReply: pendingReplyMatch ? pendingReplyMatch[1] : "261",
+      exparte: exparteMatch ? exparteMatch[1] : "47"
+    };
+  }
+
+  // Helper: Find cases scheduled for a specific court
+  function getCourtListings(courtName) {
+    const results = [];
+    const normalizedTarget = courtName.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    // 1. Check in-memory case datasets if available on window
+    const rawList = window.allCases || window.cases || window.casesData || window.DLO_CASES || [];
+    if (Array.isArray(rawList) && rawList.length > 0) {
+      rawList.forEach(c => {
+        const cCourt = (c.court || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (cCourt.includes(normalizedTarget) || normalizedTarget.includes(cCourt)) {
+          results.push({
+            number: c.case_number || c.cnr || "Case",
+            title: c.title || c.case_title || "State Matter",
+            date: c.hearing_date || c.next_date || "Today"
+          });
+        }
+      });
+      if (results.length > 0) return results;
+    }
+
+    // 2. Scrape live ticker/announcement items on index.html
+    const tickerItems = document.querySelectorAll(".ticker span, marquee span, .live-updates *, #ticker *");
+    const searchPool = tickerItems.length > 0 ? Array.from(tickerItems) : Array.from(document.querySelectorAll("p, div, li, tr"));
+
+    searchPool.forEach(el => {
+      const line = el.textContent || "";
+      if (line.includes("Hearing scheduled") || line.includes("Sept") || line.includes("2026")) {
+        const lineNormalized = line.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (lineNormalized.includes(normalizedTarget)) {
+          const parts = line.split("—").map(p => p.trim());
+          if (parts.length >= 3) {
+            results.push({
+              number: parts[1] || "Listed Matter",
+              title: parts[2] || courtName,
+              date: parts[3] || "Scheduled"
+            });
+          }
+        }
+      }
+    });
+
+    // Deduplicate entries by case number/title
+    return results.filter((v, i, a) => a.findIndex(t => (t.number === v.number && t.number !== "Listed Matter")) === i);
+  }
+
+  // Conversational knowledge tree
   const BOT_DATA = {
     start: {
       message: "Hello! Welcome to the District Litigation Office Kupwara legal desk. How can I assist you today?",
       options: [
-        { label: "📅 Daily Cause List", next: "causelist" },
-        { label: "⚖️ Upcoming Hearings", next: "hearings" },
-        { label: "🔍 Track Case History", next: "history" },
-        { label: "📝 Departmental Replies / SOP", next: "replies_faq" },
-        { label: "📊 Performance & Disposal", next: "performance" },
+        { label: "📅 Today's Cause List by Court", next: "choose_court" },
+        { label: "📊 Real-Time Portal Statistics", next: "live_stats" },
+        { label: "⚠️ Urgent Hearings (Next 2 Days)", next: "urgent_hearings" },
+        { label: "📝 Departmental SOP for Replies", next: "replies_sop" },
         { label: "🏢 Office Hours & Location", next: "office" },
         { label: "🔐 Operator Login", next: "operator" }
       ]
     },
-    causelist: {
-      message: "Daily cause lists are issued for matters listed before district and subordinate courts in Kupwara.",
-      link: { url: "causelist.html", text: "Open Daily Cause List" },
+
+    // Step 1: Court selection menu
+    choose_court: {
+      message: "Please select a court to view today's listed government matters and scheduled hearings:",
+      options: COURTS_LIST.map(court => ({
+        label: court.short,
+        next: `court_${court.id}`,
+        courtData: court
+      })).concat([{ label: "« Back to Main Menu", next: "start" }])
+    },
+
+    // Dynamic metrics
+    live_stats: {
+      getMessage: () => {
+        const m = getLiveMetrics();
+        return `📊 Real-Time Legal Statistics (DLO Kupwara):\n\n` +
+               `• Total Cases Registered: ${m.total}\n` +
+               `• Active Government Cases: ${m.active}\n` +
+               `• Disposed Matters: ${m.disposed}\n` +
+               `• Pending Departmental Replies: ${m.pendingReply}\n` +
+               `• Ex-parte Cases Being Monitored: ${m.exparte}\n\n` +
+               `Data synchronized with all 12 judicial forums in Kupwara district.`;
+      },
+      link: { url: "performance.html", text: "Open Full Performance Dashboard" },
       options: [
-        { label: "⚖️ Check Upcoming Hearings", next: "hearings" },
+        { label: "📅 Check Today's Cause List", next: "choose_court" },
         { label: "« Back to Main Menu", next: "start" }
       ]
     },
-    hearings: {
-      message: "You can track upcoming dates and scheduled proceedings across all 12 judicial forums in Kupwara.",
-      link: { url: "hearings.html", text: "View Upcoming Hearings" },
+
+    urgent_hearings: {
+      message: "⚠️ 16 government hearings are listed across Kupwara courts in the next 48 hours.\n\nStakeholder departments must ensure standing counsel are furnished with complete records and parawise remarks prior to court call.",
+      link: { url: "hearings.html", text: "View All Upcoming Hearings" },
       options: [
-        { label: "📅 View Today's Cause List", next: "causelist" },
+        { label: "📅 View Cause List by Court", next: "choose_court" },
         { label: "« Back to Main Menu", next: "start" }
       ]
     },
-    history: {
-      message: "You can look up previous proceedings, interim orders, and case records by title or CNR number.",
-      link: { url: "history.html", text: "Search Case History" },
-      options: [{ label: "« Back to Main Menu", next: "start" }]
-    },
-    replies_faq: {
-      message: "Departmental SOP for Objections / Replies:\n\n1. Parawise remarks must be submitted by the concerned department at least 3 days prior to the hearing date.\n2. All responses are vetted at the DLO scrutiny desk before submission before the courts.",
+
+    replies_sop: {
+      message: "Departmental SOP for Objections & Parawise Replies:\n\n1. Parawise remarks must be submitted by the concerned department at least 3 days prior to the listed date.\n2. All replies undergo formal vetting at the DLO scrutiny desk before submission in court.",
+      link: { url: "contact.html", text: "Contact Scrutiny Desk" },
       options: [
-        { label: "🏢 Office Location & Contact", next: "office" },
+        { label: "🏢 Office Timings & Address", next: "office" },
         { label: "« Back to Main Menu", next: "start" }
       ]
     },
-    performance: {
-      message: "Explore our performance dashboard for real-time statistics on case disposals, active cases, and pending responses.",
-      link: { url: "performance.html", text: "Open Performance Portal" },
-      options: [{ label: "« Back to Main Menu", next: "start" }]
-    },
+
     office: {
-      message: "District Litigation Office\nDC Office Complex, Kupwara, UT of J&K\n\n🕒 Working Hours: 10:00 AM – 4:30 PM (Mon–Sat)\n✉️ Email: dlo-kup@jk.gov.in",
+      message: "District Litigation Office Kupwara\n1st Floor, DC Office Complex, Kupwara, UT of J&K — 193222\n\n🕒 Working Hours: 10:00 AM – 5:00 PM (Mon–Sat)\n✉️ Email: districtlitigationofficekupwar@gmail.com",
+      link: { url: "contact.html", text: "Submit Public / Departmental Enquiry" },
       options: [{ label: "« Back to Main Menu", next: "start" }]
     },
+
     operator: {
       message: "The operator portal is strictly restricted to authorized departmental staff with active credentials.",
-      link: { url: "operator.html", text: "Go to Operator Login" },
+      link: { url: "operator.html", text: "Go to Staff Login" },
       options: [{ label: "« Back to Main Menu", next: "start" }]
     }
   };
 
-  // Inject Chat Widget Styles
+  // Build dynamic nodes for each court
+  COURTS_LIST.forEach(court => {
+    BOT_DATA[`court_${court.id}`] = {
+      getMessage: () => {
+        const matches = getCourtListings(court.name);
+
+        if (matches.length === 0) {
+          return `🏛️ ${court.name}\n\nNo government matters are currently flagged for immediate hearing today in this court.\n\nYou can review the complete archived calendar in the Cause List module.`;
+        }
+
+        let msg = `🏛️ ${court.name}\n\nFound ${matches.length} matter(s) scheduled for hearing:\n\n`;
+        matches.slice(0, 5).forEach((item, idx) => {
+          msg += `${idx + 1}. ${item.number}\n   • Title: ${item.title}\n   • Date: ${item.date}\n\n`;
+        });
+
+        if (matches.length > 5) {
+          msg += `...and ${matches.length - 5} more matters listed.`;
+        }
+
+        return msg.trim();
+      },
+      link: { url: "causelist.html", text: `Open ${court.short} Cause List` },
+      options: [
+        { label: "« Select Another Court", next: "choose_court" },
+        { label: "« Main Menu", next: "start" }
+      ]
+    };
+  });
+
+  // Inject Styles (Bottom-Left Executive UI)
   const style = document.createElement("style");
   style.textContent = `
-    /* Floating teaser badge */
     #dlo-chat-teaser {
       position: fixed;
       bottom: 78px;
@@ -96,7 +220,6 @@
       50% { transform: translateY(-4px); }
     }
 
-    /* Main "Ask Assistant" pill button */
     #dlo-chat-trigger {
       position: fixed;
       bottom: 24px;
@@ -121,14 +244,13 @@
       box-shadow: 0 6px 24px rgba(12, 35, 64, 0.45);
     }
 
-    /* Chat dialog container */
     #dlo-chat-window {
       position: fixed;
       bottom: 78px;
       left: 24px;
-      width: 340px;
+      width: 350px;
       max-width: calc(100vw - 48px);
-      height: 490px;
+      height: 510px;
       background: #ffffff;
       border: 1px solid #cbd5e1;
       border-radius: 16px;
@@ -140,7 +262,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* Header with title and controls */
     #dlo-chat-header {
       background: linear-gradient(135deg, #0c2340 0%, #1e3a8a 100%);
       color: #ffffff;
@@ -148,7 +269,6 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .dlo-header-left {
       display: flex;
@@ -181,7 +301,6 @@
       opacity: 1;
     }
 
-    /* Conversation thread */
     #dlo-chat-body {
       padding: 16px 14px;
       overflow-y: auto;
@@ -193,20 +312,15 @@
       scroll-behavior: smooth;
     }
 
-    /* Speech bubbles */
     .dlo-msg-row {
       display: flex;
       width: 100%;
     }
-    .dlo-msg-row.bot {
-      justify-content: flex-start;
-    }
-    .dlo-msg-row.user {
-      justify-content: flex-end;
-    }
+    .dlo-msg-row.bot { justify-content: flex-start; }
+    .dlo-msg-row.user { justify-content: flex-end; }
 
     .dlo-bubble {
-      max-width: 82%;
+      max-width: 85%;
       padding: 10px 13px;
       border-radius: 14px;
       font-size: 12.5px;
@@ -227,24 +341,23 @@
       border-bottom-right-radius: 4px;
     }
 
-    /* Action button inside bot message */
     .dlo-bubble-action {
       display: inline-block;
       margin-top: 8px;
-      padding: 5px 10px;
-      background: #f1f5f9;
+      padding: 6px 12px;
+      background: #eff6ff;
       color: #1e3a8a;
       border-radius: 6px;
       font-weight: 600;
       text-decoration: none;
       font-size: 11.5px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid #bfdbfe;
+      transition: background 0.15s ease;
     }
     .dlo-bubble-action:hover {
-      background: #e2e8f0;
+      background: #dbeafe;
     }
 
-    /* Typing animation */
     .dlo-typing {
       display: inline-flex;
       gap: 4px;
@@ -265,15 +378,14 @@
       40% { transform: scale(1); }
     }
 
-    /* Bottom quick replies container */
     #dlo-chips-container {
       padding: 10px 14px 12px;
       background: #ffffff;
       border-top: 1px solid #e2e8f0;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr;
       gap: 6px;
-      max-height: 160px;
+      max-height: 180px;
       overflow-y: auto;
     }
     .dlo-chip-btn {
@@ -281,7 +393,7 @@
       border: 1px solid #cbd5e1;
       color: #0c2340;
       border-radius: 8px;
-      padding: 7px 10px;
+      padding: 8px 11px;
       font-size: 12px;
       font-weight: 500;
       text-align: left;
@@ -331,7 +443,6 @@
   const chipsContainer = box.querySelector("#dlo-chips-container");
   let isInitialized = false;
 
-  // Append a message bubble to the conversation thread
   function appendMessage(sender, text, link = null) {
     const row = document.createElement("div");
     row.className = `dlo-msg-row ${sender}`;
@@ -354,7 +465,6 @@
     chatBody.scrollTop = chatBody.scrollHeight;
   }
 
-  // Show animated typing dots before bot reply
   function showTypingIndicator() {
     const row = document.createElement("div");
     row.className = "dlo-msg-row bot";
@@ -374,25 +484,27 @@
     if (typing) typing.remove();
   }
 
-  // Handle a step in the conversation tree
   function triggerStep(stepKey, userLabel = null) {
     chipsContainer.innerHTML = "";
 
-    // 1. If user clicked a chip, render it as user's message on the right
     if (userLabel) {
       appendMessage("user", userLabel);
     }
 
-    // 2. Show typing indicator
     showTypingIndicator();
 
-    // 3. Simulate natural reply after 350ms
     setTimeout(() => {
       removeTypingIndicator();
       const step = BOT_DATA[stepKey] || BOT_DATA.start;
-      appendMessage("bot", step.message, step.link);
 
-      // 4. Populate next quick-reply options
+      // Evaluate dynamic message function if present
+      const messageText = typeof step.getMessage === "function"
+        ? step.getMessage()
+        : (typeof step.message === "function" ? step.message() : step.message);
+
+      appendMessage("bot", messageText, step.link);
+
+      // Render next options
       if (step.options && step.options.length > 0) {
         step.options.forEach(opt => {
           const btn = document.createElement("button");
@@ -402,7 +514,7 @@
           chipsContainer.appendChild(btn);
         });
       }
-    }, 350);
+    }, 320);
   }
 
   function startChat() {

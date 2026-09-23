@@ -398,75 +398,101 @@
   function searchRegistryCases(rawQuery) {
     var q = normalize(rawQuery);
 
-    // Strip noise phrases to isolate the name, keywords, or case number
     var clean = q
       .replace(/\b(next\s*date\s*of|hearing\s*date\s*of|date\s*of\s*the\s*case|next\s*hearing\s*of|when\s*is\s*the\s*hearing\s*of|next\s*date|hearing\s*date|when\s*is|case\s*status\s*of|status\s*of\s*the\s*case|case\s*of|case\s*details|hearing\s*details|versus|vs|v\/s)\b/g, " ")
       .replace(/\b(the|of|for|in|court|matter|case|and|at|on|scheduled)\b/g, " ")
       .replace(/\s+/g, " ")
       .trim();
 
-    if (!clean || clean.length < 5) {
+    if (!clean || clean.length < 3) {
       return { tooShort: true, query: clean };
     }
 
-    var pool = [];
-    var rawList = window.allCases || window.cases || window.casesData || window.DLO_CASES || window.ALL_ROWS || [];
+    var matches = [];
 
-    if (Array.isArray(rawList) && rawList.length > 0) {
-      pool = rawList;
-    } else {
-      // Scrape dynamically from the master table (#live-data)
-      var rows = document.querySelectorAll("#live-data table tbody tr, table tbody tr");
-      for (var i = 0; i < rows.length; i++) {
-        var cols = Array.prototype.map.call(rows[i].querySelectorAll("td"), function (td) {
-          return td.innerText.trim();
+    // 1. Search the page text directly (Overdue cases cards, ticker, lists)
+    var pageText = (document.body && document.body.innerText) || "";
+    var casePattern = /(?:([A-Z0-9—\-\/]+)\s*—\s*)?["']?([^"\n|]+?Vs[^"\n|]+?|[^"\n|]+?V\/s[^"\n|]+?|[^"\n|]+?v\/s[^"\n|]+?)["']?\s+([^|\n]+?)\s*\|\s*(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})[^\n]*\s*(Active|Disposed|Pending)?/gi;
+    
+    var match;
+    while ((match = casePattern.exec(pageText)) !== null) {
+      var cNo = (match[1] || "").replace(/—/g, "").trim();
+      var cTitle = (match[2] || "").trim();
+      var cCourt = (match[3] || "").trim();
+      var cDate = (match[4] || "").trim();
+
+      var fullLine = (cNo + " " + cTitle + " " + cCourt).toLowerCase();
+      if (fullLine.indexOf(clean) !== -1) {
+        matches.push({
+          case_number: cNo,
+          title: cTitle,
+          court: cCourt,
+          hearing_date: cDate,
+          dept: "Monitored Department",
+          reply_status: "Active Matter"
         });
-        // Table columns: [# , Case No, Title, Subject, Dept, Court, Last Proc, Next Hearing, Reply Status, Case Status, Type, Standing Counsel, Ex-parte]
-        if (cols.length >= 9 && cols[2] && (cols[2].indexOf("Vs") !== -1 || cols[2].indexOf("V/S") !== -1 || cols[2].indexOf("v/s") !== -1 || cols[2].indexOf("V/s") !== -1 || cols[2].indexOf("vs") !== -1)) {
-          pool.push({
+      }
+    }
+
+    // 2. Programmatically click 'View All Cases' if the table is still empty
+    var viewAllBtn = Array.prototype.slice.call(document.querySelectorAll("button, a")).find(function(el) {
+      return el.textContent && el.textContent.indexOf("View All Cases") !== -1;
+    });
+
+    var tableRows = document.querySelectorAll("#live-data table tbody tr, table tbody tr");
+    if (tableRows.length <= 1 && viewAllBtn) {
+      viewAllBtn.click();
+      tableRows = document.querySelectorAll("#live-data table tbody tr, table tbody tr");
+    }
+
+    // Scrape rendered table rows
+    for (var i = 0; i < tableRows.length; i++) {
+      var cols = Array.prototype.map.call(tableRows[i].querySelectorAll("td"), function (td) {
+        return td.innerText.trim();
+      });
+      if (cols.length >= 8 && cols[2] && (cols[2].indexOf("Vs") !== -1 || cols[2].indexOf("V/s") !== -1 || cols[2].indexOf("v/s") !== -1)) {
+        var rowText = cols.join(" ").toLowerCase();
+        if (rowText.indexOf(clean) !== -1) {
+          matches.push({
             case_number: cols[1] && cols[1] !== "—" ? cols[1] : "",
             title: cols[2],
             dept: cols[4] || "Stakeholder Dept",
             court: cols[5] || "Judicial Forum Kupwara",
             hearing_date: cols[7] || "Date Awaited",
-            reply_status: cols[8] || "Not Specified",
-            status: cols[9] || "Active"
+            reply_status: cols[8] || "Not Specified"
           });
         }
       }
     }
 
-    if (!pool.length) return { noData: true, query: clean };
-
-    var tokens = clean.split(" ").filter(function (t) { return t.length >= 2; });
-
-    var matches = pool.filter(function (c) {
-      var title = normalize(c.title || c.case_title || c.caseTitle || "");
-      var cnr = normalize(c.case_number || c.cnr || c.caseNo || "");
-      var dept = normalize(c.dept || c.department || "");
-      var full = title + " " + cnr + " " + dept;
-
-      // If single token (e.g. "yaqoo"), substring matching
-      if (tokens.length === 1) {
-        return full.indexOf(tokens[0]) !== -1;
-      }
-      // If multi-token (e.g. "yaqoob khan"), all tokens must match
-      return tokens.every(function (tok) {
-        return full.indexOf(tok) !== -1;
+    // 3. Check in-memory global array if available
+    var rawList = window.allCases || window.cases || window.casesData || window.DLO_CASES || window.ALL_ROWS || [];
+    if (Array.isArray(rawList) && rawList.length > 0) {
+      rawList.forEach(function (c) {
+        var full = ((c.title || c.case_title || "") + " " + (c.case_number || c.cnr || "") + " " + (c.dept || "")).toLowerCase();
+        if (full.indexOf(clean) !== -1) {
+          matches.push({
+            case_number: c.case_number || c.cnr || "",
+            title: c.title || c.case_title || "State Matter",
+            dept: c.dept || c.department || "Stakeholder Dept",
+            court: c.court || "Judicial Forum Kupwara",
+            hearing_date: c.hearing_date || c.next_hearing || c.nextHearing || c.next_date || "Date Awaited",
+            reply_status: c.reply_status || "Not Specified"
+          });
+        }
       });
-    });
+    }
 
-    // Deduplicate by title + case number
-    var uniqueMatches = matches.filter(function (v, i, a) {
-      var vKey = (v.title || "") + "|" + (v.case_number || "");
-      return a.findIndex(function (t) {
-        return ((t.title || "") + "|" + (t.case_number || "")) === vKey;
-      }) === i;
+    // Deduplicate by title
+    var unique = matches.filter(function (v, idx, arr) {
+      return arr.findIndex(function (t) {
+        return (t.title.toLowerCase() === v.title.toLowerCase());
+      }) === idx;
     });
 
     return {
       query: clean,
-      results: uniqueMatches
+      results: unique
     };
   }
 

@@ -395,6 +395,70 @@
   }
 
   // ─── 3B. CASE SEARCH ENGINE (BY LITIGANT NAME, CNR, OR KEYWORDS) ─────────
+  // ─── DIRECT CASE SEARCH ENGINE (NO DOM CLICKS, AUTO-EXTRACTS MASTER DATA) ──
+  var _MASTER_CASES_CACHE = null;
+
+  function getMasterRegistry() {
+    if (_MASTER_CASES_CACHE && _MASTER_CASES_CACHE.length > 0) {
+      return _MASTER_CASES_CACHE;
+    }
+
+    // 1. Check window globals
+    var candidates = [window.allCases, window.cases, window.casesData, window.DLO_CASES, window.ALL_ROWS, window.masterCases];
+    for (var i = 0; i < candidates.length; i++) {
+      if (Array.isArray(candidates[i]) && candidates[i].length > 10) {
+        _MASTER_CASES_CACHE = candidates[i];
+        return _MASTER_CASES_CACHE;
+      }
+    }
+
+    // 2. Direct extraction from <script> tags in index.html
+    var scripts = document.querySelectorAll("script");
+    for (var s = 0; s < scripts.length; s++) {
+      var code = scripts[s].textContent || "";
+      var pos = code.indexOf("JKKW020002862014"); // Arsha Begum's CNR landmark
+      if (pos !== -1) {
+        var startBracket = code.lastIndexOf("[", pos);
+        var endBracket = code.indexOf("];", pos);
+        if (startBracket !== -1 && endBracket !== -1) {
+          try {
+            var extracted = (new Function("return " + code.substring(startBracket, endBracket + 1)))();
+            if (Array.isArray(extracted) && extracted.length > 0) {
+              _MASTER_CASES_CACHE = extracted;
+              window.allCases = extracted;
+              return _MASTER_CASES_CACHE;
+            }
+          } catch (e) {}
+        }
+      }
+    }
+
+    // 3. Direct table scraper (Reads all rows without clicking any buttons)
+    var tableRows = document.querySelectorAll("table tbody tr, tr");
+    var domPool = [];
+    for (var r = 0; r < tableRows.length; r++) {
+      var cols = Array.prototype.map.call(tableRows[r].querySelectorAll("td"), function (td) {
+        return td.innerText.trim();
+      });
+      if (cols.length >= 8 && cols[2] && (cols[2].indexOf("Vs") !== -1 || cols[2].indexOf("V/s") !== -1 || cols[2].indexOf("v/s") !== -1)) {
+        domPool.push({
+          case_number: cols[1] && cols[1] !== "—" ? cols[1] : "",
+          title: cols[2],
+          dept: cols[4] || "Stakeholder Dept",
+          court: cols[5] || "Judicial Forum Kupwara",
+          hearing_date: cols[7] || "—",
+          reply_status: cols[8] || "Not Specified"
+        });
+      }
+    }
+
+    if (domPool.length > 0) {
+      return domPool;
+    }
+
+    return [];
+  }
+
   function searchRegistryCases(rawQuery) {
     var q = normalize(rawQuery);
 
@@ -404,89 +468,36 @@
       .replace(/\s+/g, " ")
       .trim();
 
+    // Support short names (Mir, Dar, Shah, Lone, Arsha)
     if (!clean || clean.length < 3) {
       return { tooShort: true, query: clean };
     }
 
-    var matches = [];
-
-    // 1. Search the page text directly (Overdue cases cards, ticker, lists)
-    var pageText = (document.body && document.body.innerText) || "";
-    var casePattern = /(?:([A-Z0-9—\-\/]+)\s*—\s*)?["']?([^"\n|]+?Vs[^"\n|]+?|[^"\n|]+?V\/s[^"\n|]+?|[^"\n|]+?v\/s[^"\n|]+?)["']?\s+([^|\n]+?)\s*\|\s*(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4})[^\n]*\s*(Active|Disposed|Pending)?/gi;
-    
-    var match;
-    while ((match = casePattern.exec(pageText)) !== null) {
-      var cNo = (match[1] || "").replace(/—/g, "").trim();
-      var cTitle = (match[2] || "").trim();
-      var cCourt = (match[3] || "").trim();
-      var cDate = (match[4] || "").trim();
-
-      var fullLine = (cNo + " " + cTitle + " " + cCourt).toLowerCase();
-      if (fullLine.indexOf(clean) !== -1) {
-        matches.push({
-          case_number: cNo,
-          title: cTitle,
-          court: cCourt,
-          hearing_date: cDate,
-          dept: "Monitored Department",
-          reply_status: "Active Matter"
-        });
-      }
+    var pool = getMasterRegistry();
+    if (!pool || !pool.length) {
+      return { noData: true, query: clean };
     }
 
-    // 2. Programmatically click 'View All Cases' if the table is still empty
-    var viewAllBtn = Array.prototype.slice.call(document.querySelectorAll("button, a")).find(function(el) {
-      return el.textContent && el.textContent.indexOf("View All Cases") !== -1;
+    var tokens = clean.split(" ").filter(function (t) { return t.length >= 2; });
+
+    var matches = pool.filter(function (c) {
+      var title = normalize(c.title || c.case_title || c.caseTitle || "");
+      var cnr = normalize(c.case_number || c.case_no || c.caseNo || c.cnr || "");
+      var dept = normalize(c.dept || c.department || "");
+      var full = title + " " + cnr + " " + dept;
+
+      if (tokens.length === 1) {
+        return full.indexOf(tokens[0]) !== -1;
+      }
+      return tokens.every(function (tok) {
+        return full.indexOf(tok) !== -1;
+      });
     });
 
-    var tableRows = document.querySelectorAll("#live-data table tbody tr, table tbody tr");
-    if (tableRows.length <= 1 && viewAllBtn) {
-      viewAllBtn.click();
-      tableRows = document.querySelectorAll("#live-data table tbody tr, table tbody tr");
-    }
-
-    // Scrape rendered table rows
-    for (var i = 0; i < tableRows.length; i++) {
-      var cols = Array.prototype.map.call(tableRows[i].querySelectorAll("td"), function (td) {
-        return td.innerText.trim();
-      });
-      if (cols.length >= 8 && cols[2] && (cols[2].indexOf("Vs") !== -1 || cols[2].indexOf("V/s") !== -1 || cols[2].indexOf("v/s") !== -1)) {
-        var rowText = cols.join(" ").toLowerCase();
-        if (rowText.indexOf(clean) !== -1) {
-          matches.push({
-            case_number: cols[1] && cols[1] !== "—" ? cols[1] : "",
-            title: cols[2],
-            dept: cols[4] || "Stakeholder Dept",
-            court: cols[5] || "Judicial Forum Kupwara",
-            hearing_date: cols[7] || "Date Awaited",
-            reply_status: cols[8] || "Not Specified"
-          });
-        }
-      }
-    }
-
-    // 3. Check in-memory global array if available
-    var rawList = window.allCases || window.cases || window.casesData || window.DLO_CASES || window.ALL_ROWS || [];
-    if (Array.isArray(rawList) && rawList.length > 0) {
-      rawList.forEach(function (c) {
-        var full = ((c.title || c.case_title || "") + " " + (c.case_number || c.cnr || "") + " " + (c.dept || "")).toLowerCase();
-        if (full.indexOf(clean) !== -1) {
-          matches.push({
-            case_number: c.case_number || c.cnr || "",
-            title: c.title || c.case_title || "State Matter",
-            dept: c.dept || c.department || "Stakeholder Dept",
-            court: c.court || "Judicial Forum Kupwara",
-            hearing_date: c.hearing_date || c.next_hearing || c.nextHearing || c.next_date || "Date Awaited",
-            reply_status: c.reply_status || "Not Specified"
-          });
-        }
-      });
-    }
-
-    // Deduplicate by title
+    // Deduplicate results
     var unique = matches.filter(function (v, idx, arr) {
       return arr.findIndex(function (t) {
-        return (t.title.toLowerCase() === v.title.toLowerCase());
+        return (t.title || "").toLowerCase() === (v.title || "").toLowerCase();
       }) === idx;
     });
 
@@ -494,9 +505,7 @@
       query: clean,
       results: unique
     };
-  }
-
-  // ─── 4. STRUCTURED KNOWLEDGE TREE ────────────────────────────────────────
+  }  // ─── 4. STRUCTURED KNOWLEDGE TREE ────────────────────────────────────────
   var BOT_DATA = {
     start: {
       message: "Hello! Welcome to the District Litigation Office Kupwara legal desk.\n\nAsk in plain language — courts, departments, hearings, replies, officials — or pick a category:",

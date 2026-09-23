@@ -1,5 +1,5 @@
 (function () {
-  // Decision tree mapping to the actual pages in dlo-kupwaraa
+  // Decision tree mapping to dlo-kupwaraa portal pages
   const BOT_DATA = {
     start: {
       message: "Welcome to the District Litigation Office Kupwara legal desk. How can we assist you?",
@@ -43,39 +43,88 @@
     }
   };
 
-  // Inject widget CSS styles
+  // Inject widget CSS styles (Anchored to the Bottom-Left)
   const style = document.createElement("style");
   style.textContent = `
+    /* Floating teaser prompt / badge */
+    #dlo-chat-teaser {
+      position: fixed;
+      bottom: 78px;
+      left: 24px;
+      background: #ffffff;
+      color: #0c2340;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 7px 13px;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      animation: dloFloat 3s ease-in-out infinite;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    #dlo-chat-teaser::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 20px;
+      border-width: 6px 6px 0;
+      border-style: solid;
+      border-color: #ffffff transparent;
+      display: block;
+      width: 0;
+    }
+    @keyframes dloFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* "Ask Assistant" Main Button */
     #dlo-chat-trigger {
       position: fixed;
       bottom: 24px;
-      right: 24px;
-      background: #0f2c59;
+      left: 24px;
+      background: linear-gradient(135deg, #0c2340 0%, #1e3a8a 100%);
       color: #ffffff;
-      border: 1px solid rgba(255,255,255,0.2);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 50px;
-      padding: 12px 20px;
-      font-size: 14px;
+      padding: 10px 18px;
+      font-size: 13px;
       font-weight: 600;
+      letter-spacing: 0.3px;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      box-shadow: 0 4px 20px rgba(12, 35, 64, 0.35);
       z-index: 9999;
       display: flex;
       align-items: center;
       gap: 8px;
+      transition: all 0.2s ease;
     }
+    #dlo-chat-trigger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(12, 35, 64, 0.45);
+    }
+    #dlo-chat-trigger .dlo-icon {
+      font-size: 15px;
+    }
+
+    /* Chat Drawer Window */
     #dlo-chat-window {
       position: fixed;
-      bottom: 80px;
-      right: 24px;
+      bottom: 78px;
+      left: 24px;
       width: 320px;
       max-width: calc(100vw - 48px);
       max-height: 480px;
       background: #ffffff;
-      color: #1a1a1a;
-      border: 1px solid #dcdcdc;
-      border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
       display: none;
       flex-direction: column;
       z-index: 9999;
@@ -83,9 +132,9 @@
       font-family: inherit;
     }
     #dlo-chat-header {
-      background: #0f2c59;
-      color: #fff;
-      padding: 12px 16px;
+      background: linear-gradient(135deg, #0c2340 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 13px 16px;
       font-weight: 600;
       font-size: 14px;
       display: flex;
@@ -100,16 +149,18 @@
       line-height: 1.5;
     }
     .dlo-bot-msg {
-      background: #f0f4f8;
-      border-radius: 8px;
+      background: #f1f5f9;
+      border-left: 3px solid #1e3a8a;
+      border-radius: 6px;
       padding: 10px 12px;
       margin-bottom: 12px;
       white-space: pre-line;
+      color: #0f172a;
     }
     .dlo-bot-link {
       display: inline-block;
       margin-top: 8px;
-      color: #0f2c59;
+      color: #1e3a8a;
       font-weight: 600;
       text-decoration: underline;
     }
@@ -121,33 +172,42 @@
     }
     .dlo-chip {
       background: #ffffff;
-      border: 1px solid #0f2c59;
+      border: 1px solid #94a3b8;
       color: #0f2c59;
       border-radius: 6px;
-      padding: 7px 10px;
+      padding: 8px 11px;
       text-align: left;
       font-size: 12px;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all 0.15s ease;
     }
     .dlo-chip:hover {
-      background: #0f2c59;
+      background: #0c2340;
       color: #ffffff;
+      border-color: #0c2340;
     }
   `;
   document.head.appendChild(style);
 
-  // Inject widget HTML elements
+  // 1. Create floating teaser badge ("Ask me anything")
+  const teaser = document.createElement("div");
+  teaser.id = "dlo-chat-teaser";
+  teaser.innerHTML = `<span>💬</span> <span>Need guidance? Ask me</span>`;
+  document.body.appendChild(teaser);
+
+  // 2. Create the "Ask Assistant" button
   const trigger = document.createElement("button");
   trigger.id = "dlo-chat-trigger";
-  trigger.innerHTML = "💬 Help Desk";
+  trigger.innerHTML = `<span class="dlo-icon">⚖️</span><span>Ask Assistant</span>`;
   document.body.appendChild(trigger);
 
+  // 3. Create the chat window
   const box = document.createElement("div");
   box.id = "dlo-chat-window";
   box.innerHTML = `
     <div id="dlo-chat-header">
-      <span>DLO Kupwara Help Desk</span>
+      <span>DLO Legal Assistant</span>
       <span id="dlo-chat-close" style="cursor:pointer; font-size:16px;">✕</span>
     </div>
     <div id="dlo-chat-body"></div>
@@ -156,7 +216,6 @@
 
   const chatBody = box.querySelector("#dlo-chat-body");
 
-  // Render a step in the conversation
   function showStep(stepKey) {
     const step = BOT_DATA[stepKey] || BOT_DATA.start;
     chatBody.innerHTML = "";
@@ -189,14 +248,18 @@
     chatBody.appendChild(group);
   }
 
-  // Toggle open/close
-  trigger.onclick = () => {
+  function toggleChat() {
     const isVisible = box.style.display === "flex";
     box.style.display = isVisible ? "none" : "flex";
+    teaser.style.display = isVisible ? "flex" : "none";
     if (!isVisible) showStep("start");
-  };
+  }
+
+  trigger.onclick = toggleChat;
+  teaser.onclick = toggleChat;
 
   box.querySelector("#dlo-chat-close").onclick = () => {
     box.style.display = "none";
+    teaser.style.display = "flex";
   };
 })();

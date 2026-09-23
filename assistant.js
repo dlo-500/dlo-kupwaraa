@@ -77,48 +77,34 @@
 
   // ─── 2. EXHAUSTIVE DEPARTMENT DIRECTORY & ACRONYM RESOLVER ───────────────
   const DEPT_ALIASES = {
-    // R&B / PWD / PMGSY
     "pmgsy": "R&b", "pwd": "R&b", "r&b": "R&b", "roads": "R&b", "bridges": "R&b", "public works": "R&b", "highways": "R&b",
-    // PDD / KPDCL
     "pdd": "PDD", "kpdcl": "PDD", "power": "PDD", "electricity": "PDD", "electric": "PDD", "power development": "PDD",
-    // Jal Shakti / PHE / Irrigation
     "jal shakti": "PHE/JAL SHAKTI", "phe": "PHE/JAL SHAKTI", "water": "PHE/JAL SHAKTI", "drinking water": "PHE/JAL SHAKTI",
     "i&fc": "I&FC", "ifc": "I&FC", "irrigation": "I&FC", "flood control": "I&FC",
-    // Municipal / Urban Local Bodies
     "ulb": "URBAN LOCAL BODIES", "urban local bodies": "URBAN LOCAL BODIES", "municipality": "URBAN LOCAL BODIES",
     "mc kupwara": "URBAN LOCAL BODIES", "mc handwara": "URBAN LOCAL BODIES", "municipal council": "URBAN LOCAL BODIES",
     "municipal committee": "URBAN LOCAL BODIES", "sanitation": "URBAN LOCAL BODIES",
-    // Revenue
     "revenue": "Revenue", "patwari": "Revenue", "tehsildar": "Revenue", "naib tehsildar": "Revenue",
     "girdawar": "Revenue", "land": "Revenue", "mutation": "Revenue", "demarcation": "Revenue",
     "kahcharai": "Revenue", "state land": "Revenue", "evacuee": "Revenue", "nazool": "Revenue",
-    // RDD
     "rdd": "RDD", "rural development": "RDD", "bdo": "RDD", "panchayat": "RDD", "vlw": "RDD", "acd": "RDD",
-    // Education & Samagra Shiksha
     "education": "EDUCATION", "school": "EDUCATION", "teacher": "EDUCATION", "ceo kupwara": "EDUCATION",
     "zep": "EDUCATION", "zeo": "EDUCATION", "samagra": "SMAGRA SHIKSHA", "smagra shiksha": "SMAGRA SHIKSHA",
-    // Health
     "health": "HEALTH AND MEDICAL EDUCATION", "hospital": "HEALTH AND MEDICAL EDUCATION", "doctor": "HEALTH AND MEDICAL EDUCATION",
     "medical": "HEALTH AND MEDICAL EDUCATION", "cmo kupwara": "HEALTH AND MEDICAL EDUCATION", "bmo": "HEALTH AND MEDICAL EDUCATION",
-    // Social Welfare & ICDS
     "social welfare": "SOCIAL WELFARE", "icds": "SOCIAL WELFARE", "anganwadi": "SOCIAL WELFARE", "pension": "SOCIAL WELFARE",
-    // Forest & Environment
     "forest": "FOREST", "jungle": "FOREST", "wildlife": "FOREST", "dfo": "FOREST", "timber": "FOREST", "sfc": "FOREST",
-    // Police / Home
     "home": "HOME", "police": "HOME", "fir": "HOME", "ssp kupwara": "HOME", "sho": "HOME", "thana": "HOME",
-    // Food & Civil Supplies
     "fcs&ca": "FCS&CA", "capd": "FCS&CA", "ration": "FCS&CA", "food supplies": "FCS&CA", "food safety": "Food Safety officer", "fso": "Food Safety officer",
-    // Agriculture & Allied
     "horticulture": "HORTICULTURE", "fruit": "HORTICULTURE", "agriculture": "AGRICULTURE", "kissan": "AGRICULTURE",
     "animal husbandary": "ANIMAL HUSBANDARY", "veterinary": "ANIMAL HUSBANDARY", "sheep": "SHEEP HUSBANDRY",
-    // Industry & Others
     "jkedi": "JKEDI", "edi": "JKEDI", "industries": "INDUSTRIES AND COMMERCE", "geology": "GEOLOGY AND MINING", "mining": "GEOLOGY AND MINING",
     "transport": "TRANSPORT", "rto": "TRANSPORT", "arvo": "TRANSPORT", "skill": "SKILL DEVELOPMENT", "iti": "SKILL DEVELOPMENT",
     "defence estates": "DEFENCE ESTATES", "army land": "DEFENCE ESTATES", "uoi": "UOI", "union of india": "UOI",
     "sports": "YOUTH SERVICES AND SPORTS", "culture": "CULTURE", "science": "SCIENCE AND TECHNOLOGY", "relief": "RELIEF", "jkrlm": "JKRLM"
   };
 
-  // ─── 3. LIVE DOM SCRAPERS (READS REAL DATA FROM WEBPAGE) ─────────────────
+  // ─── 3. LIVE DOM SCRAPERS ────────────────────────────────────────────────
   function getLiveMetrics() {
     const text = document.body.innerText || "";
     const totalM = text.match(/Total cases.*?:\s*(\d+)/i) || text.match(/(\d+)\s*TOTAL CASES/i);
@@ -220,7 +206,83 @@
     return results.filter((v, i, a) => a.findIndex(t => t.number === v.number && t.number !== "Listed Matter") === i);
   }
 
-  // ─── 4. STRUCTURED KNOWLEDGE TREE (GUIDED BUTTONS) ────────────────────────
+  // ─── 4. CASE SEARCH ENGINE (BY PARTY NAME, CNR, OR COURT) ─────────────────
+  function searchCases(userQuery) {
+    const rawQ = userQuery.toLowerCase().trim();
+
+    let targetCourt = null;
+    for (const c of COURTS_LIST) {
+      if (c.aliases.some(alias => rawQ.includes(alias)) || rawQ.includes(c.short.toLowerCase())) {
+        targetCourt = c;
+        break;
+      }
+    }
+
+    let cleanQuery = rawQ
+      .replace(/next\s*date\s*(of|for)?/gi, "")
+      .replace(/hearing\s*(date|of)?/gi, "")
+      .replace(/case\s*(status|details|of)?/gi, "")
+      .replace(/when\s*is/gi, "")
+      .replace(/in\s*court/gi, "")
+      .replace(/court/gi, "")
+      .replace(/[?!.,;]/g, " ")
+      .trim();
+
+    if (targetCourt) {
+      targetCourt.aliases.forEach(alias => {
+        cleanQuery = cleanQuery.replace(new RegExp(alias, "gi"), "");
+      });
+      cleanQuery = cleanQuery.replace(new RegExp(targetCourt.short, "gi"), "").trim();
+    }
+
+    const searchTokens = cleanQuery.split(/\s+/).filter(t => t.length > 1 && !["the", "and", "for", "with"].includes(t));
+
+    if (searchTokens.length === 0 && !targetCourt) return null;
+
+    let casePool = [];
+    const rawList = window.allCases || window.cases || window.casesData || window.DLO_CASES || [];
+
+    if (Array.isArray(rawList) && rawList.length > 0) {
+      casePool = rawList;
+    } else {
+      const caseElements = document.querySelectorAll("tr, .case-card, .hearing-item");
+      caseElements.forEach(el => {
+        const text = el.innerText || "";
+        const cnrMatch = text.match(/JKKW\d{12}/i) || text.match(/[A-Z0-9\/\-]{8,25}/);
+        if (text.includes("Vs") || text.includes("V/S") || text.includes("v/s") || cnrMatch) {
+          casePool.push({
+            case_number: cnrMatch ? cnrMatch[0] : "Case",
+            title: text.split("\n")[0] || text.substring(0, 60),
+            court: text.includes("Handwara") ? "Handwara" : "Kupwara",
+            hearing_date: (text.match(/\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}/) || ["Scheduled"])[0],
+            status: text.includes("Active") ? "Active" : "Pending"
+          });
+        }
+      });
+    }
+
+    const matches = casePool.filter(c => {
+      const fullText = `${c.case_number || ""} ${c.title || ""} ${c.case_title || ""} ${c.petitioner || ""} ${c.respondent || ""}`.toLowerCase();
+      const courtText = (c.court || "").toLowerCase();
+
+      if (targetCourt) {
+        const matchesCourt = targetCourt.aliases.some(a => courtText.includes(a)) || courtText.includes(targetCourt.short.toLowerCase());
+        if (!matchesCourt) return false;
+      }
+
+      if (searchTokens.length === 0) return true;
+      return searchTokens.every(token => fullText.includes(token));
+    });
+
+    return {
+      query: cleanQuery || (targetCourt ? targetCourt.short : userQuery),
+      courtFiltered: targetCourt ? targetCourt.short : null,
+      tokensCount: searchTokens.length,
+      results: matches
+    };
+  }
+
+  // ─── 5. STRUCTURED KNOWLEDGE TREE (GUIDED BUTTONS) ────────────────────────
   const BOT_DATA = {
     start: {
       message: "Hello! Welcome to the District Litigation Office Kupwara legal desk. Ask me any question below or choose a category:",
@@ -329,7 +391,6 @@
     }
   };
 
-  // Dynamically build court cause list nodes
   COURTS_LIST.forEach(court => {
     BOT_DATA[`court_${court.id}`] = {
       getMessage: () => {
@@ -355,22 +416,24 @@
     };
   });
 
-  // ─── 5. HIGH-ACCURACY NLP QUERY PROCESSOR (300+ PERMUTATIONS) ─────────────
-  function processUserText(text) 
-  // ── Check for Case Search (Names, Numbers, CNR, or "next date") ────────
-    const isSearchIntent = q.includes("next date") || q.includes("case of") || q.includes("hearing of") || q.includes("jkkw") || q.includes(" vs ") || q.includes(" v/s ") || words.length <= 4;
-    
-    // Ignore pure menu or generic keyword queries
-    const isGenericKeyword = ["active", "total", "stats", "office", "login", "sop", "contempt", "ex-parte", "departments"].some(k => q === k);
+  // ─── 6. NLP QUERY PROCESSOR ──────────────────────────────────────────────
+  function processUserText(text) {
+    const q = text.toLowerCase().trim().replace(/[?!.,;]/g, " ");
+    const words = q.split(/\s+/);
 
-    if (isSearchIntent && !isGenericKeyword) {
+    // Check Case Search Intent
+    const isSearchIntent = q.includes("next date") || q.includes("case of") || q.includes("hearing of") || q.includes("jkkw") || q.includes(" vs ") || q.includes(" v/s ") || (words.length <= 4 && !["active", "total", "stats", "office", "login", "sop", "contempt", "ex-parte", "departments"].includes(q));
+
+    if (isSearchIntent) {
       const searchData = searchCases(text);
-
       if (searchData && searchData.results.length > 0) {
         const count = searchData.results.length;
         let reply = `🔍 Found ${count} matching case(s) for "${searchData.query}"`;
-        if (searchData.courtFiltered) reply += ` in ${searchData.courtFiltered}`:
-        reply += `:\n\n`;
+        if (searchData.courtFiltered) {
+          reply += ` in ${searchData.courtFiltered}:\n\n`;
+        } else {
+          reply += `:\n\n`;
+        }
 
         searchData.results.slice(0, 4).forEach((item, idx) => {
           const num = item.case_number || item.cnr || "Case";
@@ -398,7 +461,7 @@
             { label: "« Main Menu", next: "start" }
           ]
         };
-      } else if (searchData && searchTokens.length > 0) {
+      } else if (searchData && searchData.tokensCount > 0) {
         return {
           customReply: `🔍 No records found matching "${searchData.query}"${searchData.courtFiltered ? ` in ${searchData.courtFiltered}` : ""}.\n\nSuggestions:\n• Verify the spelling of the party's name.\n• Search using the CNR / Case number (e.g. JKKW02...).\n• Or use the full portal filter.`,
           customLink: { url: "search-filter-cases.html", text: "Search in Full Registry" },
@@ -409,11 +472,8 @@
         };
       }
     }
-  {
-    const q = text.toLowerCase().trim().replace(/[?!.,;]/g, " ");
-    const words = q.split(/\s+/);
 
-    // Q1. Officials / Counsel / DLO In-charge
+    // Officials / Counsel / DLO
     if (q.includes("ishfaq") || q.includes("dlo") || q.includes("officer") || q.includes("incharge") || q.includes("head") || q.includes("who is")) {
       if (q.includes("counsel") || q.includes("lawyer") || q.includes("advocate") || q.includes("zubair") || q.includes("wasim")) {
         return {
@@ -435,7 +495,7 @@
       return { stepKey: "officials" };
     }
 
-    // Q2. Developer / Architecture Info
+    // Developer Info
     if (q.includes("developer") || q.includes("who built") || q.includes("who created") || q.includes("who designed") || q.includes("tariq")) {
       return {
         customReply: `💻 Portal Development & System Architecture:\n\nDesigned & Developed by Tariq Ahmad Lone for the District Litigation Office Kupwara, Department of Law, Justice & Parliamentary Affairs, UT of Jammu & Kashmir.\nVersion: NK.1.0 (PWA Enabled).`,
@@ -443,7 +503,7 @@
       };
     }
 
-    // Q3. Ex-parte matters
+    // Ex-parte Cases
     if (q.includes("ex-parte") || q.includes("exparte") || q.includes("ex parte")) {
       const m = getLiveMetrics();
       return {
@@ -456,7 +516,7 @@
       };
     }
 
-    // Q4. Contempt & Compliance
+    // Contempt & Compliance
     if (q.includes("contempt") || q.includes("compliance") || q.includes("atr") || q.includes("action taken")) {
       return {
         customReply: `⚠️ Contempt Petitions & Judicial Compliance:\n\n• There are 5 active contempt petitions being closely monitored.\n• Head of Departments (HODs) must submit Action Taken Reports (ATRs) and verified compliance statements at least 48 hours prior to hearing.\n• Direct coordination with the DLO scrutiny desk is mandatory to avert personal appearance orders.`,
@@ -465,7 +525,7 @@
       };
     }
 
-    // Q5. Replies Pending / Filed statistics
+    // Replies Pending / Filed
     if (q.includes("reply pending") || q.includes("replies pending") || q.includes("unfiled") || q.includes("missing reply")) {
       const m = getLiveMetrics();
       return {
@@ -478,7 +538,7 @@
       };
     }
 
-    // Q6. Disposal Rate & Statistics
+    // Disposal Rate
     if (q.includes("disposal") || q.includes("disposed") || q.includes("disposal rate")) {
       const m = getLiveMetrics();
       return {
@@ -488,7 +548,7 @@
       };
     }
 
-    // Q7. Court-Specific Queries (Active, Total, vs Cause List)
+    // Court-Specific Queries
     for (const c of COURTS_LIST) {
       const matchesCourt = c.aliases.some(alias => q.includes(alias)) || q.includes(c.short.toLowerCase());
       if (matchesCourt) {
@@ -516,13 +576,12 @@
       }
     }
 
-    // Q8. All Courts Distribution
+    // All Courts Distribution
     if (q.includes("court distribution") || q.includes("all courts") || q.includes("how many court") || q.includes("12 court") || q.includes("courts covered")) {
       return { stepKey: "court_dist" };
     }
 
-    // Q9. Department Queries (Direct name or aliases like "pmgsy", "pwd", "pdd", "jal shakti", "revenue")
-    // Check against alias dictionary first
+    // Department Queries (e.g. pmgsy, pwd, pdd, revenue)
     for (const [alias, realDept] of Object.entries(DEPT_ALIASES)) {
       if (q.includes(alias) || words.includes(alias)) {
         const d = getDepartmentData(alias);
@@ -545,7 +604,7 @@
       }
     }
 
-    // Q10. General Department Queries
+    // General Department Queries
     if (q.includes("department") || q.includes("dept") || q.includes("stakeholder")) {
       return {
         customReply: `🏛️ Department Litigation Monitoring (30 Departments):\n\nDLO Kupwara monitors litigation for all 30 departments in the district. Top 5 caseloads:\n\n1. Revenue: 81 active (54 replies pending)\n2. Urban Local Bodies: 61 active (47 replies pending)\n3. R&B / PWD / PMGSY: 33 active (20 replies pending)\n4. PDD / KPDCL: 28 active (22 replies pending)\n5. RDD / Panchayats: 21 active (16 replies pending)\n\nType any department or acronym (e.g. "PMGSY", "PDD", "Jal Shakti") for specific details.`,
@@ -557,7 +616,7 @@
       };
     }
 
-    // Q11. Case Types Breakdown
+    // Case Types
     if (q.includes("case type") || q.includes("civil suit") || q.includes("writ") || q.includes("appeal") || q.includes("mact case")) {
       return {
         customReply: `📜 Case Types Distribution across Kupwara Forums:\n\n• Civil Suits: 220 cases (majority)\n• Execution Petitions: 19 cases\n• Wage Claims (Labour): 15 cases\n• Consumer Matters: 23 cases\n• Appeals: 15 cases\n• Restoration Applications: 10 cases\n• Contempt Petitions: 5 cases\n• Criminal Complaints: 5 cases\n• MACT Claims: 4 cases`,
@@ -566,7 +625,7 @@
       };
     }
 
-    // Q12. Overdue Cases
+    // Overdue Cases
     if (q.includes("overdue") || q.includes("delay") || q.includes("passed")) {
       return {
         customReply: `⚠️ Overdue Cases Notice:\n\nOverdue cases are matters where the scheduled hearing date has passed but status remains active in court records.\nOperators and nodal officers must update proceeding orders immediately.`,
@@ -575,33 +634,33 @@
       };
     }
 
-    // Q13. Overall Portal Statistics
+    // Overall Portal Stats
     if (q.includes("active") || q.includes("total") || q.includes("statistic") || q.includes("stats") || q.includes("performance") || q.includes("summary")) {
       return { stepKey: "live_stats" };
     }
 
-    // Q14. Urgent Hearings & Schedules
+    // Urgent Hearings
     if (q.includes("urgent") || q.includes("hearing") || q.includes("tomorrow") || q.includes("today") || q.includes("cause list") || q.includes("listed")) {
       if (q.includes("cause list")) return { stepKey: "choose_court" };
       return { stepKey: "urgent_hearings" };
     }
 
-    // Q15. Filing & Replies SOP
+    // Filing & Replies SOP
     if (q.includes("reply") || q.includes("sop") || q.includes("objection") || q.includes("parawise") || q.includes("vetting") || q.includes("scrutiny")) {
       return { stepKey: "replies_sop" };
     }
 
-    // Q16. Office Address, Hours, Contact
+    // Office Address & Contact
     if (q.includes("time") || q.includes("timing") || q.includes("hours") || q.includes("address") || q.includes("location") || q.includes("where") || q.includes("contact") || q.includes("email") || q.includes("phone") || q.includes("dc office")) {
       return { stepKey: "office" };
     }
 
-    // Q17. Staff Login & Operator Credentials
+    // Staff Login
     if (q.includes("login") || q.includes("operator") || q.includes("staff") || q.includes("admin") || q.includes("password") || q.includes("2fa")) {
       return { stepKey: "operator" };
     }
 
-    // Q18. App Download
+    // App Download
     if (q.includes("app") || q.includes("download") || q.includes("install") || q.includes("pwa") || q.includes("apk")) {
       return {
         customReply: `📱 Install DLO Kupwara Progressive Web App:\n\nYou can install the portal directly onto your Android, iPhone, or PC by tapping "Download App" in the navigation bar or "Install" in your browser settings for offline access.`,
@@ -609,9 +668,9 @@
       };
     }
 
-    // Fallback for unclassified questions
+    // Fallback
     return {
-      fallbackMessage: `I couldn't find an exact match for "${text}". You can ask about:\n\n• Active cases in any court (e.g. "Sub Judge Kupwara")\n• Department statistics (e.g. "PMGSY", "PDD", "Revenue")\n• Officials & Standing Counsel\n• Hearing schedules & replies SOP`,
+      fallbackMessage: `I couldn't find an exact match for "${text}". You can ask about:\n\n• Active cases in any court (e.g. "Sub Judge Kupwara")\n• Department statistics (e.g. "PMGSY", "PDD", "Revenue")\n• Next date for a litigant (e.g. "Ashraf Lone")\n• Hearing schedules & replies SOP`,
       fallbackOptions: [
         { label: "📅 Today's Cause List", next: "choose_court" },
         { label: "📊 Real-Time Stats", next: "live_stats" },
@@ -622,7 +681,7 @@
     };
   }
 
-  // ─── 6. EXECUTIVE UI STYLES (BOTTOM-LEFT ANCHORED) ────────────────────────
+  // ─── 7. UI STYLES (BOTTOM-LEFT ANCHORED) ──────────────────────────────────
   const style = document.createElement("style");
   style.textContent = `
     #dlo-chat-teaser {
@@ -883,7 +942,7 @@
   `;
   document.head.appendChild(style);
 
-  // ─── 7. DOM MOUNTING & CONTROLS ──────────────────────────────────────────
+  // ─── 8. DOM MOUNTING & CONTROLS ──────────────────────────────────────────
   const teaser = document.createElement("div");
   teaser.id = "dlo-chat-teaser";
   teaser.innerHTML = `<span>💬</span> <span>Need guidance? Ask me</span>`;
@@ -995,7 +1054,6 @@
     }, 280);
   }
 
-  // ─── 8. FORM SUBMISSION EVENT HANDLER ────────────────────────────────────
   inputForm.onsubmit = (e) => {
     e.preventDefault();
     const query = userInput.value.trim();
@@ -1010,7 +1068,6 @@
       removeTypingIndicator();
       const match = processUserText(query);
 
-      // A. Custom dynamic reply (Court total count, Department query, etc.)
       if (match.customReply) {
         appendMessage("bot", match.customReply, match.customLink || null);
         if (match.customOptions) {
@@ -1023,9 +1080,7 @@
             chipsContainer.appendChild(btn);
           });
         }
-      }
-      // B. Standard node jump
-      else if (match.stepKey) {
+      } else if (match.stepKey) {
         const step = BOT_DATA[match.stepKey];
         const messageText = typeof step.getMessage === "function" ? step.getMessage() : step.message;
         appendMessage("bot", messageText, step.link);
@@ -1039,9 +1094,7 @@
             chipsContainer.appendChild(btn);
           });
         }
-      }
-      // C. Fallback
-      else {
+      } else {
         appendMessage("bot", match.fallbackMessage);
         match.fallbackOptions.forEach(opt => {
           const btn = document.createElement("button");

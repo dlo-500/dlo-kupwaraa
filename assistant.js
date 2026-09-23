@@ -4,7 +4,7 @@
   window.__DLO_ASSISTANT_MOUNTED = true;
 
   // ─── 0. VERSION ──────────────────────────────────────────────────────────
-  var DLO_ASSISTANT_VERSION = "NK.1.1";
+  var DLO_ASSISTANT_VERSION = "NK.1.2";
 
   // ─── 1. OFFICIAL COURTS DIRECTORY & ALIASES (12 COURTS) ───────────────────
   var COURTS_LIST = [
@@ -394,6 +394,82 @@
     });
   }
 
+  // ─── 3B. CASE SEARCH ENGINE (BY LITIGANT NAME, CNR, OR KEYWORDS) ─────────
+  function searchRegistryCases(rawQuery) {
+    var q = normalize(rawQuery);
+
+    // Strip noise phrases to isolate the name, keywords, or case number
+    var clean = q
+      .replace(/\b(next\s*date\s*of|hearing\s*date\s*of|date\s*of\s*the\s*case|next\s*hearing\s*of|when\s*is\s*the\s*hearing\s*of|next\s*date|hearing\s*date|when\s*is|case\s*status\s*of|status\s*of\s*the\s*case|case\s*of|case\s*details|hearing\s*details|versus|vs|v\/s)\b/g, " ")
+      .replace(/\b(the|of|for|in|court|matter|case|and|at|on|scheduled)\b/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!clean || clean.length < 5) {
+      return { tooShort: true, query: clean };
+    }
+
+    var pool = [];
+    var rawList = window.allCases || window.cases || window.casesData || window.DLO_CASES || window.ALL_ROWS || [];
+
+    if (Array.isArray(rawList) && rawList.length > 0) {
+      pool = rawList;
+    } else {
+      // Scrape dynamically from the master table (#live-data)
+      var rows = document.querySelectorAll("#live-data table tbody tr, table tbody tr");
+      for (var i = 0; i < rows.length; i++) {
+        var cols = Array.prototype.map.call(rows[i].querySelectorAll("td"), function (td) {
+          return td.innerText.trim();
+        });
+        // Table columns: [# , Case No, Title, Subject, Dept, Court, Last Proc, Next Hearing, Reply Status, Case Status, Type, Standing Counsel, Ex-parte]
+        if (cols.length >= 9 && cols[2] && (cols[2].indexOf("Vs") !== -1 || cols[2].indexOf("V/S") !== -1 || cols[2].indexOf("v/s") !== -1 || cols[2].indexOf("V/s") !== -1 || cols[2].indexOf("vs") !== -1)) {
+          pool.push({
+            case_number: cols[1] && cols[1] !== "—" ? cols[1] : "",
+            title: cols[2],
+            dept: cols[4] || "Stakeholder Dept",
+            court: cols[5] || "Judicial Forum Kupwara",
+            hearing_date: cols[7] || "Date Awaited",
+            reply_status: cols[8] || "Not Specified",
+            status: cols[9] || "Active"
+          });
+        }
+      }
+    }
+
+    if (!pool.length) return { noData: true, query: clean };
+
+    var tokens = clean.split(" ").filter(function (t) { return t.length >= 2; });
+
+    var matches = pool.filter(function (c) {
+      var title = normalize(c.title || c.case_title || c.caseTitle || "");
+      var cnr = normalize(c.case_number || c.cnr || c.caseNo || "");
+      var dept = normalize(c.dept || c.department || "");
+      var full = title + " " + cnr + " " + dept;
+
+      // If single token (e.g. "yaqoo"), substring matching
+      if (tokens.length === 1) {
+        return full.indexOf(tokens[0]) !== -1;
+      }
+      // If multi-token (e.g. "yaqoob khan"), all tokens must match
+      return tokens.every(function (tok) {
+        return full.indexOf(tok) !== -1;
+      });
+    });
+
+    // Deduplicate by title + case number
+    var uniqueMatches = matches.filter(function (v, i, a) {
+      var vKey = (v.title || "") + "|" + (v.case_number || "");
+      return a.findIndex(function (t) {
+        return ((t.title || "") + "|" + (t.case_number || "")) === vKey;
+      }) === i;
+    });
+
+    return {
+      query: clean,
+      results: uniqueMatches
+    };
+  }
+
   // ─── 4. STRUCTURED KNOWLEDGE TREE ────────────────────────────────────────
   var BOT_DATA = {
     start: {
@@ -744,18 +820,6 @@
     return prev[b.length];
   }
 
-  function fuzzyHas(q, phrase) {
-    if (q.indexOf(phrase) !== -1) return true;
-    var pw = phrase.split(" ");
-    if (pw.length === 1 && phrase.length >= 5) {
-      var qs = q.split(" ");
-      for (var i = 0; i < qs.length; i++) {
-        if (lev(qs[i], phrase) <= 1) return true;
-      }
-    }
-    return false;
-  }
-
   function extractCourt(q) {
     var best = null, bestLen = 0;
     COURTS_LIST.forEach(function (c) {
@@ -768,7 +832,6 @@
       });
     });
     if (best) return best;
-    // single-token fuzzy on distinctive place names
     var places = [
       ["kralpora", "munsiff_kralpora"], ["sogam", "munsiff_sogam"], ["trehgam", "sub_trehgam"],
       ["lolab", "munsiff_sogam"], ["mact", "mact"], ["consumer", "consumer"],
@@ -828,7 +891,6 @@
     return null;
   }
 
-  // Question templates expand to 3000+ permutations at first use.
   var COURT_Q = [
     "how many cases in {c}", "total cases in {c}", "total cases {c}", "cases registered in {c}",
     "what is the caseload of {c}", "{c} case count", "number of government cases in {c}",
@@ -933,7 +995,6 @@
       TYPE_Q.forEach(function (tpl) { add(tpl.replace("{t}", normalize(t)), { kind: "type", name: t }); });
     });
     STATIC_Q.forEach(function (row) { add(row.q, { kind: "static", intent: row.intent }); });
-    // extra global phrasings
     var extras = [
       "hi", "hello", "assalamualaikum", "salaam", "salam", "good morning", "good afternoon",
       "help", "menu", "what can you do", "examples", "thanks", "thank you", "shukria",
@@ -1065,7 +1126,7 @@
       return { stepKey: "start" };
     }
     return {
-      customReply: "Wa-alaikum assalam. I can help with DLO Kupwara courts, departments, hearings, replies and office information. Try: \"PMGSY pending replies\", \"Sessions Court cases\", or \"who is the DLO\".",
+      customReply: "Wa-alaikum assalam. I can help with DLO Kupwara courts, departments, hearings, replies and office information. Try: \"next date of Yaqoob Khan\", \"PMGSY pending replies\", or \"who is the DLO\".",
       customOptions: [
         { label: "Main Menu", next: "start" },
         { label: "Real-Time Stats", next: "live_stats" }
@@ -1101,24 +1162,42 @@
     return null;
   }
 
+  // ─── 6. MASTER NLP & CASE LOOKUP PROCESSOR ───────────────────────────────
   function processUserText(text) {
     ensureQuestionBank();
     var q = normalize(text);
     var words = q.split(" ");
 
-    // greetings first
-    if (/^(hi|hii|hello|hey|yo|salaam|salam|assalam|asalam|good morning|good afternoon|good evening|namaste|adaab)\b/.test(q) && q.split(" ").length <= 4) {
+    // 1. Greetings & Courtesy
+    if (/^(hi|hii|hello|hey|yo|salaam|salam|assalam|asalam|good morning|good afternoon|good evening|namaste|adaab)\b/.test(q) && words.length <= 4) {
       return smalltalkReply(q);
     }
-    if (/^(thanks|thank you|thx|ok|okay|shukria|jee)\b/.test(q) && q.split(" ").length <= 4) {
+    if (/^(thanks|thank you|thx|ok|okay|shukria|jee)\b/.test(q) && words.length <= 4) {
       return smalltalkReply(q);
     }
 
-    // CNR-like lookup
+    // 2. Direct CNR Pattern Matching
     var cnr = text.match(/\b(JK[A-Z]{2}\d{6,}|CASE-[A-Z0-9]{3,}|CMR[\/\-]\d+[\/\-]\d+)\b/i);
     if (cnr) {
+      var cnrSearch = searchRegistryCases(cnr[1]);
+      if (cnrSearch && cnrSearch.results && cnrSearch.results.length > 0) {
+        var c = cnrSearch.results[0];
+        return {
+          customReply: "🔍 Record Found for CNR " + cnr[1] + ":\n\n" +
+            "• Case Title: " + (c.title || "Government Matter") + "\n" +
+            "• 📅 Next Hearing Date: " + (c.hearing_date || c.next_date || "Date Awaited") + "\n" +
+            "• 🏢 Department: " + (c.dept || c.department || "Stakeholder Dept") + "\n" +
+            "• 📋 Reply Status: " + (c.reply_status || "Not Specified") + "\n" +
+            "• 🏛️ Court: " + (c.court || "Judicial Forum Kupwara"),
+          customLink: PAGES.filter,
+          customOptions: [
+            { label: "Search Another Case", next: "start" },
+            { label: "« Main Menu", next: "start" }
+          ]
+        };
+      }
       return {
-        customReply: "CNR / case id \"" + cnr[1] + "\" should be searched in the Live Data filter or Case History tracker on the portal.\n\nThis chat does not publish individual party records (the public site is for departmental awareness only and cannot be the basis of litigation).",
+        customReply: "CNR / Case ID \"" + cnr[1] + "\" was not found in active listings.\n\nPlease verify on the master Case Filter or Case History tracker.",
         customLink: PAGES.filter,
         customOptions: [
           { label: "Open Case History", next: "history_help" },
@@ -1127,19 +1206,86 @@
       };
     }
 
-    var court = extractCourt(q);
-    var dept = extractDept(q);
-    var metric = extractMetric(q);
+    // 3. Litigant & Case Next-Date Engine
+    var isExplicitSearch = /(next\s*date|hearing\s*date|when\s*is|case\s*of|vs|v\/s|hearing\s*of)/.test(q);
+    var isCourtQ = extractCourt(q);
+    var isDeptQ = extractDept(q);
+    var isMetricQ = extractMetric(q);
+    var isStaticKeyword = /(active|total|stat|office|login|sop|contempt|exparte|ex[-\s]parte|department|developer|disclaimer|counsel|lawyer|advocate)/.test(q);
+
+    var cleanSearchTerm = q
+      .replace(/\b(next|hearing|date|status|when|is|the|of|for|case|matter|versus|vs|v\/s)\b/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    // Trigger lookup if explicitly asked for hearing date OR if user typed a name/keyword (>= 5 chars) not matching system topics
+    if (isExplicitSearch || (!isCourtQ && !isDeptQ && !isMetricQ && !isStaticKeyword && cleanSearchTerm.length >= 5 && words.length <= 4)) {
+      var searchRes = searchRegistryCases(text);
+
+      if (searchRes && searchRes.results && searchRes.results.length > 0) {
+        var count = searchRes.results.length;
+        var reply = "🔍 Found " + count + " matching case(s) for \"" + searchRes.query + "\":\n\n";
+
+        searchRes.results.slice(0, 4).forEach(function (c, idx) {
+          var title = c.title || c.case_title || "Government Matter";
+          var nextDate = c.hearing_date || c.next_date || "Date Awaited";
+          var dept = c.dept || c.department || "Stakeholder Dept";
+          var court = c.court || "Judicial Forum Kupwara";
+          var replyStat = c.reply_status || (c.reply_filed ? "Reply Filed ✅" : "Reply Not Filed ❌");
+          var caseNum = c.case_number && c.case_number !== "—" ? (" (" + c.case_number + ")") : "";
+
+          reply += (idx + 1) + ". " + title + caseNum + "\n" +
+                   "   • 📅 Next Hearing: " + nextDate + "\n" +
+                   "   • 🏢 Department: " + dept + "\n" +
+                   "   • 📋 Reply Status: " + replyStat + "\n" +
+                   "   • 🏛️ Court: " + court + "\n\n";
+        });
+
+        if (count > 4) {
+          reply += "…and " + (count - 4) + " more matching record(s). Open Live Data for full records.";
+        }
+
+        return {
+          customReply: reply.trim(),
+          customLink: PAGES.filter,
+          customOptions: [
+            { label: "Check Another Case", next: "start" },
+            { label: "« Main Menu", next: "start" }
+          ]
+        };
+      } else if (searchRes && !searchRes.tooShort) {
+        if (isExplicitSearch || cleanSearchTerm.length >= 5) {
+          return {
+            customReply: "🔍 I couldn't find any registered case matching \"" + searchRes.query + "\".\n\n" +
+                         "Suggestions:\n" +
+                         "• Verify the spelling of the party's name (e.g. \"Yaqoob Khan\").\n" +
+                         "• Search with at least 5 letters of the litigant's name (e.g. \"Yaqoo\").\n" +
+                         "• Search by CNR number or open the master Case Filter on the portal.",
+            customLink: PAGES.filter,
+            customOptions: [
+              { label: "Today's Cause List", next: "choose_court" },
+              { label: "« Main Menu", next: "start" }
+            ]
+          };
+        }
+      } else if (isExplicitSearch && searchRes && searchRes.tooShort) {
+        return {
+          customReply: "Please provide at least 5 letters of the litigant's name (e.g. \"Yaqoob\") or the case CNR number to search.",
+          customLink: PAGES.filter,
+          customOptions: [{ label: "« Main Menu", next: "start" }]
+        };
+      }
+    }
+
+    // 4. Disambiguation & Entity Resolution
+    var court = isCourtQ;
+    var dept = isDeptQ;
+    var metric = isMetricQ;
     var ctype = extractType(q);
 
-    // Disambiguate labour court vs labour department
     if (dept && court && /labour|labor/.test(q)) {
       if (/court|tribunal|wage claim/.test(q)) dept = null;
       else if (/dept|department/.test(q)) court = null;
-    }
-    // "consumer" as court vs case type
-    if (court && court.id === "consumer" && /case type|how many consumer matter/.test(q) && !/court/.test(q)) {
-      /* keep both; type handler below if no court metric */
     }
 
     if (court && (!dept || (metric && metric !== "total") || /court|munsiff|munsif|sessions|cjm|judge|mact|forum/.test(q))) {
@@ -1165,7 +1311,7 @@
       };
     }
 
-    // Officials
+    // 5. Officials & Administration
     if (/ishfaq|dlo\b|incharge|in charge|who is the officer|who heads|litigation officer/.test(q) && !/counsel|lawyer|advocate|zubair|wasim/.test(q)) {
       return {
         customReply: "District Litigation Officer Kupwara:\n\nIshfaq Ahmad Khan\nDistrict Litigation Officer, DLO Kupwara\nDepartment of Law, Justice & Parliamentary Affairs, UT of J&K.\nOffice: 1st Floor, DC Office Complex Kupwara — 193222.",
@@ -1245,7 +1391,7 @@
       return { stepKey: "live_stats" };
     }
 
-    // Question-bank nearest neighbour
+    // 6. Question Bank Nearest-Neighbor Match
     var hit = bestQuestionMatch(q);
     if (hit && hit.item) {
       var p = hit.item.p;
@@ -1279,16 +1425,16 @@
     ];
     return {
       fallbackMessage: "I couldn't find an exact match for \"" + text + "\". Try one of these:\n\n" +
+        "• Case / Litigant lookup — \"next date of Yaqoob Khan\" or \"Yaqoo\"\n" +
         "• A court — \"Sub Judge Kupwara\", \"CJM Handwara\", \"MACT\"\n" +
         "• A department or acronym — \"PMGSY\", \"PDD\", \"Jal Shakti\", \"Revenue\"\n" +
         "• Officials — \"who is the DLO\", \"standing counsel\"\n" +
-        "• Process — \"parawise SOP\", \"contempt ATR\", \"office hours\"\n" +
-        "• Portal — \"cause list\", \"overdue cases\", \"install app\"",
+        "• Process — \"parawise SOP\", \"contempt ATR\", \"office hours\"",
       fallbackOptions: suggestions
     };
   }
 
-  // ─── 6. UI STYLES ────────────────────────────────────────────────────────
+  // ─── 7. UI STYLES (EXECUTIVE NAVY GRADIENT, RESPONSIVE) ──────────────────
   var style = document.createElement("style");
   style.textContent = [
     "#dlo-chat-teaser{position:fixed;bottom:78px;left:24px;background:#fff;color:#0c2340;border:1px solid #cbd5e1;border-radius:10px;padding:7px 13px;font-size:12px;font-weight:600;box-shadow:0 4px 18px rgba(0,0,0,.12);z-index:9998;display:flex;align-items:center;gap:6px;cursor:pointer;animation:dloFloat 3s ease-in-out infinite}",
@@ -1331,11 +1477,11 @@
   ].join("\n");
   document.head.appendChild(style);
 
-  // ─── 7. DOM MOUNT ────────────────────────────────────────────────────────
+  // ─── 8. DOM MOUNTING & EVENT BINDINGS ────────────────────────────────────
   var teaser = document.createElement("div");
   teaser.id = "dlo-chat-teaser";
   teaser.setAttribute("role", "button");
-  teaser.innerHTML = "<span>Need guidance? Ask me</span>";
+  teaser.innerHTML = "<span>💬 Need guidance? Ask me</span>";
   document.body.appendChild(teaser);
 
   var trigger = document.createElement("button");
@@ -1364,7 +1510,7 @@
     + "<div id=\"dlo-chat-body\"></div>"
     + "<div id=\"dlo-chips-container\"></div>"
     + "<form id=\"dlo-input-bar\">"
-    + "  <input type=\"text\" id=\"dlo-user-input\" placeholder=\"e.g. PMGSY pending replies, CJM Handwara…\" autocomplete=\"off\" />"
+    + "  <input type=\"text\" id=\"dlo-user-input\" placeholder=\"e.g. next date of yaqoob khan, PMGSY…\" autocomplete=\"off\" />"
     + "  <button type=\"submit\" id=\"dlo-send-btn\" title=\"Send\">&#10148;</button>"
     + "</form>";
   document.body.appendChild(box);

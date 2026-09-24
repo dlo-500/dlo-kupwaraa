@@ -1,35 +1,4 @@
-/*!
- * DLO Kupwara Assistant · NK.2.0 — dlokupwara.in
- *
- * NEW IN NK.2.0
- *  - Searches every case TITLE word (plus case no., subject, department, court, counsel)
- *    with typo + phonetic matching: "yakub", "yaqoob", "yaqub" all find Yaqoob Khan.
- *  - Reads live rows from Supabase (no more DOM scraping / hardcoded stats).
- *  - Understands dates ("hearings tomorrow", "cases on 15 Oct", "next 3 days", Roman Urdu "kal").
- *  - Filters: court + department + case type + flags (overdue, ex-parte, reply pending, missing reply).
- *  - Follow-ups: "and its court?", "what about revenue?".
- *  - Public visitors see matches one at a time (cascading); staff see up to 6 per page.
- *  - Case cards with highlighted title words, Add-to-Calendar, WhatsApp share, Copy.
- *
- * SETUP: paste your Supabase URL + anon key into the two constants near the top of this file.
- * (Optional per-page override, BEFORE this script tag:)
- *   <script>
- *     window.DLO_ASSISTANT_CONFIG = {
- *       supabaseUrl: "https://YOUR-PROJECT.supabase.co",
- *       supabaseKey: "YOUR-ANON-KEY",          // the same public anon key your pages already use
- *       table: "case_diary"                    // optional, default case_diary
- *       // client: yourSupabaseClient,        // optional: lets the bot detect a staff login
- *       // isStaff: () => true,               // optional override for staff mode
- *       // logTable: "assistant_misses",      // optional: logs question SHAPES only (never names)
- *       // pages: { contact: {url:"index.html#contact", text:"Open Contact / Enquiry"} }
- *     };
- *   </script>
- *   <script src="dlo-assistant.js" defer></script>
- *
- * NOTE: the case table is anon-readable, so public/staff mode here is a presentation rule
- * (cascading results, hidden counsel/last-proceeding), not a security boundary.
- * Enforce real limits with RLS / a public view.
- */
+
 (function () {
   "use strict";
 
@@ -39,10 +8,10 @@
   W.__DLO_ASSISTANT_MOUNTED = true;
 
   const VERSION = "NK.2.0";
-  // ▼▼ PASTE YOUR TWO VALUES HERE (once). Use the public ANON key only — never the service_role key. ▼▼
-  const SUPABASE_URL = "PASTE_SUPABASE_URL_HERE";       // e.g. https://abcdxyz.supabase.co
-  const SUPABASE_ANON_KEY = "PASTE_ANON_KEY_HERE";      // the same anon key already used by your pages
-  // ▲▲ nothing else needs configuring; DLO_ASSISTANT_CONFIG on a page is now optional ▲▲
+  
+  const SUPABASE_URL = 'https://ibicsdsehxlsaygjnefk.supabase.co';       
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU';
+  
   const CFG = Object.assign(
     { supabaseUrl: /^PASTE_/.test(SUPABASE_URL) ? "" : SUPABASE_URL, supabaseKey: /^PASTE_/.test(SUPABASE_ANON_KEY) ? "" : SUPABASE_ANON_KEY, table: "case_diary", client: null, maxRows: 5000,
       refreshMs: 300000, staffPageSize: 6, publicPageSize: 1, isStaff: null, logTable: "", pages: {} },

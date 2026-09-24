@@ -1,5 +1,5 @@
 // Run: node law-desk-selftest.js  — generates phrasings from every topic alias x 30 templates and checks the Law Desk finds the right topic.
-const core = require('./dlo-assistant.js');
+const core = require('./assistant.js');
 const KB = core.KB, norm = core.norm;
 const T = ["{}","what is {}","what is the {}","explain {}","{} meaning","meaning of {}","define {}","tell me about {}","{} procedure","procedure for {}","how to file {}","how does {} work","{} process","steps in {}","{} time limit","limitation for {}","{} kya hai","{} kaise hota hai","can you explain {} in simple words","please tell me about {} details","{} under cpc","law on {}","{} grounds","what are the grounds for {}","i want to know about {}","sir {} ke bare me batao","{} in jammu and kashmir","how many days for {}","{} ki muddat","{} sir"];
 // alias -> topics

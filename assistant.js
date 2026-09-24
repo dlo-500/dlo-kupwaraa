@@ -44,8 +44,8 @@
 
   const VERSION = "NK.2.1";
   // ▼▼ PASTE YOUR TWO VALUES HERE (once). Use the public ANON key only — never the service_role key. ▼▼
-  const SUPABASE_URL = "PASTE_SUPABASE_URL_HERE";       // e.g. https://abcdxyz.supabase.co
-  const SUPABASE_ANON_KEY = "PASTE_ANON_KEY_HERE";      // the same anon key already used by your pages
+  const SUPABASE_URL = "https://ibicsdsehxlsaygjnefk.supabase.co";       // e.g. https://abcdxyz.supabase.co
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU'";      // the same anon key already used by your pages
   // ▲▲ nothing else needs configuring; DLO_ASSISTANT_CONFIG on a page is now optional ▲▲
   const CFG = Object.assign(
     { supabaseUrl: /^PASTE_/.test(SUPABASE_URL) ? "" : SUPABASE_URL, supabaseKey: /^PASTE_/.test(SUPABASE_ANON_KEY) ? "" : SUPABASE_ANON_KEY, table: "case_diary", client: null, maxRows: 5000,

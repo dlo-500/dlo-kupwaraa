@@ -1,0 +1,44 @@
+{
+  "package_version": "NK.2.6-LR-ACCURATE",
+  "bot_type": "Non-LLM rule-based legal reasoning assistant",
+  "question_count": 60000,
+  "question_count_unique": 60000,
+  "topic_count": null,
+  "reasoning_rule_count": 42,
+  "accuracy_source_count": 11,
+  "validated_on": "2026-09-25",
+  "smoke_test": "22/22 representative legal topics routed without fallback",
+  "node_syntax_check": "passed",
+  "features": [
+    "fact-gated cross-questioning",
+    "rule scoring and specialist-topic routing",
+    "contextual date extraction",
+    "preliminary assessment layer",
+    "contradiction/fact-conflict handling",
+    "source registry",
+    "accuracy safeguards",
+    "60,000 natural-language legal question routes"
+  ],
+  "files": [
+    {
+      "name": "assistant_NK_2_4_LEGAL_REASONING_COMPLETE.js",
+      "size_bytes": 414430,
+      "sha256": "062578df29752d62354aee930fe7ef254f6a52feb93f99b63062b947cfbd04e6"
+    },
+    {
+      "name": "legal_question_bank_60000_COMPLETE.json",
+      "size_bytes": 15960554,
+      "sha256": "e7be72d9737306faa54068b67782ba7554afeb2a46516792083f504866647fa5"
+    },
+    {
+      "name": "legal_reasoning_rules_complete.json",
+      "size_bytes": 104692,
+      "sha256": "88bbb388f007fbb712af46bfa3b60eb31691c9f180c8867d4d74d12c59f2ec9e"
+    },
+    {
+      "name": "legal_accuracy_sources_2026-09-25.json",
+      "size_bytes": 2276,
+      "sha256": "144b72bfdea9d11b1b91e61115fb8e41ff90216f7f2a5a737241c602ce98976e"
+    }
+  ]
+}

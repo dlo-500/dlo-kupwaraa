@@ -1,0 +1,2869 @@
+[
+  {
+    "id": "caveat_restoration",
+    "title": "Caveat against an anticipated restoration application",
+    "source": "Code of Civil Procedure, 1908 — Section 148A; Order IX; verify current court rules",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "caveat.*restor|restor.*caveat|caveat.*dismiss|dismiss.*caveat",
+    "keywords": [
+      "caveat",
+      "restoration",
+      "dismissed in default",
+      "order ix"
+    ],
+    "facts": [
+      "applicationStatus",
+      "dismissalStatus",
+      "court",
+      "partyRole"
+    ],
+    "questions": [
+      {
+        "key": "applicationStatus",
+        "q": "Has the restoration application already been filed, or is it only anticipated?",
+        "patterns": [
+          {
+            "re": "\\b(already|has|have).*\\b(filed|moved|presented)\\b",
+            "v": "filed"
+          },
+          {
+            "re": "\\b(expect|apprehend|likely|may|threat|anticipat).*(restor|application)",
+            "v": "anticipated"
+          },
+          {
+            "re": "\\bnot filed\\b",
+            "v": "anticipated"
+          }
+        ]
+      },
+      {
+        "key": "dismissalStatus",
+        "q": "Was the suit actually dismissed for default/non-appearance under Order IX, and was it a dismissal of the plaintiff's suit?",
+        "patterns": [
+          {
+            "re": "dismissed (for |in )?default|dismissal (for |in )?default|non.?appearance",
+            "v": "default"
+          },
+          {
+            "re": "ex.?parte decree",
+            "v": "exparte"
+          }
+        ]
+      },
+      {
+        "key": "partyRole",
+        "q": "Are you appearing for the defendant/respondent who wants notice before the application is heard?",
+        "patterns": [
+          {
+            "re": "\\b(defendant|respondent|dlo|department|government)\\b",
+            "v": "defendant"
+          },
+          {
+            "re": "\\bplaintiff|applicant\\b",
+            "v": "plaintiff"
+          }
+        ]
+      }
+    ],
+    "base": "Section 148A permits a person claiming a right to appear on an application to lodge a caveat when an application is expected or has been made in a suit or proceeding. A caveat ordinarily remains in force for 90 days unless the application is made before expiry.",
+    "branches": [
+      {
+        "when": {
+          "applicationStatus": "filed"
+        },
+        "text": "Because the application is said to have been filed, the question is no longer merely anticipatory: the caveator's immediate focus should be service of the application and opportunity to be heard."
+      },
+      {
+        "when": {
+          "applicationStatus": "anticipated"
+        },
+        "text": "Because the application is only apprehended, the key issue is whether you have a right to appear on that anticipated application and can properly invoke Section 148A."
+      },
+      {
+        "when": {
+          "dismissalStatus": "exparte"
+        },
+        "text": "Do not treat an ex-parte decree and dismissal for default as the same procedural event. The remedy and limitation analysis may differ."
+      }
+    ],
+    "next": "Do not calculate a filing deadline or assume that a caveat automatically blocks an order; verify the relevant court's filing and service requirements.",
+    "priority": 120,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "caveat",
+      "restor",
+      "dismiss",
+      "default",
+      "order ix",
+      "order 9"
+    ]
+  },
+  {
+    "id": "commercial_ws",
+    "title": "Written statement in a commercial dispute",
+    "source": "Commercial Courts Act, 2015; amended CPC Order V Rule 1 / Order VIII Rule 1",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2156?view_type=browse",
+    "trigger": "commercial.*(written statement|\\bws\\b)|(written statement|\\bws\\b).*commercial|\\b120\\s*days?\\b.*(written statement|\\bws\\b)|forfeit.*written statement",
+    "keywords": [
+      "commercial",
+      "written statement",
+      "120 days",
+      "summons"
+    ],
+    "facts": [
+      "serviceDate",
+      "commercialNature",
+      "urgentRelief",
+      "statementFiled"
+    ],
+    "questions": [
+      {
+        "key": "serviceDate",
+        "q": "On what date were summons served on the defendant?",
+        "patterns": [
+          {
+            "re": "\\b(\\d{1,2}[\\/\\-.]\\d{1,2}[\\/\\-.]\\d{2,4})\\b",
+            "v": "date"
+          }
+        ]
+      },
+      {
+        "key": "statementFiled",
+        "q": "Has the written statement already been filed, or has the 120-day period expired?",
+        "patterns": [
+          {
+            "re": "\\b(file[d]?|submitted|taken on record)\\b",
+            "v": "filed"
+          },
+          {
+            "re": "\\b120\\s*days?.*(expired|over|lapsed)|forfeit",
+            "v": "expired"
+          },
+          {
+            "re": "\\bnot filed|no ws",
+            "v": "notfiled"
+          }
+        ]
+      },
+      {
+        "key": "serviceMode",
+        "q": "Was the summons served in the proceeding in the manner recorded by the court, and is the service record available?",
+        "patterns": [
+          {
+            "re": "\\bservice|served|summons\\b",
+            "v": "recorded"
+          }
+        ]
+      }
+    ],
+    "base": "In a commercial dispute governed by the Commercial Courts Act regime, Order V/Order VIII as modified for commercial suits provides a hard outer limit of 120 days from service of summons for filing the written statement; after expiry, the right to file is forfeited and the court shall not allow the written statement to be taken on record.",
+    "branches": [
+      {
+        "when": {
+          "statementFiled": "expired"
+        },
+        "text": "If the 120-day period has actually expired, the issue is no longer an ordinary request for extension; counsel should examine the exact service date, computation, court record and applicable commercial-court rules before advising on any procedural route."
+      },
+      {
+        "when": {
+          "statementFiled": "filed"
+        },
+        "text": "If the written statement was filed, the next accuracy question is whether it was within the statutory period and in the prescribed commercial-pleading format/verification requirements."
+      }
+    ],
+    "next": "Calculate from the legally relevant service date, not from the department's internal receipt date.",
+    "priority": 120,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "commercial",
+      "written statement",
+      "120 days",
+      "120 day",
+      "forfeit"
+    ]
+  },
+  {
+    "id": "ordinary_ws",
+    "title": "Written statement in an ordinary civil suit",
+    "source": "Code of Civil Procedure, 1908 — Order VIII Rule 1",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "written statement.*(ordinary|civil suit|order viii)|order viii rule 1|delay.*written statement|written statement.*delay",
+    "keywords": [
+      "written statement",
+      "90 days",
+      "order viii rule 1"
+    ],
+    "facts": [
+      "serviceDate",
+      "statementFiled",
+      "delayReason"
+    ],
+    "questions": [
+      {
+        "key": "serviceDate",
+        "q": "When were summons served on the defendant?",
+        "patterns": [
+          {
+            "re": "\\b(\\d{1,2}[\\/\\-.]\\d{1,2}[\\/\\-.]\\d{2,4})\\b",
+            "v": "date"
+          }
+        ]
+      },
+      {
+        "key": "statementFiled",
+        "q": "Has the written statement been filed already?",
+        "patterns": [
+          {
+            "re": "\\b(yes|filed|submitted|already filed)\\b",
+            "v": "filed"
+          },
+          {
+            "re": "\\b(no|not filed|pending)\\b",
+            "v": "notfiled"
+          }
+        ]
+      },
+      {
+        "key": "delayReason",
+        "q": "If there is delay, what is the specific reason and how long is the delay?",
+        "patterns": [
+          {
+            "re": "\\b(office|departmental|file|sanction|approval|administrative)\\b",
+            "v": "administrative"
+          },
+          {
+            "re": "\\b(illness|hospital|medical)\\b",
+            "v": "medical"
+          },
+          {
+            "re": "\\b(no delay|within time)\\b",
+            "v": "none"
+          }
+        ]
+      }
+    ],
+    "base": "Order VIII Rule 1 sets 30 days from service of summons as the ordinary period for filing a written statement, with judicially recognized extension in appropriate cases up to 90 days in ordinary suits; the commercial-suit regime is materially stricter.",
+    "branches": [
+      {
+        "when": {
+          "statementFiled": "notfiled"
+        },
+        "text": "A department should immediately establish the summons-service date and place the plaint, annexures and complete instructions before counsel rather than treating internal file processing as the statutory starting point."
+      },
+      {
+        "when": {
+          "delayReason": "administrative"
+        },
+        "text": "Administrative movement of a government file does not itself answer whether sufficient cause exists; the court will examine the governing procedural rule and the explanation for delay."
+      }
+    ],
+    "next": "Keep ordinary-suit timing separate from the 120-day commercial-suit hard stop.",
+    "priority": 70,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "ordinary suit",
+      "civil suit",
+      "order viii",
+      "written statement"
+    ]
+  },
+  {
+    "id": "s80_notice",
+    "title": "Section 80 CPC notice before suing Government",
+    "source": "Code of Civil Procedure, 1908 — Section 80",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "section 80|s 80|section eighty|notice.*government.*suit|suit.*government.*notice",
+    "keywords": [
+      "section 80",
+      "government",
+      "notice",
+      "two months"
+    ],
+    "facts": [
+      "governmentDefendant",
+      "noticeServed",
+      "urgentRelief"
+    ],
+    "questions": [
+      {
+        "key": "governmentDefendant",
+        "q": "Is the suit against the Government/public officer in respect of an act purportedly done in official capacity?",
+        "patterns": [
+          {
+            "re": "\\b(government|govt|state|public officer|department|official capacity)\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bprivate party|private person\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "noticeServed",
+        "q": "Was a Section 80(1) notice served, and can you prove the date and contents of service?",
+        "patterns": [
+          {
+            "re": "\\bnotice (was )?served|section 80 notice sent|legal notice served",
+            "v": "served"
+          },
+          {
+            "re": "\\bno notice|without notice|not served",
+            "v": "notserved"
+          }
+        ]
+      },
+      {
+        "key": "urgentRelief",
+        "q": "Does the plaint genuinely seek immediate urgent or interim relief, or is it an ordinary suit?",
+        "patterns": [
+          {
+            "re": "\\b(urgent|immediate|interim|injunction|temporary injunction)\\b",
+            "v": "urgent"
+          },
+          {
+            "re": "\\bordinary|no interim relief|routine",
+            "v": "ordinary"
+          }
+        ]
+      }
+    ],
+    "base": "Section 80(1) generally requires two months' notice before institution of a suit against the Government or specified public officers for official acts. Section 80(2) creates a court-controlled route for urgent or immediate relief, subject to its statutory conditions.",
+    "branches": [
+      {
+        "when": {
+          "noticeServed": "notserved",
+          "urgentRelief": "ordinary"
+        },
+        "text": "If no Section 80 notice was served and the case is not within the urgent-relief route, the department should examine the statutory objection at the threshold and the exact relief claimed."
+      },
+      {
+        "when": {
+          "noticeServed": "notserved",
+          "urgentRelief": "urgent"
+        },
+        "text": "If urgent relief is genuinely contemplated, the question becomes whether leave under Section 80(2) was sought/obtained and what the court actually ordered. Do not assume that urgency automatically waives Section 80."
+      }
+    ],
+    "next": "Check the notice date, addressee, contents, statutory two-month period, and any order granting leave under Section 80(2).",
+    "priority": 115,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "section 80",
+      "s 80",
+      "government",
+      "public officer",
+      "notice"
+    ]
+  },
+  {
+    "id": "caveat",
+    "title": "Caveat under Section 148A CPC",
+    "source": "Code of Civil Procedure, 1908 — Section 148A",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "\\bcaveat\\b|148a",
+    "keywords": [
+      "caveat",
+      "148a",
+      "notice",
+      "90 days"
+    ],
+    "facts": [
+      "applicationStatus",
+      "court"
+    ],
+    "questions": [
+      {
+        "key": "applicationStatus",
+        "q": "Is the application already filed, or is it only expected?",
+        "patterns": [
+          {
+            "re": "\\b(already|has|have).*\\b(filed|moved)\\b",
+            "v": "filed"
+          },
+          {
+            "re": "\\b(expected|anticipated|apprehend|likely|may file)\\b",
+            "v": "anticipated"
+          }
+        ]
+      },
+      {
+        "key": "court",
+        "q": "Which court or forum is expected to hear the application?",
+        "patterns": [
+          {
+            "re": "\\b(high court|district court|sessions|sub judge|munsiff|consumer|cat|tribunal)\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Section 148A allows a person claiming a right to appear at the hearing of an application to lodge a caveat where the application is expected or has been made. The caveat procedure includes notice/service duties, and the statutory text provides a 90-day life unless the application is made before expiry.",
+    "next": "A caveat is about notice and opportunity to be heard; it is not itself an adjudication on the merits of the expected application.",
+    "priority": 85,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "exparte",
+    "title": "Setting aside an ex-parte decree under Order IX Rule 13",
+    "source": "Code of Civil Procedure, 1908 — Order IX Rule 13 and Limitation Act",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "ex.?parte.*decree|order ix rule 13|set aside.*ex.?parte|ex.?parte remedies",
+    "keywords": [
+      "ex parte",
+      "order ix rule 13",
+      "decree",
+      "30 days"
+    ],
+    "facts": [
+      "decreeDate",
+      "serviceStatus",
+      "appearanceReason",
+      "appealFiled"
+    ],
+    "questions": [
+      {
+        "key": "serviceStatus",
+        "q": "Was the defendant duly served with summons, and if so was there sufficient time to appear?",
+        "patterns": [
+          {
+            "re": "\\b(not served|no service|not duly served)\\b",
+            "v": "defective"
+          },
+          {
+            "re": "\\bduly served|properly served|served in time\\b",
+            "v": "proper"
+          }
+        ]
+      },
+      {
+        "key": "appearanceReason",
+        "q": "Why did the defendant not appear when the matter was called?",
+        "patterns": [
+          {
+            "re": "\\bsufficient cause|illness|hospital|wrong date|miscommunication|counsel absent|mistake\\b",
+            "v": "possibleCause"
+          },
+          {
+            "re": "\\bdeliberate|intentionally|knowingly did not appear\\b",
+            "v": "deliberate"
+          }
+        ]
+      },
+      {
+        "key": "appealFiled",
+        "q": "Has an appeal against the ex-parte decree already been filed and disposed of?",
+        "patterns": [
+          {
+            "re": "\\bappeal.*filed|filed.*appeal\\b",
+            "v": "filed"
+          },
+          {
+            "re": "\\bno appeal|appeal not filed\\b",
+            "v": "none"
+          }
+        ]
+      }
+    ],
+    "base": "Order IX Rule 13 provides a route to seek setting aside of an ex-parte decree on the statutory grounds, including improper service or sufficient cause for non-appearance. Limitation must be calculated from the legally relevant date under the Limitation Act and its exclusion rules.",
+    "branches": [
+      {
+        "when": {
+          "serviceStatus": "defective"
+        },
+        "text": "If service was not duly effected, that fact is central and should be proved from the summons record and court process, not merely asserted."
+      },
+      {
+        "when": {
+          "appearanceReason": "possibleCause"
+        },
+        "text": "If a sufficient-cause explanation is relied on, preserve contemporaneous medical, travel, communication or counsel records supporting it."
+      },
+      {
+        "when": {
+          "appealFiled": "filed"
+        },
+        "text": "If an appeal has already been pursued, the availability of a separate Order IX Rule 13 route can be affected by the statutory explanation attached to Rule 13 and by what happened in the appeal; counsel should examine the appellate record."
+      }
+    ],
+    "next": "Do not give a fixed limitation date without the decree/service facts and the relevant limitation article.",
+    "priority": 110,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "restoration",
+    "title": "Restoration after dismissal for default",
+    "source": "Code of Civil Procedure, 1908 — Order IX Rules 4 and 9; Limitation Act",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "restore.*suit|restoration.*suit|dismissed.*default|order ix rule 9",
+    "keywords": [
+      "restoration",
+      "dismissed for default",
+      "order ix rule 9"
+    ],
+    "facts": [
+      "dismissalType",
+      "absenceReason",
+      "noticeDate"
+    ],
+    "questions": [
+      {
+        "key": "dismissalType",
+        "q": "Was the plaintiff's suit dismissed for non-appearance/default, and under which Order IX provision if known?",
+        "patterns": [
+          {
+            "re": "dismissed.*default|dismissed.*non.?appearance|order ix rule 9",
+            "v": "plaintiffDefault"
+          }
+        ]
+      },
+      {
+        "key": "absenceReason",
+        "q": "What is the explanation for the plaintiff or counsel not appearing?",
+        "patterns": [
+          {
+            "re": "\\bsufficient cause|illness|hospital|wrong date|counsel absent|mistake\\b",
+            "v": "possibleCause"
+          }
+        ]
+      }
+    ],
+    "base": "Where a suit is dismissed for default, the appropriate restoration route depends on the precise Order IX provision under which dismissal occurred and the facts explaining non-appearance. Limitation must be checked against the applicable Article and Section 5 where condonation is legally available.",
+    "next": "Obtain the dismissal order itself before advising on the remedy; the wording of the order determines the procedural route.",
+    "priority": 100,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "condonation_delay",
+    "title": "Condonation of delay under Section 5 Limitation Act",
+    "source": "Limitation Act, 1963 — Section 5",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1565?col=123456789%2F1362&view_type=search",
+    "trigger": "condonation|delay.*limitation|section 5|s\\.?5.*limitation",
+    "keywords": [
+      "condonation",
+      "delay",
+      "section 5",
+      "sufficient cause"
+    ],
+    "facts": [
+      "proceedingType",
+      "delayCause",
+      "dayToDayExplanation"
+    ],
+    "questions": [
+      {
+        "key": "proceedingType",
+        "q": "What proceeding is delayed—an appeal or an application? Section 5 does not extend to every proceeding or every special limitation regime.",
+        "patterns": [
+          {
+            "re": "\\bappeal\\b",
+            "v": "appeal"
+          },
+          {
+            "re": "\\bapplication|miscellaneous application|restoration|review\\b",
+            "v": "application"
+          },
+          {
+            "re": "\\bsuit\\b",
+            "v": "suit"
+          }
+        ]
+      },
+      {
+        "key": "delayCause",
+        "q": "What is the specific cause of delay, with supporting dates/documents?",
+        "patterns": [
+          {
+            "re": "\\bmedical|hospital|illness\\b",
+            "v": "medical"
+          },
+          {
+            "re": "\\bdepartment|administrative|file|sanction|approval\\b",
+            "v": "administrative"
+          },
+          {
+            "re": "\\bcounsel|advocate|wrong advice|communication\\b",
+            "v": "counsel"
+          }
+        ]
+      },
+      {
+        "key": "dayToDayExplanation",
+        "q": "Can the delay be explained for the relevant period rather than only by a single broad reason?",
+        "patterns": [
+          {
+            "re": "\\bday.?to.?day|each day|chronology|date wise\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno chronology|no explanation\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Section 5 permits condonation in appeals and specified applications where sufficient cause is shown; it does not automatically apply to suits, and special statutes may contain their own limitation regime. The explanation and evidence for delay must be matched to the governing provision.",
+    "branches": [
+      {
+        "when": {
+          "proceedingType": "suit"
+        },
+        "text": "If the delayed proceeding is a suit, do not assume Section 5 can condone the delay. First identify the applicable statutory limitation rule and any specific extension/exclusion provision."
+      },
+      {
+        "when": {
+          "delayCause": "administrative"
+        },
+        "text": "Internal departmental delay should be documented chronologically; merely stating that a file moved through offices is not a substitute for the statutory test."
+      }
+    ],
+    "next": "Always identify the exact limitation Article/section before calculating delay or drafting a condonation application.",
+    "priority": 80,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "execution",
+    "title": "Execution of civil decrees",
+    "source": "CPC Sections 36–74, Section 47, Order XXI; Limitation Act Article 136",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "execution.*decree|execute.*decree|order xxi|execution petition",
+    "keywords": [
+      "execution",
+      "decree holder",
+      "judgment debtor",
+      "order xxi"
+    ],
+    "facts": [
+      "decreeType",
+      "paymentStatus",
+      "appealStay",
+      "mode"
+    ],
+    "questions": [
+      {
+        "key": "decreeType",
+        "q": "What does the decree require—money payment, possession, injunction, delivery, or another act?",
+        "patterns": [
+          {
+            "re": "\\bmoney|payment|amount|mesne profits\\b",
+            "v": "money"
+          },
+          {
+            "re": "\\bpossession|eviction|delivery\\b",
+            "v": "possession"
+          },
+          {
+            "re": "\\binjunction|restrain|mandatory direction\\b",
+            "v": "injunction"
+          }
+        ]
+      },
+      {
+        "key": "paymentStatus",
+        "q": "Has the judgment-debtor complied with the decree, wholly or partly?",
+        "patterns": [
+          {
+            "re": "\\bpaid|complied|satisfied|partly complied\\b",
+            "v": "partly"
+          },
+          {
+            "re": "\\bnot paid|not complied|unsatisfied\\b",
+            "v": "unsatisfied"
+          }
+        ]
+      },
+      {
+        "key": "appealStay",
+        "q": "Is there an appeal, and has a stay of execution actually been granted?",
+        "patterns": [
+          {
+            "re": "\\bappeal.*stay|stay.*execution|stay order\\b",
+            "v": "stay"
+          },
+          {
+            "re": "\\bappeal.*no stay|no stay\\b",
+            "v": "nostay"
+          }
+        ]
+      }
+    ],
+    "base": "A decree is enforced through the execution machinery of CPC, principally Order XXI. The executing court ordinarily enforces the decree rather than reopening its merits; Section 47 assigns specified execution questions to the executing court. Limitation and any stay order must be checked separately.",
+    "branches": [
+      {
+        "when": {
+          "appealStay": "nostay"
+        },
+        "text": "The mere filing of an appeal does not by itself establish a stay of execution. Obtain and read the actual stay order, if any."
+      },
+      {
+        "when": {
+          "decreeType": "possession"
+        },
+        "text": "For possession decrees, the execution route, resistance/obstruction provisions and the nature of the occupant must be identified before choosing the procedural step."
+      }
+    ],
+    "next": "Identify the exact decree and relief before selecting the execution mode.",
+    "priority": 90,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "exec_govt",
+    "title": "Execution of decrees against Government",
+    "source": "CPC Section 82",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "execution.*government|section 82|s\\.?82.*cpc|three months.*government",
+    "keywords": [
+      "government",
+      "section 82",
+      "three months",
+      "execution"
+    ],
+    "facts": [
+      "decreeDate",
+      "satisfied"
+    ],
+    "questions": [
+      {
+        "key": "decreeDate",
+        "q": "What is the date of the decree/order/award against the Government or public officer?",
+        "patterns": [
+          {
+            "re": "\\b(\\d{1,2}[\\/\\-.]\\d{1,2}[\\/\\-.]\\d{2,4})\\b",
+            "v": "date"
+          }
+        ]
+      },
+      {
+        "key": "satisfied",
+        "q": "Has the decree been satisfied, partly satisfied, or remains unsatisfied?",
+        "patterns": [
+          {
+            "re": "\\bunsatisfied|not complied|not paid\\b",
+            "v": "unsatisfied"
+          },
+          {
+            "re": "\\bpaid|satisfied|complied\\b",
+            "v": "satisfied"
+          }
+        ]
+      }
+    ],
+    "base": "Section 82 CPC provides that where a qualifying decree is against the Government or a public officer in respect of an official act, execution shall not issue unless the decree remains unsatisfied for three months from the date of the decree; the provision also addresses qualifying orders/awards capable of execution as decrees.",
+    "next": "Do not confuse the three-month execution protection with the separate 12-year limitation applicable to many civil decrees under Article 136 of the Limitation Act.",
+    "priority": 110,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "injunction",
+    "title": "Temporary injunction",
+    "source": "CPC Order XXXIX Rules 1–2; Specific Relief Act",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "temporary injunction|interim injunction|order xxxix|injunction.*prima facie|balance of convenience",
+    "keywords": [
+      "injunction",
+      "prima facie",
+      "balance of convenience",
+      "irreparable injury"
+    ],
+    "facts": [
+      "relief",
+      "urgency",
+      "priorOrder"
+    ],
+    "questions": [
+      {
+        "key": "relief",
+        "q": "What exactly is sought to be restrained—dispossession, construction, recovery, transfer, or another act?",
+        "patterns": [
+          {
+            "re": "\\bdispossess|evict|possession\\b",
+            "v": "possession"
+          },
+          {
+            "re": "\\bconstruct|demolish|infrastructure|road|bridge|pipeline\\b",
+            "v": "construction"
+          },
+          {
+            "re": "\\btransfer|sale|alienate\\b",
+            "v": "transfer"
+          }
+        ]
+      },
+      {
+        "key": "urgency",
+        "q": "What immediate event is said to make relief urgent?",
+        "patterns": [
+          {
+            "re": "\\bimmediate|urgent|tomorrow|demolition|demolish|dispossession|auction\\b",
+            "v": "urgent"
+          }
+        ]
+      },
+      {
+        "key": "priorOrder",
+        "q": "Is there already an interim/status-quo/stay order in force?",
+        "patterns": [
+          {
+            "re": "\\bstatus quo|stay order|interim order|injunction already\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno prior order|no stay|no injunction\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Temporary injunction analysis is fact-sensitive. Courts ordinarily examine the recognised interim-relief principles, including prima facie case, balance of convenience and irreparable injury, alongside the statutory restrictions and conduct of the parties.",
+    "next": "The bot should not predict whether an injunction will be granted without the exact act sought to be restrained, existing orders and the applicable statutory bar.",
+    "priority": 85,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "infrastructure_injunction",
+    "title": "Infrastructure-project injunction restrictions",
+    "source": "Specific Relief Act, 1963 — Sections 20A and 41(ha), Schedule",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1583?view_type=browse",
+    "trigger": "infrastructure.*injunction|injunction.*infrastructure|41\\(?ha\\)?|20a.*injunction|road.*(?:injunction|stay|project)|bridge.*(?:injunction|stay|project)|pipeline.*(?:injunction|stay|project)|power.*(?:injunction|stay|project)",
+    "keywords": [
+      "infrastructure",
+      "injunction",
+      "section 20a",
+      "section 41 ha"
+    ],
+    "facts": [
+      "projectType",
+      "projectSchedule",
+      "injunctionImpact"
+    ],
+    "questions": [
+      {
+        "key": "projectType",
+        "q": "What infrastructure project is involved—for example roads, bridges, water/sanitation, energy or another scheduled category?",
+        "patterns": [
+          {
+            "re": "\\broad|highway|bridge|rail|airport|port|water|sanitation|power|electric|energy\\b",
+            "v": "scheduledCandidate"
+          }
+        ]
+      },
+      {
+        "key": "projectSchedule",
+        "q": "Can the project be matched to the current statutory Schedule/notification defining an infrastructure project?",
+        "patterns": [
+          {
+            "re": "\\b(schedule|notified|listed|specified)\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bnot in schedule|uncertain|don't know|unknown\\b",
+            "v": "unknown"
+          }
+        ]
+      },
+      {
+        "key": "injunctionImpact",
+        "q": "Would the requested injunction, on the pleaded facts, impede or delay progress/completion or interfere with the relevant facility/service?",
+        "patterns": [
+          {
+            "re": "\\b(delay|impede|stop|halt|block|interfere)\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno delay|would not affect\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Sections 20A and 41(ha) of the Specific Relief Act impose restrictions on injunctions in qualifying infrastructure-project circumstances. The project must satisfy the statutory definition/Schedule requirements and the requested injunction must satisfy the statutory impact test; this is not a blanket bar on every injunction connected with infrastructure.",
+    "next": "Verify the current Schedule/notification and the precise contractual/statutory basis of the suit before relying on Sections 20A or 41(ha).",
+    "priority": 125,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "electronic_evidence",
+    "title": "Electronic evidence under BSA Section 63",
+    "source": "Bharatiya Sakshya Adhiniyam, 2023 — Section 63 and Schedule",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/20063?col=123456789%2F1362&view_type=search",
+    "trigger": "electronic evidence|digital evidence|65b|section 63.*bsa|whatsapp.*(?:chat|message|evidence|certificate)|(?:chat|message).*bsa|cctv.*(?:evidence|certificate)|email.*(?:evidence|certificate)|electronic record",
+    "keywords": [
+      "electronic evidence",
+      "BSA 63",
+      "certificate",
+      "hash"
+    ],
+    "facts": [
+      "recordType",
+      "sourceDevice",
+      "certificateAvailable"
+    ],
+    "questions": [
+      {
+        "key": "recordType",
+        "q": "What electronic record is involved—WhatsApp/chat, email, CCTV, audio/video, server log, phone data, or a computer output?",
+        "patterns": [
+          {
+            "re": "\\bwhatsapp|chat|message|email|cctv|audio|video|server|log|computer output|mobile|digital\\b",
+            "v": "electronic"
+          }
+        ]
+      },
+      {
+        "key": "sourceDevice",
+        "q": "Do you have the original device/source or only a copy/export/printout/screenshot?",
+        "patterns": [
+          {
+            "re": "\\boriginal device|original source|device available\\b",
+            "v": "original"
+          },
+          {
+            "re": "\\bcopy|printout|export|screenshot|forwarded\\b",
+            "v": "copy"
+          }
+        ]
+      },
+      {
+        "key": "certificateAvailable",
+        "q": "Do you have the Section 63 certificate in the prescribed form, with the required device/source particulars and other statutory particulars where applicable?",
+        "patterns": [
+          {
+            "re": "\\bcertificate|section 63 certificate\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno certificate|without certificate\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "tenderRoute",
+        "q": "How will the record be tendered—through the Section 63 statutory computer/device-output route or another mode of proof?",
+        "patterns": [
+          {
+            "re": "\\bsection 63|computer output|device output|certificate\\b",
+            "v": "section63"
+          },
+          {
+            "re": "\\boriginal device|directly from device|primary\\b",
+            "v": "source"
+          }
+        ]
+      }
+    ],
+    "base": "Section 63 BSA governs the statutory route for proving electronic records through computer/communication-device output. The Act contains a certificate framework and Schedule. The correct mode of proof must be identified before saying a certificate is or is not required in a particular case.",
+    "branches": [
+      {
+        "when": {
+          "sourceDevice": "original"
+        },
+        "text": "If the original source/device is available, counsel should identify whether the record is being proved through direct/primary evidence or as a computer output under Section 63."
+      },
+      {
+        "when": {
+          "certificateAvailable": "no"
+        },
+        "text": "If a certificate is required for the chosen mode of proof, its absence is a procedural/evidentiary issue to address before tendering the record; verify the exact statutory route and current case law."
+      }
+    ],
+    "next": "Identify the mode of tender, preserve the source/device and provenance, and verify the current Section 63 certificate requirements and controlling case law before asserting admissibility or inadmissibility.",
+    "priority": 125,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "whatsapp",
+      "email",
+      "cctv",
+      "electronic evidence",
+      "digital evidence",
+      "65b",
+      "bsa 63",
+      "section 63"
+    ]
+  },
+  {
+    "id": "civil_death",
+    "title": "Seven-year evidentiary presumption concerning a missing person",
+    "source": "Bharatiya Sakshya Adhiniyam, 2023 — Sections 110–111",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/20063?col=123456789%2F1362&view_type=search",
+    "trigger": "civil death|presumption of death|not heard.*seven years|section 111.*bsa",
+    "keywords": [
+      "seven years",
+      "missing person",
+      "presumption of death",
+      "BSA 111"
+    ],
+    "facts": [
+      "lastHeard",
+      "naturalInformants",
+      "reliefSought"
+    ],
+    "questions": [
+      {
+        "key": "lastHeard",
+        "q": "When was the person last heard of, and has the statutory seven-year period been completed?",
+        "patterns": [
+          {
+            "re": "\\bseven years?|7 years?\\b",
+            "v": "sevenYears"
+          }
+        ]
+      },
+      {
+        "key": "naturalInformants",
+        "q": "Which persons would naturally have heard from the missing person if the person were alive, and what evidence shows they did not?",
+        "patterns": [
+          {
+            "re": "\\bfamily|spouse|children|parents|natural informants|heard from\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "reliefSought",
+        "q": "What consequential relief is actually being sought—succession, pension, mutation, declaration, appointment, or another benefit?",
+        "patterns": [
+          {
+            "re": "\\bpension|mutation|succession|declaration|appointment|benefit\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Section 111 BSA addresses the evidentiary burden concerning a person who has not been heard of for the statutory seven-year period by persons who would naturally have heard from that person if alive. It should not be treated as an automatic determination of an exact date/place/time of death or as a universal administrative declaration.",
+    "next": "Identify the competent forum and the exact consequential relief before advising on the next procedural step.",
+    "priority": 110,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "limitation_general",
+    "title": "Limitation: identifying the correct period",
+    "source": "Limitation Act, 1963",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1565?col=123456789%2F1362&view_type=search",
+    "trigger": "limitation|time barred|time-barred|limitation period|article \\d+.*limitation|section 3.*limitation|section 5.*limitation",
+    "keywords": [
+      "limitation",
+      "article",
+      "section 3",
+      "special law"
+    ],
+    "facts": [
+      "proceeding",
+      "startEvent",
+      "specialLaw"
+    ],
+    "questions": [
+      {
+        "key": "proceeding",
+        "q": "What exact proceeding is being timed—a suit, first/second appeal, review, revision, execution, or application?",
+        "patterns": [
+          {
+            "re": "\\bsuit\\b",
+            "v": "suit"
+          },
+          {
+            "re": "\\bfirst appeal|appeal\\b",
+            "v": "appeal"
+          },
+          {
+            "re": "\\bsecond appeal\\b",
+            "v": "secondAppeal"
+          },
+          {
+            "re": "\\breview\\b",
+            "v": "review"
+          },
+          {
+            "re": "\\brevision\\b",
+            "v": "revision"
+          },
+          {
+            "re": "\\bexecution\\b",
+            "v": "execution"
+          },
+          {
+            "re": "\\bapplication\\b",
+            "v": "application"
+          }
+        ]
+      },
+      {
+        "key": "startEvent",
+        "q": "What event/date started the limitation period—order, decree, knowledge, refusal, cause of action, or another statutory event?",
+        "patterns": [
+          {
+            "re": "\\bdecree|judgment|order\\b",
+            "v": "order"
+          },
+          {
+            "re": "\\bknowledge|discovery|aware\\b",
+            "v": "knowledge"
+          },
+          {
+            "re": "\\brefusal|rejected|denied\\b",
+            "v": "refusal"
+          }
+        ]
+      },
+      {
+        "key": "specialLaw",
+        "q": "Does a special statute govern the proceeding and prescribe its own limitation period?",
+        "patterns": [
+          {
+            "re": "\\bconsumer|commercial|arbitration|motor vehicles|electricity|special act|special statute\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno special law|general law\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "The Limitation Act contains different Articles for different proceedings, and Section 3 makes limitation a mandatory threshold rule subject to the Act and special statutes. The first task is to identify the exact proceeding and the Article or special-law provision, then compute the legally relevant start date and statutory exclusions/extensions.",
+    "next": "Never answer a limitation question from the number of days alone; identify the proceeding, Article, triggering event and any exclusion/extension provision.",
+    "priority": 20,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "appeals",
+    "title": "First appeal and limitation",
+    "source": "CPC Section 96, Order XLI; Limitation Act",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "first appeal|section 96|order xli|appeal against decree",
+    "keywords": [
+      "appeal",
+      "section 96",
+      "order xli",
+      "decree"
+    ],
+    "facts": [
+      "decreeType",
+      "forum",
+      "stayNeeded"
+    ],
+    "questions": [
+      {
+        "key": "decreeType",
+        "q": "Is the impugned decision a decree, and is it a preliminary or final decree?",
+        "patterns": [
+          {
+            "re": "\\bdecree\\b",
+            "v": "decree"
+          },
+          {
+            "re": "\\binterim order|order only\\b",
+            "v": "order"
+          }
+        ]
+      },
+      {
+        "key": "forum",
+        "q": "Which court passed the decree and which appellate forum is contemplated?",
+        "patterns": [
+          {
+            "re": "\\bsub judge|munsiff|district court|trial court\\b",
+            "v": "subordinate"
+          },
+          {
+            "re": "\\bhigh court\\b",
+            "v": "highcourt"
+          }
+        ]
+      },
+      {
+        "key": "stayNeeded",
+        "q": "Does execution or implementation need to be stayed urgently pending appeal?",
+        "patterns": [
+          {
+            "re": "\\bstay|execution|urgent\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno stay\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Section 96 CPC provides for appeals from decrees subject to its statutory exceptions. The appropriate appellate forum and limitation period must be identified from the nature of the decree, the court that passed it and the applicable Limitation Act Article. A stay of execution is a separate question and is not automatic merely because an appeal is filed.",
+    "next": "Read the decree, identify the appellate court and separately prepare any stay application if execution is at risk.",
+    "priority": 75,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "second_appeal",
+    "title": "Second appeal and substantial question of law",
+    "source": "CPC Section 100",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "second appeal|section 100|substantial question of law",
+    "keywords": [
+      "second appeal",
+      "section 100",
+      "substantial question of law"
+    ],
+    "facts": [
+      "appellateDecree",
+      "questionOfLaw",
+      "factFindings"
+    ],
+    "questions": [
+      {
+        "key": "appellateDecree",
+        "q": "Is the impugned decision a decree passed in first appeal?",
+        "patterns": [
+          {
+            "re": "\\bfirst appeal.*decree|appellate decree\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "questionOfLaw",
+        "q": "What precise question of law is said to be substantial?",
+        "patterns": [
+          {
+            "re": "\\bquestion of law|substantial question|interpretation of statute|jurisdictional legal error\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "factFindings",
+        "q": "Is the proposed challenge only asking the High Court to re-appreciate concurrent findings of fact?",
+        "patterns": [
+          {
+            "re": "\\bre.?appreciate evidence|concurrent findings|facts only\\b",
+            "v": "factsOnly"
+          },
+          {
+            "re": "\\blegal question|perversity|misapplication of law\\b",
+            "v": "law"
+          }
+        ]
+      }
+    ],
+    "base": "Section 100 CPC confines second appeals to cases involving a substantial question of law, subject to the statutory conditions. A second appeal is not a routine third factual hearing.",
+    "branches": [
+      {
+        "when": {
+          "factFindings": "factsOnly"
+        },
+        "text": "If the proposed grounds only seek re-appreciation of concurrent factual findings, the Section 100 threshold must be addressed explicitly rather than presenting the case as an ordinary appeal."
+      }
+    ],
+    "next": "Frame the proposed substantial question of law precisely before drafting the memorandum of appeal.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "review",
+    "title": "Review under Section 114 and Order XLVII CPC",
+    "source": "CPC Section 114, Order XLVII; Limitation Act Article 124",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "review.*judgment|section 114|order xlvii|error apparent",
+    "keywords": [
+      "review",
+      "error apparent",
+      "new evidence",
+      "order xlvii"
+    ],
+    "facts": [
+      "ground",
+      "dueDiligence",
+      "sameCourt"
+    ],
+    "questions": [
+      {
+        "key": "ground",
+        "q": "Is the review based on new evidence, an error apparent on the record, or another recognised sufficient reason?",
+        "patterns": [
+          {
+            "re": "new evidence|new and important evidence",
+            "v": "newEvidence"
+          },
+          {
+            "re": "error apparent|apparent error",
+            "v": "error"
+          },
+          {
+            "re": "sufficient reason",
+            "v": "sufficientReason"
+          }
+        ]
+      },
+      {
+        "key": "dueDiligence",
+        "q": "If new evidence is relied on, why could it not be produced earlier despite due diligence?",
+        "patterns": [
+          {
+            "re": "due diligence|not available|could not obtain",
+            "v": "explained"
+          }
+        ]
+      },
+      {
+        "key": "sameCourt",
+        "q": "Is the application being made before the same court that passed the decree/order?",
+        "patterns": [
+          {
+            "re": "same court|same judge|court which passed",
+            "v": "yes"
+          },
+          {
+            "re": "different court|appeal court",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Review is a limited statutory jurisdiction. The grounds are materially narrower than an appeal and ordinarily include discovery of new and important matter/evidence despite due diligence, an error apparent on the face of the record, or another recognised sufficient reason under Order XLVII.",
+    "next": "Do not use review simply to re-argue the merits as though it were an appeal.",
+    "priority": 95,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "res_judicata",
+    "title": "Res judicata under Section 11 CPC",
+    "source": "CPC Section 11",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "res judicata|section 11|constructive res judicata",
+    "keywords": [
+      "res judicata",
+      "former suit",
+      "same parties",
+      "constructive"
+    ],
+    "facts": [
+      "sameParties",
+      "sameIssue",
+      "finalDecision",
+      "competentCourt"
+    ],
+    "questions": [
+      {
+        "key": "sameParties",
+        "q": "Are the parties (or persons litigating under the same title) substantially the same?",
+        "patterns": [
+          {
+            "re": "\\bsame parties|same title|same litigants\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bdifferent parties|different title\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "sameIssue",
+        "q": "Is the matter directly and substantially in issue in both proceedings?",
+        "patterns": [
+          {
+            "re": "\\bsame issue|same matter|directly and substantially\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bdifferent issue\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "finalDecision",
+        "q": "Was the issue heard and finally decided by a competent court?",
+        "patterns": [
+          {
+            "re": "\\bfinally decided|judgment on merits|final decision\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bnot decided|pending|withdrawn before decision\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Section 11 bars a subsequent suit or issue where the statutory conditions of former adjudication are satisfied. The analysis is fact-specific: parties, title, issue, competence of the former court and final adjudication must all be tested. Constructive res judicata adds the statutory deeming rule in Explanation IV.",
+    "next": "Compare the two pleadings and prior judgment side-by-side before asserting res judicata.",
+    "priority": 95,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "sub_judice",
+    "title": "Res sub judice under Section 10 CPC",
+    "source": "CPC Section 10",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2191?view_type=browse",
+    "trigger": "res sub judice|section 10|parallel suit|stay.*suit",
+    "keywords": [
+      "section 10",
+      "parallel suit",
+      "same matter",
+      "previously instituted"
+    ],
+    "facts": [
+      "earlierSuit",
+      "sameIssue",
+      "sameParties",
+      "competentCourt"
+    ],
+    "questions": [
+      {
+        "key": "earlierSuit",
+        "q": "Is there a previously instituted suit still pending?",
+        "patterns": [
+          {
+            "re": "\\bpreviously instituted|earlier suit|pending suit\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "sameIssue",
+        "q": "Is the matter directly and substantially in issue in both suits?",
+        "patterns": [
+          {
+            "re": "\\bsame issue|same matter|directly and substantially\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "sameParties",
+        "q": "Are the parties litigating under the same title in both suits?",
+        "patterns": [
+          {
+            "re": "\\bsame parties|same title\\b",
+            "v": "yes"
+          }
+        ]
+      }
+    ],
+    "base": "Section 10 concerns the trial of a later suit where the statutory conditions of a previously instituted pending suit are satisfied. It is distinct from res judicata because the earlier matter has not yet reached final adjudication.",
+    "next": "Obtain the earlier suit's pleadings, parties, court competence and current status before relying on Section 10.",
+    "priority": 85,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "public_premises",
+    "title": "Eviction from public premises",
+    "source": "Public Premises (Eviction of Unauthorised Occupants) Act, 1971",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1609?col=123456789%2F1362&view_type=search",
+    "trigger": "public premises|estate officer|unauthori[sz]ed occupant|eviction.*public premises",
+    "keywords": [
+      "public premises",
+      "eviction",
+      "unauthorised occupant",
+      "estate officer"
+    ],
+    "facts": [
+      "premisesStatus",
+      "authority",
+      "notice"
+    ],
+    "questions": [
+      {
+        "key": "premisesStatus",
+        "q": "Is the property actually covered by the statutory definition of public premises?",
+        "patterns": [
+          {
+            "re": "\\bgovernment|public authority|corporation|premises\\b",
+            "v": "candidate"
+          }
+        ]
+      },
+      {
+        "key": "notice",
+        "q": "Has the Estate Officer served the statutory notice and provided the opportunity contemplated by the Act?",
+        "patterns": [
+          {
+            "re": "\\bnotice served|show cause|estate officer\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno notice\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "The Public Premises Act establishes a statutory eviction process for covered public premises, including notice, adjudication by the Estate Officer and an appeal route. The Act also contains finality/jurisdiction provisions, so a civil-court challenge must be tested against the exact statutory provision and relief sought.",
+    "next": "Confirm that the land/premises falls within the Act before treating ordinary civil-suit procedure as the primary route.",
+    "priority": 100,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "public premises",
+      "estate officer"
+    ]
+  },
+  {
+    "id": "arbitration",
+    "title": "Arbitration and setting aside an award",
+    "source": "Arbitration and Conciliation Act, 1996; J&K/Ladakh adaptation must be checked",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1978?view_type=browse",
+    "trigger": "arbitration|section 34.*award|set aside.*award|arbitral award",
+    "keywords": [
+      "arbitration",
+      "section 34",
+      "award",
+      "stay"
+    ],
+    "facts": [
+      "awardDate",
+      "partyReceivesAward",
+      "jurisdiction",
+      "jkaAdaptation"
+    ],
+    "questions": [
+      {
+        "key": "partyReceivesAward",
+        "q": "When did the challenging party receive the arbitral award (or the decision on a Section 33 request, if any)?",
+        "patterns": [
+          {
+            "re": "\\b(\\d{1,2}[\\/\\-.]\\d{1,2}[\\/\\-.]\\d{2,4})\\b",
+            "v": "date"
+          }
+        ]
+      },
+      {
+        "key": "jkaAdaptation",
+        "q": "Is the matter governed by the J&K/Ladakh statutory adaptation of Section 34?",
+        "patterns": [
+          {
+            "re": "\\bjammu.?kashmir|j&k|ladakh\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bother state|delhi|punjab|outside jk\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Section 34 provides the statutory route to set aside an arbitral award. In the India Code text for the J&K/Ladakh adaptations, the period in Section 34(3) is modified from three months to six months, with the proviso figures modified from thirty days to sixty days. The exact applicable adaptation and computation must be checked from the current statutory text.",
+    "next": "Read the current statutory/adaptation text and award-service date before calculating the Section 34 deadline.",
+    "priority": 120,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "arbitration",
+      "section 34",
+      "arbitral award"
+    ]
+  },
+  {
+    "id": "mediation",
+    "title": "Mediation and pre-litigation settlement",
+    "source": "Mediation Act, 2023; Commercial Courts Act Section 12A for specified commercial suits",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/19637?col=123456789%2F1362&view_type=search",
+    "trigger": "mediation|pre.?litigation mediation|pre.?institution mediation|section 12a|12a.*commercial",
+    "keywords": [
+      "mediation",
+      "pre litigation",
+      "commercial court",
+      "settlement"
+    ],
+    "facts": [
+      "commercial",
+      "urgentRelief",
+      "consent"
+    ],
+    "questions": [
+      {
+        "key": "commercial",
+        "q": "Is the dispute a commercial dispute of specified value governed by the Commercial Courts Act?",
+        "patterns": [
+          {
+            "re": "\\bcommercial|commercial suit|specified value\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bcivil|non.?commercial\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "urgentRelief",
+        "q": "Does the proposed commercial suit contemplate urgent interim relief?",
+        "patterns": [
+          {
+            "re": "\\burgent|immediate interim|urgent injunction\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno urgent|no interim\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "The Mediation Act, 2023 provides a general statutory framework for mediation, while Section 12A of the Commercial Courts Act specifically governs pre-institution mediation for covered commercial suits that do not contemplate urgent interim relief.",
+    "branches": [
+      {
+        "when": {
+          "commercial": "yes",
+          "urgentRelief": "no"
+        },
+        "text": "For a qualifying commercial suit without urgent interim relief, Section 12A is a threshold procedural requirement and should be checked before institution."
+      },
+      {
+        "when": {
+          "commercial": "yes",
+          "urgentRelief": "yes"
+        },
+        "text": "The urgent-relief exception must be examined carefully; do not treat the word 'urgent' in a plaint as automatically dispositive without the court considering the relief actually contemplated."
+      }
+    ],
+    "next": "Keep the Commercial Courts Act's mandatory pre-institution regime distinct from voluntary/general mediation under the Mediation Act.",
+    "priority": 120,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "mediation",
+      "12a",
+      "pre institution",
+      "pre litigation"
+    ]
+  },
+  {
+    "id": "consumer_process",
+    "title": "Consumer Commission written version",
+    "source": "Consumer Protection Act, 2019 — Section 38",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/15256/5/A2019-35.pdf",
+    "trigger": "consumer.*(?:reply|written version|defence|defense)|45 days|consumer commission.*(?:version|reply)|hilli",
+    "keywords": [
+      "consumer",
+      "written version",
+      "30 days",
+      "15 days"
+    ],
+    "facts": [
+      "serviceDate",
+      "versionFiled"
+    ],
+    "questions": [
+      {
+        "key": "serviceDate",
+        "q": "When was the complaint served on the opposite party?",
+        "patterns": [
+          {
+            "re": "\\b(\\d{1,2}[\\/\\-.]\\d{1,2}[\\/\\-.]\\d{2,4})\\b",
+            "v": "date"
+          }
+        ]
+      },
+      {
+        "key": "versionFiled",
+        "q": "Has the written version/reply already been filed?",
+        "patterns": [
+          {
+            "re": "\\bfiled|submitted\\b",
+            "v": "filed"
+          },
+          {
+            "re": "\\bnot filed|pending\\b",
+            "v": "notfiled"
+          }
+        ]
+      }
+    ],
+    "base": "Section 38 of the Consumer Protection Act, 2019 provides 30 days for the opposite party's version, with a further period not exceeding 15 days that the Commission may grant. The statutory/procedural position has been treated strictly by the Supreme Court, so the service date and case record matter.",
+    "next": "Do not simply import ordinary CPC written-statement rules into a consumer complaint.",
+    "priority": 115,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "consumer",
+      "consumer commission",
+      "written version"
+    ]
+  },
+  {
+    "id": "motor_vehicle",
+    "title": "Motor accident compensation claim",
+    "source": "Motor Vehicles Act, 1988 — Sections 166, 168, 169 and related provisions",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/1798/1/198859.pdf",
+    "trigger": "mact|motor accident|motor vehicle.*(?:claim|accident)|section 166|section 164|section 173|accident compensation",
+    "keywords": [
+      "MACT",
+      "accident",
+      "compensation",
+      "insurer"
+    ],
+    "facts": [
+      "accident",
+      "claimRoute",
+      "records"
+    ],
+    "questions": [
+      {
+        "key": "claimRoute",
+        "q": "Is the claim being pursued before the Motor Accident Claims Tribunal under the current statutory regime?",
+        "patterns": [
+          {
+            "re": "\\bMACT|claims tribunal|section 166\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "records",
+        "q": "Are FIR/accident records, medical or post-mortem evidence and vehicle/insurance records available?",
+        "patterns": [
+          {
+            "re": "\\bFIR|medical|post.?mortem|insurance|RC|driving licence\\b",
+            "v": "available"
+          }
+        ]
+      }
+    ],
+    "base": "Motor accident compensation proceedings are governed by the Motor Vehicles Act and the procedure/rules applicable to the Claims Tribunal. The claim file should distinguish the statutory route, claimant category, insurer position and the evidence required to quantify or establish compensation.",
+    "next": "Verify the current limitation/procedural rule applicable to the particular claim and preserve the accident record immediately.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "contempt",
+    "title": "Civil contempt and wilful disobedience",
+    "source": "Contempt of Courts Act, 1971 — Sections 2(b), 12, 20 and applicable court rules",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1514?view_type=browse",
+    "trigger": "civil contempt|wilful disobedience|contempt.*order|section 12.*contempt|section 20.*contempt",
+    "keywords": [
+      "contempt",
+      "wilful disobedience",
+      "court order",
+      "undertaking"
+    ],
+    "facts": [
+      "orderClarity",
+      "knowledge",
+      "wilfulness"
+    ],
+    "questions": [
+      {
+        "key": "orderClarity",
+        "q": "What exact order, judgment, direction or undertaking is said to have been breached?",
+        "patterns": [
+          {
+            "re": "\\bjudgment|decree|direction|order|undertaking\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "knowledge",
+        "q": "How and when did the alleged contemnor receive knowledge of the order?",
+        "patterns": [
+          {
+            "re": "\\bserved|notice|knowledge|received|informed\\b",
+            "v": "known"
+          }
+        ]
+      },
+      {
+        "key": "wilfulness",
+        "q": "What facts show deliberate or wilful disobedience rather than inability, ambiguity or accidental non-compliance?",
+        "patterns": [
+          {
+            "re": "\\bdeliberate|wilful|knowingly|intentionally\\b",
+            "v": "alleged"
+          },
+          {
+            "re": "\\bno knowledge|impossible|unable|ambiguous\\b",
+            "v": "defence"
+          }
+        ]
+      }
+    ],
+    "base": "Civil contempt under Section 2(b) focuses on wilful disobedience of a judgment, decree, direction, order, writ or process of a court, or wilful breach of an undertaking given to a court. The clarity of the order and the evidence of knowledge and wilfulness are central.",
+    "branches": [
+      {
+        "when": {
+          "wilfulness": "defence"
+        },
+        "text": "If impossibility, ambiguity or lack of knowledge is relied on, preserve the chronology and compliance efforts; contempt should not be treated as automatic merely because an order was not fully complied with."
+      }
+    ],
+    "next": "Also check Section 20 and the applicable court's contempt rules for limitation/procedure.",
+    "priority": 110,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "specific_performance",
+    "title": "Specific performance of a contract",
+    "source": "Specific Relief Act, 1963 — current statutory text and amendments",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1583?view_type=browse",
+    "trigger": "specific performance|enforce.*contract|performance of contract",
+    "keywords": [
+      "specific performance",
+      "contract",
+      "specific relief"
+    ],
+    "facts": [
+      "contract",
+      "readiness",
+      "limitation"
+    ],
+    "questions": [
+      {
+        "key": "contract",
+        "q": "Is there a written or otherwise provable contract, and what obligation is sought to be specifically enforced?",
+        "patterns": [
+          {
+            "re": "\\bcontract|agreement|undertaking\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "readiness",
+        "q": "What evidence shows performance, readiness/willingness or compliance with contractual conditions?",
+        "patterns": [
+          {
+            "re": "\\breadiness|willingness|payment|performance|complied\\b",
+            "v": "evidence"
+          }
+        ]
+      },
+      {
+        "key": "limitation",
+        "q": "What date is said to start the limitation period for the specific-performance claim?",
+        "patterns": [
+          {
+            "re": "\\brefusal|notice|termination|breach\\b",
+            "v": "triggerIdentified"
+          }
+        ]
+      }
+    ],
+    "base": "Specific performance is governed by the current Specific Relief Act and its statutory conditions, exclusions and limitation rules. The precise contractual term, enforceability, plaintiff conduct and limitation event must be identified before assessing the remedy.",
+    "next": "Do not rely on pre-2018 descriptions of specific performance without checking the amended statute.",
+    "priority": 110,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "specific performance"
+    ]
+  },
+  {
+    "id": "declaratory_relief",
+    "title": "Declaratory relief under Section 34 of the Specific Relief Act",
+    "source": "Specific Relief Act, 1963 — Section 34",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1583?view_type=browse",
+    "trigger": "section 34.*declaration|declaratory relief|declaration.*legal character",
+    "keywords": [
+      "section 34",
+      "declaration",
+      "legal character",
+      "property right"
+    ],
+    "facts": [
+      "rightClaimed",
+      "furtherRelief",
+      "possession"
+    ],
+    "questions": [
+      {
+        "key": "rightClaimed",
+        "q": "What legal character or right as to property is sought to be declared?",
+        "patterns": [
+          {
+            "re": "\\btitle|ownership|legal character|right|status\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "furtherRelief",
+        "q": "Is further relief such as possession, injunction or cancellation available but omitted?",
+        "patterns": [
+          {
+            "re": "\\bpossession|injunction|cancellation|further relief\\b",
+            "v": "possible"
+          }
+        ]
+      },
+      {
+        "key": "possession",
+        "q": "Is the plaintiff in possession of the property or seeking possession?",
+        "patterns": [
+          {
+            "re": "\\bin possession|possession with plaintiff\\b",
+            "v": "in"
+          },
+          {
+            "re": "\\bnot in possession|seeking possession\\b",
+            "v": "out"
+          }
+        ]
+      }
+    ],
+    "base": "Section 34 addresses declaratory relief concerning legal character or a right as to property. The availability and necessity of consequential relief must be assessed from the statutory proviso and the pleaded facts.",
+    "next": "A declaration should be matched to the exact right asserted and to any consequential relief that the plaintiff is legally able to seek.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "declaration",
+      "declaratory",
+      "section 34"
+    ]
+  },
+  {
+    "id": "lis_pendens",
+    "title": "Lis pendens under Section 52 of the Transfer of Property Act",
+    "source": "Transfer of Property Act, 1882 — Section 52",
+    "url": "https://www.indiacode.nic.in/handle/123456789/2187?col=123456789%2F1362",
+    "trigger": "lis pendens|section 52.*transfer|sale.*during.*pending suit|pendente lite",
+    "keywords": [
+      "lis pendens",
+      "section 52",
+      "pending suit",
+      "transfer"
+    ],
+    "facts": [
+      "propertyInIssue",
+      "pendingSuit",
+      "transferDate"
+    ],
+    "questions": [
+      {
+        "key": "propertyInIssue",
+        "q": "Are rights in the immovable property directly and specifically in issue in the pending proceeding?",
+        "patterns": [
+          {
+            "re": "\\btitle|ownership|partition|possession|property rights\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "pendingSuit",
+        "q": "Was the proceeding pending when the transfer was made?",
+        "patterns": [
+          {
+            "re": "\\bpending|during suit|during litigation|pendency\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "transferDate",
+        "q": "What is the date and nature of the transfer?",
+        "patterns": [
+          {
+            "re": "\\bsale|gift|mortgage|lease|transfer\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Section 52 applies to qualifying transfers of immovable property during the pendency of a suit or proceeding in which the right to the property is directly and specifically in question. It does not simply make every transfer during litigation void; its statutory effect must be stated accurately.",
+    "next": "Compare the pleading, property description, pendency period and transfer instrument before invoking lis pendens.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "lis pendens",
+      "section 52",
+      "pending suit",
+      "pendente lite"
+    ]
+  },
+  {
+    "id": "contract_general",
+    "title": "Contract validity and breach",
+    "source": "Indian Contract Act, 1872",
+    "url": "https://www.indiacode.nic.in/handle/123456789/2187?col=123456789%2F1362",
+    "trigger": "contract validity|valid contract|breach of contract|indian contract act",
+    "keywords": [
+      "contract",
+      "offer",
+      "acceptance",
+      "breach",
+      "consideration"
+    ],
+    "facts": [
+      "agreement",
+      "breach",
+      "relief"
+    ],
+    "questions": [
+      {
+        "key": "agreement",
+        "q": "What are the essential terms, parties and consideration alleged?",
+        "patterns": [
+          {
+            "re": "\\bagreement|offer|acceptance|consideration|contract\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "breach",
+        "q": "What exact contractual obligation is alleged to have been breached, and when?",
+        "patterns": [
+          {
+            "re": "\\bbreach|failed|default|repudiation|terminated\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "relief",
+        "q": "What relief is claimed—damages, specific performance, injunction, restitution or termination?",
+        "patterns": [
+          {
+            "re": "\\bdamages|specific performance|injunction|restitution|termination\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Contract disputes should be analysed by first identifying formation/validity, the contractual obligation, the alleged breach and the remedy claimed. Contract-law questions often interact with limitation, specific relief, arbitration and public-contract rules.",
+    "next": "Read the complete contract and amendments; a summary of the contract is not a substitute for its operative clauses.",
+    "priority": 55,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "writ_jurisdiction",
+    "title": "Article 226 writ jurisdiction",
+    "source": "Constitution of India — Article 226; applicable High Court rules",
+    "url": "https://www.indiacode.nic.in/",
+    "trigger": "article ?226|writ(?: petition)?|mandamus|certiorari|prohibition|quo warranto|government order.*writ|writ.*government order",
+    "keywords": [
+      "article 226",
+      "writ",
+      "mandamus",
+      "certiorari"
+    ],
+    "facts": [
+      "publicLaw",
+      "alternativeRemedy",
+      "impugnedAction"
+    ],
+    "questions": [
+      {
+        "key": "publicLaw",
+        "q": "Is the challenged action by a public authority or otherwise amenable to public-law review?",
+        "patterns": [
+          {
+            "re": "\\b(government|department|authority|public body|statutory|official order)\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "alternativeRemedy",
+        "q": "Is there an effective statutory appeal or alternative remedy, and is any recognised exception relied on?",
+        "patterns": [
+          {
+            "re": "\\bappeal|alternative remedy|tribunal|statutory remedy\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno appeal|no alternative remedy\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "impugnedAction",
+        "q": "What exact order, action, omission or inaction is challenged?",
+        "patterns": [
+          {
+            "re": "\\border|notice|inaction|decision|termination|assessment|refusal\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "relief",
+        "q": "What writ relief is sought—mandamus, certiorari, prohibition, quo warranto, or another Article 226 remedy?",
+        "patterns": [
+          {
+            "re": "\\bmandamus|certiorari|prohibition|quo warranto|writ\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Article 226 gives the High Court power to issue constitutional writs for enforcement of fundamental rights and for other purposes, subject to the constitutional and judicially developed limits of writ jurisdiction. Alternative-remedy principles are important but are not an absolute jurisdictional bar in every case.",
+    "next": "Identify the public-law element, impugned action, statutory remedy and the precise writ relief sought.",
+    "priority": 125,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "writ",
+      "article 226",
+      "mandamus",
+      "certiorari",
+      "prohibition",
+      "quo warranto"
+    ]
+  },
+  {
+    "id": "natural_justice",
+    "title": "Natural justice in administrative decisions",
+    "source": "Constitutional administrative law; relevant statute and case law",
+    "url": "https://www.indiacode.nic.in/",
+    "trigger": "natural justice|show cause|audi alteram partem|bias|hearing before adverse order",
+    "keywords": [
+      "natural justice",
+      "hearing",
+      "bias",
+      "show cause"
+    ],
+    "facts": [
+      "adverseAction",
+      "notice",
+      "hearing",
+      "bias"
+    ],
+    "questions": [
+      {
+        "key": "adverseAction",
+        "q": "What adverse administrative decision is proposed or has been made?",
+        "patterns": [
+          {
+            "re": "\\btermination|penalty|blacklist|cancellation|adverse order|recovery\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "notice",
+        "q": "Was a meaningful notice of the proposed action and allegations given?",
+        "patterns": [
+          {
+            "re": "\\bshow cause|notice served|notice\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno notice|without notice\\b",
+            "v": "no"
+          }
+        ]
+      },
+      {
+        "key": "hearing",
+        "q": "Was a reasonable opportunity to respond/hear provided where the governing law requires it?",
+        "patterns": [
+          {
+            "re": "\\bhearing|reply|opportunity\\b",
+            "v": "yes"
+          },
+          {
+            "re": "\\bno hearing|no opportunity\\b",
+            "v": "no"
+          }
+        ]
+      }
+    ],
+    "base": "Natural justice usually concerns fair procedure, including notice and an opportunity to respond, and the rule against bias, subject to the governing statute and recognised exceptions. The exact content depends on the nature of the power and decision.",
+    "next": "Check the statutory scheme first; not every administrative act carries the same hearing requirement.",
+    "priority": 90,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "rti",
+    "title": "Right to Information requests and exemptions",
+    "source": "Right to Information Act, 2005",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/13072?view_type=browse",
+    "trigger": "right to information|RTI|section 8.*RTI|public information officer",
+    "keywords": [
+      "RTI",
+      "information",
+      "PIO",
+      "exemption"
+    ],
+    "facts": [
+      "publicAuthority",
+      "informationHeld",
+      "exemption"
+    ],
+    "questions": [
+      {
+        "key": "publicAuthority",
+        "q": "Is the information sought from a public authority covered by the RTI Act?",
+        "patterns": [
+          {
+            "re": "\\bgovernment|department|public authority|PIO|CPIO|SPIO\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "informationHeld",
+        "q": "Is the requested material held by or under the control of the public authority?",
+        "patterns": [
+          {
+            "re": "\\bheld|record|file|register|document|information\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "exemption",
+        "q": "Is a specific Section 8/9 exemption being claimed, or is the issue only that the department does not hold the information?",
+        "patterns": [
+          {
+            "re": "\\bsection 8|exemption|national security|personal information|commercial confidence\\b",
+            "v": "possible"
+          },
+          {
+            "re": "\\bnot held|does not exist|no record\\b",
+            "v": "notheld"
+          }
+        ]
+      }
+    ],
+    "base": "RTI analysis should distinguish information held by the public authority from information that would require creation/opinion/advice, and should identify any specific statutory exemption before refusing access.",
+    "next": "State the precise record requested and the statutory provision relied on for any exemption/refusal.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "rti",
+      "right to information",
+      "public information officer"
+    ]
+  },
+  {
+    "id": "land_acquisition",
+    "title": "Land acquisition and compensation under the 2013 Act",
+    "source": "Right to Fair Compensation and Transparency in Land Acquisition, Rehabilitation and Resettlement Act, 2013",
+    "url": "https://www.indiacode.nic.in/",
+    "trigger": "land acquisition|RFCTLARR|compensation.*acquisition|rehabilitation.*resettlement",
+    "keywords": [
+      "land acquisition",
+      "compensation",
+      "award",
+      "rehabilitation"
+    ],
+    "facts": [
+      "notification",
+      "award",
+      "compensation",
+      "possession"
+    ],
+    "questions": [
+      {
+        "key": "notification",
+        "q": "Which statutory notification/section initiated the acquisition and on what date?",
+        "patterns": [
+          {
+            "re": "\\bnotification|section 4|section 11|preliminary notification\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "award",
+        "q": "Has an award been passed and what compensation components are included?",
+        "patterns": [
+          {
+            "re": "\\baward|compensation|solatium|market value\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "possession",
+        "q": "Has possession been taken, and under what statutory record?",
+        "patterns": [
+          {
+            "re": "\\bpossession|taking possession|panchnama|memo\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Land-acquisition disputes require identification of the statutory acquisition route, notification, objections, award, compensation, rehabilitation/resettlement obligations and possession chronology. Special acquisition regimes can displace the general statute.",
+    "next": "Do not infer the applicable acquisition law merely from the department involved; identify the notification and statutory power actually used.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "land acquisition",
+      "rfctlarr",
+      "compensation",
+      "rehabilitation"
+    ]
+  },
+  {
+    "id": "electricity_law",
+    "title": "Electricity assessment and appeal disputes",
+    "source": "Electricity Act, 2003 — Sections 126–127 and related provisions",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2058?view_type=browse",
+    "trigger": "electricity.*section 126|assessment.*electricity|electricity.*appeal|electricity bill dispute",
+    "keywords": [
+      "electricity",
+      "assessment",
+      "section 126",
+      "appeal"
+    ],
+    "facts": [
+      "disputeType",
+      "assessmentOrder",
+      "appeal"
+    ],
+    "questions": [
+      {
+        "key": "disputeType",
+        "q": "Is this an assessment under Section 126, a billing dispute, a disconnection issue, or another electricity-law matter?",
+        "patterns": [
+          {
+            "re": "\\bsection 126|assessment|unauthorised use\\b",
+            "v": "assessment"
+          },
+          {
+            "re": "\\bbill|billing|disconnection\\b",
+            "v": "billing"
+          }
+        ]
+      },
+      {
+        "key": "assessmentOrder",
+        "q": "Was an assessment/order served and is there a record of inspection and reasons?",
+        "patterns": [
+          {
+            "re": "\\binspection|assessment order|notice|served\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "appeal",
+        "q": "Has the statutory appeal route under Section 127 been used or is the limitation period still running?",
+        "patterns": [
+          {
+            "re": "\\bappeal|section 127\\b",
+            "v": "yes"
+          }
+        ]
+      }
+    ],
+    "base": "Electricity disputes should be classified under the statutory provision governing assessment, billing, disconnection, theft allegations or regulatory adjudication. Sections 126 and 127 create a specific assessment-and-appeal framework for unauthorised-use cases.",
+    "next": "Read the assessment order and statutory notice before treating the issue as an ordinary civil dispute.",
+    "priority": 100,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "easements",
+    "title": "Easement and right-of-way claims",
+    "source": "Indian Easements Act, 1882, where applicable; local land law may also matter",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/2349?view_type=browse",
+    "trigger": "easement|right of way|right-of-way|prescriptive easement",
+    "keywords": [
+      "easement",
+      "right of way",
+      "dominant heritage",
+      "servient heritage"
+    ],
+    "facts": [
+      "dominant",
+      "servient",
+      "route",
+      "prescription"
+    ],
+    "questions": [
+      {
+        "key": "dominant",
+        "q": "What property is said to benefit from the claimed easement?",
+        "patterns": [
+          {
+            "re": "\\bdominant|benefited property|enjoyment\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "servient",
+        "q": "What property is alleged to be subject to the easement?",
+        "patterns": [
+          {
+            "re": "\\bservient|burdened property\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "route",
+        "q": "What exact physical route/right is claimed, and what maps or inspection records prove it?",
+        "patterns": [
+          {
+            "re": "\\bpath|road|route|access|map|demarcation\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "prescription",
+        "q": "Is acquisition by prescription being claimed, and for how long?",
+        "patterns": [
+          {
+            "re": "\\bprescription|twenty years|20 years\\b",
+            "v": "claimed"
+          }
+        ]
+      }
+    ],
+    "base": "Right-of-way and easement disputes turn on the property relationship, the precise nature of the claimed right, its mode of acquisition and the evidence establishing the route and use. Local land/revenue rules may also affect the dispute.",
+    "next": "Attach a precise map/route and distinguish an easement from a public pathway, tenancy right or mere permissive use.",
+    "priority": 90,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "easement",
+      "right of way",
+      "prescriptive"
+    ]
+  },
+  {
+    "id": "succession",
+    "title": "Succession and legal-heir documentation",
+    "source": "Indian Succession Act, 1925 and applicable personal law",
+    "url": "https://www.indiacode.nic.in/",
+    "trigger": "succession|legal heir|probate|letters of administration|succession certificate",
+    "keywords": [
+      "succession",
+      "will",
+      "probate",
+      "legal heirs",
+      "intestate"
+    ],
+    "facts": [
+      "will",
+      "personalLaw",
+      "asset",
+      "courtDocument"
+    ],
+    "questions": [
+      {
+        "key": "will",
+        "q": "Did the deceased leave a will, or is the succession intestate?",
+        "patterns": [
+          {
+            "re": "\\bwill|testament|probate\\b",
+            "v": "will"
+          },
+          {
+            "re": "\\bno will|intestate\\b",
+            "v": "intestate"
+          }
+        ]
+      },
+      {
+        "key": "personalLaw",
+        "q": "Which personal-law regime applies to the succession?",
+        "patterns": [
+          {
+            "re": "\\bhindu|muslim|christian|parsi|personal law\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "asset",
+        "q": "What asset or departmental benefit is being claimed?",
+        "patterns": [
+          {
+            "re": "\\bland|property|pension|salary|deposit|service benefit\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Succession questions require the applicable personal law, the existence and status of any will, the asset/benefit involved and the documentary or court order required for the particular transfer or payment. Revenue mutation alone does not necessarily adjudicate disputed title.",
+    "next": "Identify the exact benefit/property and the legally appropriate succession document before releasing or mutating it.",
+    "priority": 90,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "hindu_succession",
+    "title": "Hindu Succession Act and coparcenary questions",
+    "source": "Hindu Succession Act, 1956, including 2005 amendment and controlling case law",
+    "url": "https://www.indiacode.nic.in/",
+    "trigger": "hindu succession|daughter coparcener|section 6.*hindu|class i heirs",
+    "keywords": [
+      "Hindu Succession Act",
+      "coparcenary",
+      "daughter",
+      "Class I"
+    ],
+    "facts": [
+      "dateOfDeath",
+      "propertyCharacter",
+      "familyTree"
+    ],
+    "questions": [
+      {
+        "key": "dateOfDeath",
+        "q": "What are the relevant dates of death of the coparcener/deceased persons?",
+        "patterns": [
+          {
+            "re": "\\b(19|20)\\d{2}\\b",
+            "v": "date"
+          }
+        ]
+      },
+      {
+        "key": "propertyCharacter",
+        "q": "Is the property claimed to be coparcenary/ancestral property or separate property?",
+        "patterns": [
+          {
+            "re": "\\bcoparcenary|ancestral|joint family|self.?acquired\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "familyTree",
+        "q": "Who are the surviving heirs/coparceners and what were their relationships?",
+        "patterns": [
+          {
+            "re": "\\bdaughter|son|widow|mother|father|coparcener|heir\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "The Hindu Succession Act contains rules on intestate succession and coparcenary rights. The 2005 amendment is material, and the answer can turn on the property character and the relevant dates and relationship structure.",
+    "next": "Build the family tree and property history before applying Section 6 or the intestate-succession provisions.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "benami",
+    "title": "Benami transaction analysis",
+    "source": "Prohibition of Benami Property Transactions Act, 1988, as amended",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/15415?view_type=browse",
+    "trigger": "benami|benamidar|beneficial owner",
+    "keywords": [
+      "benami",
+      "beneficial owner",
+      "benamidar",
+      "property"
+    ],
+    "facts": [
+      "ownerOnTitle",
+      "consideration",
+      "exception",
+      "authority"
+    ],
+    "questions": [
+      {
+        "key": "ownerOnTitle",
+        "q": "Who is recorded as the owner of the property, and who allegedly provided the consideration?",
+        "patterns": [
+          {
+            "re": "\\btitle|registered owner|consideration|paid by\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "consideration",
+        "q": "What evidence links the consideration/payment to the alleged beneficial owner?",
+        "patterns": [
+          {
+            "re": "\\bpayment|bank|funds|consideration|source of money\\b",
+            "v": "evidence"
+          }
+        ]
+      },
+      {
+        "key": "exception",
+        "q": "Has any statutory exception to the definition been considered?",
+        "patterns": [
+          {
+            "re": "\\bexception|HUF|fiduciary|spouse|child\\b",
+            "v": "consider"
+          }
+        ]
+      },
+      {
+        "key": "authority",
+        "q": "At what statutory stage is the matter—notice, provisional attachment, adjudication or appeal?",
+        "patterns": [
+          {
+            "re": "\\bnotice|attachment|adjudication|appeal\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Benami analysis starts with the statutory definition and exceptions, then examines title, consideration, beneficial interest and the prescribed authorities/procedure. A department should not label a transaction benami merely because ownership and payment are different without applying the statutory test.",
+    "next": "Read the current statutory definition and exception clauses before drafting a factual allegation or defence.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": []
+  },
+  {
+    "id": "partnership",
+    "title": "Partnership Act and firm liability",
+    "source": "Indian Partnership Act, 1932",
+    "url": "https://www.indiacode.nic.in/handle/123456789/19914?view_type=browse",
+    "trigger": "partnership.*firm|section 69.*partnership|partner liability|unregistered firm",
+    "keywords": [
+      "partnership",
+      "partner",
+      "firm",
+      "section 69"
+    ],
+    "facts": [
+      "registration",
+      "partnerAuthority",
+      "contract",
+      "relief"
+    ],
+    "questions": [
+      {
+        "key": "registration",
+        "q": "Is the firm registered, and what does the registration/deed show?",
+        "patterns": [
+          {
+            "re": "\\bregistered firm|registration|unregistered\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "partnerAuthority",
+        "q": "Was the person who bound the firm authorised as a partner/agent under the deed and applicable law?",
+        "patterns": [
+          {
+            "re": "\\bauthori[sz]ed|partner|power|deed\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "contract",
+        "q": "What contract, tender or transaction is the firm alleged to have entered into?",
+        "patterns": [
+          {
+            "re": "\\bcontract|tender|agreement|purchase order\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "relief",
+        "q": "What remedy is sought against the firm or individual partner?",
+        "patterns": [
+          {
+            "re": "\\bdamages|recovery|injunction|specific performance|declaration\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "Partnership disputes require identification of the firm, partnership deed/registration, authority of the partner, transaction and relief. Section 69 can create important consequences for suits by an unregistered firm, but its exact application depends on the statutory ingredients and nature of the claim.",
+    "next": "Read the partnership deed and registration record before treating the firm and each partner as automatically interchangeable defendants.",
+    "priority": 90,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "partnership",
+      "unregistered firm",
+      "partner"
+    ]
+  },
+  {
+    "id": "lok_adalat",
+    "title": "Lok Adalat and settlement",
+    "source": "Legal Services Authorities Act, 1987",
+    "url": "https://www.indiacode.nic.in/handle/123456789/12883?view_type=browse",
+    "trigger": "lok adalat|legal services authority|settlement.*lok adalat",
+    "keywords": [
+      "Lok Adalat",
+      "settlement",
+      "award",
+      "legal services"
+    ],
+    "facts": [
+      "settlement",
+      "pendingCase",
+      "consent"
+    ],
+    "questions": [
+      {
+        "key": "pendingCase",
+        "q": "Is the dispute already pending before a court/tribunal or proposed to be taken to a Lok Adalat?",
+        "patterns": [
+          {
+            "re": "\\bpending|court case|tribunal\\b",
+            "v": "pending"
+          }
+        ]
+      },
+      {
+        "key": "settlement",
+        "q": "Are the parties willing to settle and what terms can actually be agreed?",
+        "patterns": [
+          {
+            "re": "\\bsettle|settlement|compromise|consent\\b",
+            "v": "yes"
+          }
+        ]
+      },
+      {
+        "key": "consent",
+        "q": "Is the settlement voluntary and within the authority of the persons signing it?",
+        "patterns": [
+          {
+            "re": "\\bconsent|authori[sz]ed|settlement authority\\b",
+            "v": "yes"
+          }
+        ]
+      }
+    ],
+    "base": "Lok Adalats under the Legal Services Authorities Act facilitate settlement/conciliation of matters within their jurisdiction. A settlement must be voluntary and within the parties' authority; the statutory effect of an award/settlement should be checked before assuming that every referred matter ends in the same way.",
+    "next": "For Government cases, obtain competent sanction/authority for settlement before committing the department to terms.",
+    "priority": 105,
+    "status": "source-anchored",
+    "verifiedOn": "2026-09-25",
+    "sourceNote": "Use the current statutory text and applicable court/local rules; do not infer a final legal outcome from topic alone.",
+    "disambiguators": [
+      "lok adalat",
+      "legal services authority"
+    ]
+  },
+  {
+    "id": "special_law_priority",
+    "title": "Special statute versus general CPC procedure",
+    "source": "Code of Civil Procedure, 1908 Section 4 and the governing special statute/rules",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/2191/1/A1908-05.pdf",
+    "trigger": "special statute|special law|specific statute|cpc and special act|which law applies|general law.*special law",
+    "keywords": [
+      "special law",
+      "special statute",
+      "general law",
+      "cpc",
+      "special act"
+    ],
+    "facts": [
+      "specialStatute",
+      "conflict",
+      "specificProvision"
+    ],
+    "questions": [
+      {
+        "key": "specialStatute",
+        "q": "Which special statute, rules or tribunal regime governs the dispute?",
+        "patterns": [
+          {
+            "re": "\\b(consumer|commercial courts|arbitration|electricity|public premises|land acquisition|service tribunal|labour|revenue|special act|special statute)\\b",
+            "v": "identified"
+          }
+        ]
+      },
+      {
+        "key": "specificProvision",
+        "q": "What specific provision or procedural route is said to conflict with the general CPC rule?",
+        "patterns": [
+          {
+            "re": "\\b(section|rule|order|appeal|tribunal|authority|limitation)\\b",
+            "v": "identified"
+          }
+        ]
+      }
+    ],
+    "base": "The CPC is a general procedural code, but Section 4 and numerous special statutes preserve or create special procedures. When a special statute governs the subject matter, identify the exact statutory provision and forum before importing a general CPC rule.",
+    "next": "Do not answer a deadline, forum or remedy question from the CPC alone when a special enactment may govern."
+  }
+]

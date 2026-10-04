@@ -1,7 +1,7 @@
 // DLO Kupwara: versioned shell cache with network-first page updates.
 // Bump CACHE_VERSION on every deployment: it renames both caches, so the old
 // pair is deleted on activate and no old HTML/JS/CSS can be mixed with new files.
-const CACHE_VERSION = 14;
+const CACHE_VERSION = 15;
 const STATIC_CACHE = 'dlo-kupwara-static-v' + CACHE_VERSION;
 const DATA_CACHE = 'dlo-kupwara-data-v' + CACHE_VERSION;
 

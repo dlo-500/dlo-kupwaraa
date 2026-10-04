@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="Case Statistics & Performance Analytics — DLO Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Analytics & Performance | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;}
+.section-title{font-family:'Playfair Display',serif!important}
+.analytics-card{border-radius:14px}
+.analytics-scroll-hint{display:none}
+@media (max-width:760px){
+  .analytics-scroll-hint{display:block;margin:-22px 0 16px;color:var(--muted);font-size:12px}
+  .analytics-section .analytics-grid{
+    display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:88%;
+    gap:14px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+    scroll-snap-type:x mandatory;scroll-padding:2px;padding:2px 2px 14px;
+    scrollbar-width:thin;scrollbar-color:var(--gold) rgba(10,31,61,.12)
+  }
+  .analytics-section .analytics-grid:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .analytics-section .analytics-card{min-width:0;scroll-snap-align:start}
+  .analytics-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+  .dept-table{min-width:620px}
+}
+@media (max-width:760px){.analytics-grid::-webkit-scrollbar{height:7px}.analytics-grid::-webkit-scrollbar-thumb{background:var(--gold);border-radius:8px}}
+</style>
+<meta property="og:title" content="Analytics Dashboard | DLO Kupwara">
+<meta property="og:description" content="Overdue cases, reply status, case-type distribution, disposal rate and department performance">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+  </div>
+</div>
+
+<section class="analytics-section" id="analytics" style="padding-top:60px">
+  <div class="container">
+    <div style="margin-bottom:40px">
+      <span class="section-eyebrow">Analytics &amp; Insights</span>
+      <h2 class="section-title">Case Statistics &amp; Performance</h2>
+      <div class="divider"></div>
+    </div>
+    <p class="analytics-scroll-hint">Swipe sideways to explore each analytics panel.</p>
+
+    <!-- ROW 1: Disposal Rate + Department Performance -->
+    <div class="analytics-grid" role="region" aria-label="Overview and department performance panels" tabindex="0">
+      <div class="analytics-card">
+        <h3>Disposal Rate</h3>
+        <p>Percentage of cases disposed vs total registered</p>
+        <div style="text-align:center;margin:16px 0">
+          <span style="font-family:'Playfair Display',serif;font-size:52px;font-weight:700;color:var(--active-fg)" id="disposalPct">—</span>
+          <span style="font-size:24px;color:var(--active-fg)">%</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="disposalBar" style="width:0%;background:linear-gradient(90deg,#00875A,#4ADE80)">
+            <span class="progress-label" id="disposalBarLabel"></span>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:var(--muted)">
+          <span id="disposalCount">— disposed</span>
+          <span id="totalCount">— total</span>
+        </div>
+        <div style="margin-top:20px">
+          <p style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Active vs Disposed vs Pending vs Ex-parte</p>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Active</span><span id="activeCountLbl">—</span></div>
+              <div class="progress-wrap" style="height:16px"><div class="progress-bar" id="activeBar" style="width:0%;background:linear-gradient(90deg,#00875A,#4ADE80)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Disposed</span><span id="disposedCountLbl">—</span></div>
+              <div class="progress-wrap" style="height:16px"><div class="progress-bar" id="disposedBar" style="width:0%;background:linear-gradient(90deg,#C81E1E,#DC2626)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Pending</span><span id="pendingCountLbl">—</span></div>
+              <div class="progress-wrap" style="height:16px"><div class="progress-bar" id="pendingBar" style="width:0%;background:linear-gradient(90deg,#B45309,#F59E0B)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>Ex-parte</span><span id="exparteCountLbl">—</span></div>
+              <div class="progress-wrap" style="height:16px"><div class="progress-bar" id="exparteBar" style="width:0%;background:linear-gradient(90deg,#7C3AED,#A78BFA)"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card">
+        <h3>Department Performance</h3>
+        <p>Pending reply count by department — sorted by most pending</p>
+        <div class="analytics-table-scroll" role="region" aria-label="Department performance table; scroll horizontally for more columns" tabindex="0" style="overflow-x:auto">
+          <table class="dept-table" id="deptPerfTable">
+            <thead>
+              <tr>
+                <th>#</th><th>Department</th><th>Total</th><th>Active</th><th>Disposed</th>
+                <th>Reply Pending<br><small style="font-weight:400;opacity:0.8">(Active cases only)</small></th>
+              </tr>
+            </thead>
+            <tbody id="deptPerfBody">
+              <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">⏳ Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn-export btn-excel" id="deptExcelBtn" style="font-size:12px;padding:8px 14px">⬇ Excel</button>
+          <button type="button" class="btn-export btn-pdf" id="deptPdfBtn" style="font-size:12px;padding:8px 14px">⬇ PDF</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROW 2: Charts -->
+    <div class="analytics-grid" role="region" aria-label="Case type and court analytics charts" tabindex="0" style="margin-top:24px">
+      <div class="analytics-card">
+        <h3>Case Type Distribution</h3>
+        <p>Breakdown by case type across all registered cases</p>
+        <canvas id="caseTypeChart" style="max-height:260px"></canvas>
+        <div id="caseTypeLegend" style="margin-top:14px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+      <div class="analytics-card">
+        <h3>Reply Pending by Court</h3>
+        <p>Courts with highest number of unfiled replies</p>
+        <canvas id="replyCourtChart" style="max-height:260px"></canvas>
+      </div>
+    </div>
+
+    <!-- ROW 3: Overdue + Missing Reply -->
+    <div class="analytics-grid" role="region" aria-label="Overdue cases and upcoming missing replies panels" tabindex="0" style="margin-top:24px">
+      <div class="analytics-card">
+        <h3>⚠️ Overdue Cases</h3>
+        <p>Cases where hearing date has passed but status is still Active</p>
+        <div id="overdueList" style="max-height:220px;overflow-y:auto;margin-bottom:14px"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn-export btn-excel" id="overdueExcelBtn" style="font-size:12px;padding:8px 14px">⬇ Excel</button>
+          <button type="button" class="btn-export btn-pdf" id="overduePdfBtn" style="font-size:12px;padding:8px 14px">⬇ PDF</button>
+        </div>
+      </div>
+      <div class="analytics-card">
+        <h3>❗ Missing Reply — Hearing Soon</h3>
+        <p>Active cases with hearing in next 7 days and reply not filed</p>
+        <div id="missingReplyList" style="max-height:220px;overflow-y:auto;margin-bottom:14px"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn-export btn-excel" id="missingExcelBtn" style="font-size:12px;padding:8px 14px">⬇ Excel</button>
+          <button type="button" class="btn-export btn-pdf" id="missingPdfBtn" style="font-size:12px;padding:8px 14px">⬇ PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  if (!window.DLO) return;
+
+  const $ = id => document.getElementById(id);
+  const PALETTE = ['#C6A358','#0A1F3D','#00875A','#B45309','#7C3AED','#DC2626','#0891B2','#65A30D','#DB2777','#4B5563'];
+
+  function setBar(barId, labelId, count, total, lblId) {
+    const bar = $(barId);
+    const pct = total ? Math.round((count / total) * 100) : 0;
+    if (bar) bar.style.width = pct + '%';
+    if (lblId) { const l = $(lblId); if (l) l.textContent = count; }
+  }
+
+  function renderDisposalRate(stats) {
+    if ($('disposalPct')) $('disposalPct').textContent = stats.disposalRate;
+    if ($('disposalCount')) $('disposalCount').textContent = stats.disposed + ' disposed';
+    if ($('totalCount')) $('totalCount').textContent = stats.total + ' total';
+    setBar('disposalBar', null, stats.disposed, stats.total);
+    if ($('disposalBarLabel')) $('disposalBarLabel').textContent = stats.disposalRate + '%';
+    setBar('activeBar', null, stats.active, stats.total, 'activeCountLbl');
+    setBar('disposedBar', null, stats.disposed, stats.total, 'disposedCountLbl');
+    setBar('pendingBar', null, stats.replyPending, stats.total, 'pendingCountLbl');
+    setBar('exparteBar', null, stats.exparte, stats.total, 'exparteCountLbl');
+  }
+
+  function computeDeptPerf(rows) {
+    const map = {};
+    rows.forEach(r => {
+      const dept = r.department || 'Unknown';
+      if (!map[dept]) map[dept] = { total: 0, active: 0, disposed: 0, pending: 0 };
+      const status = (r.status || '').toLowerCase();
+      const isActive = status.includes('active');
+      map[dept].total++;
+      if (isActive) map[dept].active++;
+      if (status.includes('dispos')) map[dept].disposed++;
+      if (isActive && r.reply && r.reply.toLowerCase().includes('not')) map[dept].pending++;
+    });
+    return Object.entries(map).map(([dept, v]) => ({ dept, ...v })).sort((a, b) => b.pending - a.pending);
+  }
+
+  function renderDeptPerf(rows) {
+    const body = $('deptPerfBody');
+    if (!body) return;
+    const perf = computeDeptPerf(rows);
+    if (!perf.length) { body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted)">No data available</td></tr>'; return; }
+    body.innerHTML = perf.map((d, i) =>
+      `<tr><td>${i + 1}</td><td>${DLO.escapeHtml(d.dept)}</td><td>${d.total}</td><td>${d.active}</td><td>${d.disposed}</td><td>${d.pending}</td></tr>`
+    ).join('');
+  }
+
+  // Chart instances are kept so a re-render replaces the old chart instead of stacking a new one on it.
+  let caseTypeChart = null, replyCourtChart = null;
+  // Axis text/grid colours follow the active theme (menu.css --muted / --border).
+  function chartColors() {
+    const css = getComputedStyle(document.documentElement);
+    return { text: (css.getPropertyValue('--muted') || '').trim() || '#64748B', grid: (css.getPropertyValue('--border') || '').trim() || 'rgba(0,0,0,.1)' };
+  }
+
+  function renderCaseTypeChart(stats) {
+    const canvas = $('caseTypeChart'), legend = $('caseTypeLegend');
+    const entries = Object.entries(stats.byType).sort((a, b) => b[1] - a[1]);
+    if (legend) {
+      legend.innerHTML = entries.map(([type, count], i) =>
+        `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text)">
+          <span style="width:10px;height:10px;border-radius:50%;background:${PALETTE[i % PALETTE.length]};flex-shrink:0"></span>
+          <span style="flex:1">${DLO.escapeHtml(type)}</span><span style="color:var(--muted)">${count}</span>
+        </div>`).join('');
+    }
+    if (canvas && window.Chart) {
+      if (caseTypeChart) caseTypeChart.destroy();
+      caseTypeChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: entries.map((_, i) => PALETTE[i % PALETTE.length]), borderWidth: 0 }] },
+        options: { plugins: { legend: { display: false } }, cutout: '60%' }
+      });
+    }
+  }
+
+  function renderReplyCourtChart(rows) {
+    const canvas = $('replyCourtChart');
+    const map = {};
+    rows.forEach(r => {
+      if (r.reply && r.reply.toLowerCase().includes('not')) {
+        const c = r.court || 'Unknown';
+        map[c] = (map[c] || 0) + 1;
+      }
+    });
+    const entries = Object.entries(map).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    if (canvas && window.Chart) {
+      if (replyCourtChart) replyCourtChart.destroy();
+      const colors = chartColors();
+      replyCourtChart = new Chart(canvas, {
+        type: 'bar',
+        data: { labels: entries.map(e => e[0]), datasets: [{ data: entries.map(e => e[1]), backgroundColor: '#C6A358', borderRadius: 4 }] },
+        options: { indexAxis: 'y', plugins: { legend: { display: false } },
+          scales: { x: { beginAtZero: true, ticks: { stepSize: 1, color: colors.text }, grid: { color: colors.grid } },
+                    y: { ticks: { color: colors.text }, grid: { color: colors.grid } } } }
+      });
+    }
+  }
+
+  function renderAlertLists(rows) {
+    const today = DLO.nowIST(); today.setHours(0, 0, 0, 0);
+    const overdue = [], missingReply = [];
+    rows.forEach(r => {
+      const status = (r.status || '').toLowerCase();
+      if (!status.includes('active') || !r.nextHearing) return;
+      const hd = new Date(r.nextHearing);
+      if (isNaN(hd.getTime())) return;
+      hd.setHours(0, 0, 0, 0);
+      const diff = (hd - today) / 86400000;
+      if (diff < 0) overdue.push(r);
+      else if (diff <= 7 && r.reply && r.reply.toLowerCase().includes('not')) missingReply.push(r);
+    });
+
+    function renderList(el, list, emptyMsg) {
+      if (!el) return;
+      if (!list.length) { el.innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center;padding:16px">${emptyMsg}</p>`; return; }
+      el.innerHTML = list.slice(0, 20).map(r =>
+        `<div style="padding:10px 12px;border-bottom:1px solid var(--border);font-size:12px">
+          <div style="font-weight:600;color:var(--text)">${DLO.escapeHtml(r.caseTitle || r.cnrCaseNo || 'Untitled')}</div>
+          <div style="color:var(--muted);margin-top:2px">${DLO.escapeHtml(r.court)} · ${DLO.formatDDMMYYYY(r.nextHearing)}</div>
+        </div>`).join('');
+    }
+    renderList($('overdueList'), overdue, 'No overdue cases 🎉');
+    renderList($('missingReplyList'), missingReply, 'No pending replies due soon 🎉');
+  }
+
+  let currentRows = [];
+  function renderAll(rows) {
+    currentRows = rows;
+    const stats = DLO.calculateStats(rows);
+    renderDisposalRate(stats);
+    renderDeptPerf(rows);
+    renderCaseTypeChart(stats);
+    renderReplyCourtChart(rows);
+    renderAlertLists(rows);
+  }
+  // Fresh rows arriving after the cached ones were shown replace them in place (no page reload).
+  document.addEventListener('dlo:case-diary-updated', function (event) {
+    if (event.detail && Array.isArray(event.detail.rows) && event.detail.rows.length) renderAll(event.detail.rows);
+  });
+  // Re-colour the chart axes when the theme is switched.
+  document.addEventListener('dlo:theme-changed', function () {
+    if (currentRows.length) renderReplyCourtChart(currentRows);
+  });
+
+  try {
+    const rows = await DLO.fetchCaseDiary();
+    if (!rows.length) {
+      const failed = DLO.getCaseDiaryError && DLO.getCaseDiaryError();
+      DLO.showToast(failed ? (navigator.onLine === false ? 'You appear to be offline' : 'Could not load case data — check Supabase connection')
+                           : 'No case data returned', failed ? 'error' : 'warn', 5000);
+      return;
+    }
+    renderAll(rows);
+  } catch (e) {
+    console.error('[Analytics] failed to load case data:', e);
+    DLO.showToast('Failed to load analytics data', 'error', 5000);
+  }
+  // NOTE: Excel/PDF export buttons (deptExcelBtn, deptPdfBtn, overdueExcelBtn,
+  // overduePdfBtn, missingExcelBtn, missingPdfBtn) are not yet wired — this
+  // page doesn't load the xlsx/print-popup libraries causelist.html uses.
+  // Deferred; flagging rather than leaving silently broken.
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

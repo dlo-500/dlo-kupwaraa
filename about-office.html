@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="About District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>About the Office | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;}
+.section-title{font-family:'Playfair Display',serif!important}
+</style>
+<meta property="og:title" content="About the Office | DLO Kupwara">
+<meta property="og:description" content="About the District Litigation Office Kupwara — mandate, mission and role">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+  </div>
+</div>
+
+<section class="about" id="about" style="padding-top:60px;padding-bottom:80px">
+  <div class="container">
+    <div class="about-content" style="max-width:760px;margin:0 auto;text-align:center">
+      <span class="section-eyebrow">About the Office</span>
+      <h2 class="section-title">District Litigation Office, Kupwara</h2>
+      <div class="divider" style="margin:20px auto"></div>
+      <p style="text-align:left">The District Litigation Office (DLO) Kupwara operates under the Department of Law, Justice &amp; Parliamentary Affairs, Government of Jammu &amp; Kashmir. We provide legal representation and litigation management on behalf of government departments across all courts in Kupwara district.</p>
+      <p style="text-align:left">Our office coordinates with departments including Revenue, Labour, Forest, Education, PWD, Police, and others to ensure robust legal defence and timely compliance with court orders.</p>
+      <div class="about-features" style="text-align:left">
+        <div class="about-feature">
+          <div class="icon">⚖️</div>
+          <div>
+            <h4>Legal Representation</h4>
+            <p>Government counsel in civil, service and labour matters across all courts.</p>
+          </div>
+        </div>
+        <div class="about-feature">
+          <div class="icon">📋</div>
+          <div>
+            <h4>Case Management</h4>
+            <p>Real-time tracking of active cases across 12+ courts in Kupwara district.</p>
+          </div>
+        </div>
+        <div class="about-feature">
+          <div class="icon">🏛️</div>
+            <div>
+              <h4>Court Coordination</h4>
+              <p>Liaising with all district courts from Sessions Court to MACT and DLSA.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self';">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="common.js"></script>
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
@@ -24,6 +26,7 @@
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "13c9c451d4a0426ab17029262ad729db"}'></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
 <style id="mobile-scroll-fix">
 /* ============================================================
    MOBILE TABLE SCROLL FIX
@@ -132,6 +135,7 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
 <style>#causelist,#calendar,#history{display:none!important}</style>
 </head>
 <body>
+<script>DLO.injectMenu();</script>
 <style>
 .page-header{background:var(--navy);padding:22px 0;border-bottom:3px solid var(--gold)}
 .page-header .container{display:flex;align-items:center;gap:16px}
@@ -1096,54 +1100,10 @@ html.app-mode body{padding-top:0!important}
 <!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <h3>⚖️ District Litigation Office Kupwara</h3>
-        <p>An office of the Department of Law, Justice & Parliamentary Affairs, Government of Jammu & Kashmir. Committed to transparent, timely and effective legal representation.</p>
-        <p style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.25);font-style:italic">This website is managed by the employees of District Litigation Office Kupwara for the purpose of keeping stakeholder departments informed about case statistics and developments.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Quick Links</h4>
-        <a href="#about">About the Office</a>
-        <a href="#services">Legal Services</a>
-        <a href="#live-data">Filter Cases</a>
-        <a href="hearings.html">Upcoming Hearings</a>
-        <a href="#courts">Court-wise Cases</a>
-        <a href="#contact">Contact Us</a>
-      </div>
-      <div class="footer-col">
-        <h4>Important Courts</h4>
-        <a href="#">Sessions Court Kupwara</a>
-        <a href="#">Sub Judge Court Kupwara</a>
-        <a href="#">CJM Court Handwara</a>
-        <a href="#">Additional Sessions Court Handwara</a>
-        <a href="#">Munsiff Court Sogam</a>
-      </div>
-    </div>
-    <div class="footer-bottom" style="flex-direction:column;gap:12px;text-align:center">
-      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;flex-wrap:wrap;gap:10px">
-        <p style="font-size:12px;color:rgba(255,255,255,0.25)">© 2026 District Litigation Office Kupwara. All rights reserved. Government of Jammu & Kashmir.</p>
-        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
-          <span style="font-size:11px;color:rgba(255,255,255,0.3);letter-spacing:1px">VERSION: NK.1.0</span>
-          <span style="font-size:11px;color:rgba(255,255,255,0.3)">Last Updated: <span id="footerLastUpdated">—</span></span>
-        </div>
-      </div>
-      <p style="font-size:11px;color:rgba(255,255,255,0.2);font-style:italic;text-align:center">The information on this portal is for internal departmental awareness only and cannot be the basis of any legal proceeding.</p>
-    </div>
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs · Last updated: <span id="footerLastUpdated">—</span></div>
   </div>
 </footer>
-
-<!-- DEVELOPER CREDIT BAR -->
-<div style="background:#030810;border-top:1px solid rgba(201,168,76,0.2);padding:12px 32px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-  <div style="display:flex;align-items:center;gap:12px">
-    <img src="logo.png" alt="DLO Logo" style="width:28px;height:28px;border-radius:50%;object-fit:cover;opacity:0.7">
-    <span style="font-size:12px;color:rgba(255,255,255,0.3)">District Litigation Office Kupwara &nbsp;·&nbsp; Justice · Integrity · Law</span>
-  </div>
-  <p style="font-size:12px;color:rgba(255,255,255,0.3)">
-    Designed & Developed by &nbsp;<span style="color:var(--gold);font-weight:600">Tariq Ahmad Lone</span>
-    &nbsp;·&nbsp; <span style="color:rgba(255,255,255,0.2)">VERSION: NK.1.0</span>
-  </p>
-</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -1154,8 +1114,8 @@ html.app-mode body{padding-top:0!important}
 //  (Project Settings -> API in the dashboard). Same values as
 //  operator.html — the anon key is safe to expose client-side.
 // ═══════════════════════════════════════════════
-const SUPABASE_URL = 'https://ibicsdsehxlsaygjnefk.supabase.co';       // e.g. https://xxxxx.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU';
+const SUPABASE_URL = window.DLO_CONFIG.supabase.url;       // centralized — see config.js
+const SUPABASE_ANON_KEY = window.DLO_CONFIG.supabase.anonKey;  // centralized — see config.js
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let HISTORY_ROWS = [];
@@ -1179,10 +1139,31 @@ function nowIST() {
 // ═══════════════════════════════════════════════
 //  FETCH CASE DIARY (from Supabase, was Google Sheets)
 // ═══════════════════════════════════════════════
+// Reads every row, page by page. A bare select() is capped by the API (1,000
+// rows by default) and would silently drop the rest. `make(first)` builds the
+// query (with its existing ordering); the exact count is requested once.
+async function pagedAll(make) {
+  const PAGE = 1000, rows = [];
+  let total = null;
+  for (let from = 0; ; ) {
+    const res = await make(from === 0).range(from, from + PAGE - 1);
+    if (res.error) throw res.error;
+    const data = res.data || [];
+    if (from === 0 && Number.isFinite(res.count)) total = res.count;
+    rows.push.apply(rows, data);
+    from += data.length;
+    if (!data.length || (total !== null ? rows.length >= total : data.length < PAGE)) break;
+  }
+  return rows;
+}
+const CASE_DIARY_COLUMNS = 's_no,cnr_case_no,case_title,subject_matter,department,court_name,last_proceedings,next_hearing_date,reply_status,case_status,case_type,advocate_name,exparte_status';
+const CASE_HISTORY_COLUMNS = 'created_at,hearing_date,proceedings_summary,advocate_name,attendance,case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)';
+
 async function fetchSheetData() {
   try {
-    const { data, error } = await sb.from('case_diary').select('*').order('s_no');
-    if (error) throw error;
+    const data = await pagedAll(first => sb.from('case_diary')
+      .select(CASE_DIARY_COLUMNS, first ? { count: 'exact' } : undefined)
+      .order('s_no'));
 
     ALL_ROWS = (data || []).map(r => ({
       sr:          r.s_no != null ? String(r.s_no) : '',
@@ -1218,11 +1199,15 @@ function escapeHtml(val) {
 // ═══════════════════════════════════════════════
 async function fetchHistoryLog() {
   try {
-    const { data, error } = await sb
-      .from('case_history')
-      .select('*, case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
+    const historyQuery = (first, tiebreak) => {
+      let q = sb.from('case_history')
+        .select(CASE_HISTORY_COLUMNS, first ? { count: 'exact' } : undefined)
+        .order('created_at', { ascending: false });
+      return tiebreak ? q.order('id', { ascending: true }) : q;   // fixed order for equal timestamps so pages never overlap or skip rows
+    };
+    let data;
+    try { data = await pagedAll(first => historyQuery(first, true)); }
+    catch (e) { data = await pagedAll(first => historyQuery(first, false)); }   // e.g. id not readable
 
     HISTORY_ROWS = (data || []).map(r => ({
       entryDate:   r.created_at ? new Date(r.created_at) : null,
@@ -1645,7 +1630,8 @@ function exportPDF() {
     <table>
       <thead><tr><th>#</th><th>Case No.</th><th>Title</th><th>Department</th><th>Court</th><th>Next Hearing</th><th>Reply</th><th>Status</th><th>Standing Counsel</th><th>Ex-parte</th></tr></thead>
       <tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${r.caseNo||''}</td><td>${r.title||''}</td><td>${r.dept||''}</td><td>${r.court||''}</td><td>${formatDate(r.nextHearing)}</td><td>${r.reply||''}</td><td>${r.status||''}</td><td>${r.counsel||''}</td><td>${r.exparte||''}</td></tr>`).join('')}</tbody>
-    </table></body></html>`);
+    </table>
+</body></html>`);
   win.document.close();
 }
 
@@ -3018,6 +3004,7 @@ init();
   }, 1000);
 })();
 </script>
+
 
 </body>
 </html>

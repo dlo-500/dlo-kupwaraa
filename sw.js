@@ -1,155 +1,160 @@
-// DLO Kupwara — Service Worker v2.1 (offline-capable)
-// Changes from v2.0: relative pre-cache paths (work at the domain root or under /dlo-kupwaraa/),
-// pre-cache no longer all-or-nothing, error responses are never cached, same-origin assets revalidate
-// so a new assistant.js / index.html is picked up immediately.
-const STATIC_CACHE = 'dlo-kupwara-static-v5';
-const DATA_CACHE   = 'dlo-kupwara-data-v5';
+// DLO Kupwara: versioned shell cache with network-first page updates.
+// Bump CACHE_VERSION on every deployment: it renames both caches, so the old
+// pair is deleted on activate and no old HTML/JS/CSS can be mixed with new files.
+const CACHE_VERSION = 14;
+const STATIC_CACHE = 'dlo-kupwara-static-v' + CACHE_VERSION;
+const DATA_CACHE = 'dlo-kupwara-data-v' + CACHE_VERSION;
 
-// Relative URLs resolve against this file's location, so they follow wherever the site is hosted.
+// Third-party libraries/fonts the pages need to run offline.
+const CDN_HOSTS = ['cdn.jsdelivr.net', 'cdnjs.cloudflare.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
+
+// If any of these fail to download, the install fails and the previous
+// (consistent) service worker + cache stay in charge.
+const REQUIRED_ASSETS = ['./', './index.html', './app.html', './config.js', './common.js', './styles.css', './menu.css'];
+
 const STATIC_ASSETS = [
   './',
   './index.html',
-  './logo.png',
-  './manifest.json',
+  './app.html',
   './offline.html',
+  './404.html',
+  './manifest.json',
+  './config.js',
+  './common.js',
+  './translations.js',
+  './styles.css',
+  './menu.css',
+  './styles-performance.css',
+  './search-filter-cases.html',
+  './analytics.html',
+  './statistics.html',
+  './court-wise-distribution.html',
+  './areas-of-practice.html',
+  './our-officials.html',
+  './about-office.html',
+  './contact.html',
+  './public-enquiries.html',
+  './latest-updates.html',
+  './hearings.html',
+  './causelist.html',
+  './history.html',
+  './performance.html',
+  './operator.html',
+  './logo.png',
+  './icons/dlo-kupwara-app-icon-192.png',
+  './icons/dlo-kupwara-app-icon-512.png',
+  './icons/dlo-kupwara-app-icon.jpeg'
 ];
 
-// Only keep good responses (200-range) or opaque cross-origin ones (CDN scripts, fonts).
-const cacheable = res => res && (res.ok || res.type === 'opaque');
-
-// ═══════════════════════════════════════════════
-//  INSTALL — precache the app shell + offline page (each file independently)
-// ═══════════════════════════════════════════════
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then(cache =>
-      Promise.allSettled(STATIC_ASSETS.map(asset => cache.add(asset)))
-    )
-  );
-  self.skipWaiting();
+  event.waitUntil((async () => {
+    const cache = await caches.open(STATIC_CACHE);
+    const failedRequired = [];
+    await Promise.all(STATIC_ASSETS.map(async path => {
+      try {
+        const request = new Request(path, { cache: 'reload' });
+        const response = await fetch(request);
+        if (response.ok) await cache.put(request, response);
+        else if (REQUIRED_ASSETS.includes(path)) failedRequired.push(path);
+      } catch (_) {
+        if (REQUIRED_ASSETS.includes(path)) failedRequired.push(path);
+      }
+    }));
+    if (failedRequired.length) {
+      await caches.delete(STATIC_CACHE);
+      throw new Error('DLO SW install aborted, could not fetch: ' + failedRequired.join(', '));
+    }
+    await self.skipWaiting();
+  })());
 });
 
-// ═══════════════════════════════════════════════
-//  ACTIVATE — drop old cache versions
-// ═══════════════════════════════════════════════
 self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(k => k !== STATIC_CACHE && k !== DATA_CACHE)
-          .map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys
+      .filter(key => key !== STATIC_CACHE && key !== DATA_CACHE)
+      .map(key => caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
-// Lets the page tell a waiting worker to activate immediately (used for the
-// "update available — tap to refresh" prompt on the front end).
 self.addEventListener('message', event => {
   if (event.data === 'SKIP_WAITING') self.skipWaiting();
 });
 
-// Legacy Google Sheets ("gviz") requests append a random cache-busting query string,
-// so they are cached under a normalised key (the sheet name). Kept for any page that still uses Sheets.
 function sheetCacheKey(url) {
   const sheet = url.searchParams.get('sheet') || 'default';
   return new Request(self.location.origin + '/__sheet-cache__/' + encodeURIComponent(sheet));
 }
 
 self.addEventListener('fetch', event => {
-  const req = event.request;
-  const url = new URL(req.url);
+  const request = event.request;
+  const url = new URL(request.url);
 
-  // Analytics — best-effort only, never cache, never block on it.
   if (url.hostname.includes('cloudflareinsights.com')) {
-    event.respondWith(fetch(req).catch(() => new Response('', { status: 204 })));
+    event.respondWith(fetch(request).catch(() => new Response('', { status: 204 })));
     return;
   }
 
-  // Legacy Google Sheets data — network-first, last good copy when offline.
   if (url.hostname === 'docs.google.com' && url.pathname.includes('/gviz/tq')) {
     const cacheKey = sheetCacheKey(url);
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(DATA_CACHE).then(cache => cache.put(cacheKey, clone));
-          }
-          return res;
-        })
-        .catch(async () => {
-          const cached = await caches.match(cacheKey);
-          if (cached) {
-            const body = await cached.text();
-            return new Response(body, {
-              status: 200,
-              headers: { 'Content-Type': 'application/json', 'X-DLO-Offline': '1' }
-            });
-          }
-          return new Response('Offline', { status: 503 });
-        })
-    );
-    return;
-  }
-
-  // Legacy Apps Script calls — live actions, not cacheable.
-  if (url.hostname === 'script.google.com') {
-    event.respondWith(fetch(req).catch(() => new Response('Offline', { status: 503 })));
-    return;
-  }
-
-  // Page navigations — network-first; fall back to the cached page, then the cached shell,
-  // then the friendly offline page.
-  if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req)
-        .then(res => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(STATIC_CACHE).then(cache => cache.put(req, clone));
-          }
-          return res;
-        })
-        .catch(() =>
-          caches.match(req)
-            .then(cached => cached || caches.match('./index.html'))
-            .then(cached => cached || caches.match('./offline.html'))
-        )
-    );
-    return;
-  }
-
-  // Non-GET calls (logins, inserts, updates): the Cache API only supports GET — pass through.
-  if (req.method !== 'GET') {
-    event.respondWith(fetch(req));
-    return;
-  }
-
-  // Supabase GET calls (case data, auth session checks, profile lookups) —
-  // NEVER cache these. The data is sensitive and often viewed on shared office
-  // computers; caching would let it survive logout in Cache Storage.
-  // (The assistant reads the same data in memory only and stores nothing.)
-  if (url.hostname.endsWith('.supabase.co')) {
-    event.respondWith(fetch(req).catch(() => new Response('Offline', { status: 503 })));
-    return;
-  }
-
-  // Everything else (CSS/JS/images/fonts) — network-first with a cache fallback.
-  // Same-origin files are revalidated so a new deploy (e.g. assistant.js) is not held back
-  // by the browser's HTTP cache.
-  const init = url.origin === self.location.origin ? { cache: 'no-cache' } : undefined;
-  event.respondWith(
-    fetch(req, init)
-      .then(res => {
-        if (cacheable(res)) {
-          const clone = res.clone();
-          caches.open(STATIC_CACHE).then(cache => cache.put(req, clone)).catch(() => {});
-        }
-        return res;
+    event.respondWith(fetch(request).then(response => {
+      if (response && response.ok) {
+        const copy = response.clone();
+        caches.open(DATA_CACHE).then(cache => cache.put(cacheKey, copy));
+      }
+      return response;
+    }).catch(() => caches.open(DATA_CACHE).then(cache => cache.match(cacheKey).then(cached =>
+      cached || new Response(JSON.stringify({ error: 'offline' }), {
+        status: 503, headers: { 'Content-Type': 'application/json' }
       })
-      .catch(() => caches.match(req))
-  );
+    ))));
+    return;
+  }
+
+  if (url.hostname.endsWith('supabase.co')) {
+    event.respondWith(fetch(request).catch(() => new Response('{"error":"offline"}', {
+      status: 503, headers: { 'Content-Type': 'application/json' }
+    })));
+    return;
+  }
+
+  if (request.mode === 'navigate') {
+    event.respondWith(fetch(request).then(response => {
+      if (response && response.status === 404) {
+        return caches.match('./404.html').then(cached => cached || response);
+      }
+      if (response && response.ok && request.method === 'GET' && url.origin === self.location.origin) {
+        const copy = response.clone();
+        caches.open(STATIC_CACHE).then(cache => cache.put(request, copy));
+      }
+      return response;
+    }).catch(() => caches.match(request, { ignoreSearch: true }).then(cached => {
+      if (cached) return cached;
+      return caches.match('./offline.html').then(offline => {
+        if (offline) return offline;
+        return caches.match('./app.html').then(app => app || caches.match('./index.html'));
+      });
+    })));
+    return;
+  }
+
+  // Only GET requests are cached; anything else goes straight to the network.
+  if (request.method !== 'GET') return;
+
+  const isCdn = CDN_HOSTS.includes(url.hostname);
+  const isSameOrigin = url.origin === self.location.origin;
+  if (!isSameOrigin && !isCdn) return;
+
+  // Network-first keeps updated page assets visible as soon as they are online.
+  event.respondWith(fetch(request).then(response => {
+    // Opaque (no-cors) CDN responses report ok=false but are valid to store.
+    if (response && (response.ok || (isCdn && response.type === 'opaque'))) {
+      const copy = response.clone();
+      caches.open(STATIC_CACHE).then(cache => cache.put(request, copy));
+    }
+    return response;
+  }).catch(() => caches.match(request).then(cached =>
+    cached || new Response('', { status: 504, statusText: 'Offline' })
+  )));
 });

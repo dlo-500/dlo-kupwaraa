@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="Court-wise Case Distribution — District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Court-wise Case Distribution | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+<script src="common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;}
+.section-title{font-family:'Playfair Display',serif!important}
+</style>
+<meta property="og:title" content="Court-wise Case Distribution | DLO Kupwara">
+<meta property="og:description" content="Distribution of cases across courts under District Litigation Office Kupwara">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+<style id="dlo-theme-fix-court-wise">
+/* Court-wise Case Distribution — dark-theme readability only (no layout, data or chart change).
+   The "Case Distribution" card is painted with var(--surface), which is not themed (always
+   near-white), while its heading, caption and legend text use the themed --text/--muted
+   (light in dark theme) — so they vanish. Re-point the card at the existing --dlo-* panel
+   tokens in dark theme. The navy (#0A1F3D) slice and legend dot would otherwise merge into the
+   dark card, so they get a thin light outline; chart colours themselves are unchanged. */
+html[data-theme="dark"] #courts div[style*="background:var(--surface)"] {
+  background-color: var(--dlo-panel-bg, #122238) !important;
+  border-color: var(--dlo-border, rgba(224,192,131,.18)) !important;
+}
+html[data-theme="dark"] #courts div[style*="background:var(--surface)"] h3 {
+  color: var(--dlo-heading, #f1f5f9) !important;
+}
+html[data-theme="dark"] #courts #chartLegend > div { color: var(--dlo-page-text, #e5edf6) !important; }
+html[data-theme="dark"] #courts #chartLegend > div > span:last-child { color: var(--dlo-muted, #aab8c9) !important; }
+html[data-theme="dark"] #courts #chartLegend span[style*="background:#0A1F3D" i] { box-shadow: 0 0 0 1px rgba(255,255,255,.6); }
+html[data-theme="dark"] #courts #courtChart { filter: drop-shadow(0 0 1px rgba(255,255,255,.55)); }
+</style>
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+  </div>
+</div>
+
+<section class="courts-section" id="courts" style="padding-top:60px">
+  <div class="container">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px;flex-wrap:wrap;gap:12px">
+      <div>
+        <span class="section-eyebrow">Jurisdiction</span>
+        <h2 class="section-title">Court-wise Case Distribution</h2>
+        <div class="divider"></div>
+      </div>
+      <div style="font-size:13px;color:var(--muted);font-style:italic" id="lastUpdated"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:28px;align-items:start">
+      <!-- COURTS TABLE -->
+      <div class="courts-table-wrap">
+        <table class="courts-table">
+          <thead>
+            <tr><th>#</th><th>Court Name</th><th>Total Cases</th></tr>
+          </thead>
+          <tbody id="courtsTableBody">
+            <tr><td colspan="3" style="text-align:center;padding:32px;color:var(--muted)">⏳ Loading court data...</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td colspan="2">Total Cases Registered</td><td id="courtsTotalFooter">—</td></tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- DONUT CHART -->
+      <div style="background:var(--surface);border-radius:10px;border:1px solid var(--border);padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+        <h3 style="font-family:'Playfair Display',serif;font-size:16px;color:var(--text);margin-bottom:4px;text-align:center">Case Distribution</h3>
+        <p style="font-size:12px;color:var(--muted);text-align:center;margin-bottom:16px">Court-wise proportional spread</p>
+        <canvas id="courtChart" style="max-height:280px"></canvas>
+        <div id="chartLegend" style="margin-top:16px;display:flex;flex-direction:column;gap:6px"></div>
+      </div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="disclaimer-box" style="margin-top:32px">
+      <span style="font-size:22px;flex-shrink:0">⚠️</span>
+      <div>
+        <p class="title">Important Disclaimer</p>
+        <p class="body">The information provided on this website is intended solely to keep the employees of stakeholder departments aware regarding statistics and developments of cases being handled by the District Litigation Office Kupwara. <strong>This information cannot be made the basis of any litigation, legal proceeding or claim.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  if (!window.DLO) return;
+  const tbody = document.getElementById('courtsTableBody');
+  const footerTotal = document.getElementById('courtsTotalFooter');
+  const lastUpdated = document.getElementById('lastUpdated');
+  const legendEl = document.getElementById('chartLegend');
+  const canvas = document.getElementById('courtChart');
+  const PALETTE = ['#C6A358','#0A1F3D','#00875A','#B45309','#7C3AED','#DC2626','#0891B2','#65A30D','#DB2777','#4B5563'];
+
+  try {
+    const rows = await DLO.fetchCaseDiary();
+    const stats = DLO.calculateStats(rows);
+    const entries = Object.entries(stats.byCourt).sort((a, b) => b[1] - a[1]);
+
+    if (!rows.length) {
+      if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--muted)">No case data available — check Supabase connection.</td></tr>';
+      DLO.showToast('No case data returned — check Supabase connection', 'warn', 5000);
+      return;
+    }
+
+    if (tbody) {
+      tbody.innerHTML = entries.map(([court, count], i) =>
+        `<tr><td>${i + 1}</td><td>${DLO.escapeHtml(court)}</td><td>${count}</td></tr>`
+      ).join('');
+    }
+    if (footerTotal) footerTotal.textContent = stats.total;
+    if (lastUpdated) lastUpdated.textContent = 'Last updated: ' + DLO.formatDateTimeIST(new Date());
+
+    if (legendEl) {
+      legendEl.innerHTML = entries.map(([court, count], i) => {
+        const color = PALETTE[i % PALETTE.length];
+        const pct = stats.total ? Math.round((count / stats.total) * 100) : 0;
+        return `<div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text)">
+          <span style="width:10px;height:10px;border-radius:50%;background:${color};flex-shrink:0"></span>
+          <span style="flex:1">${DLO.escapeHtml(court)}</span>
+          <span style="color:var(--muted)">${count} (${pct}%)</span>
+        </div>`;
+      }).join('');
+    }
+
+    if (canvas && window.Chart) {
+      new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: entries.map(e => e[0]),
+          datasets: [{ data: entries.map(e => e[1]), backgroundColor: entries.map((_, i) => PALETTE[i % PALETTE.length]), borderWidth: 0 }]
+        },
+        options: { plugins: { legend: { display: false } }, cutout: '65%' }
+      });
+    }
+  } catch (e) {
+    console.error('[Court Distribution] failed to load case data:', e);
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:32px;color:var(--muted)">Failed to load case data.</td></tr>';
+  }
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

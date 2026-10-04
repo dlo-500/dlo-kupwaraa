@@ -3,14 +3,14 @@
 <head>
 
 <script>
-/* Preserve the original public homepage; route legacy installed-app URLs to the app shell. */
+/* Apply app-mode BEFORE first paint when running as installed PWA */
 (function(){
   try {
-    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
-    var appRequested = /(?:\?|&)app=1(?:&|$)/.test(location.search || '');
-    var isHome = /(?:^|\/)(?:index\.html)?$/.test(location.pathname || '/');
-    if (isHome && (standalone || appRequested)) {
-      location.replace(new URL('./app.html?app=1', location.href).href);
+    var s = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    var ios = window.navigator.standalone === true;
+    var q = /(?:\?|&)app=1(?:&|$)/.test(location.search || '');
+    if (s || ios || q) {
+      document.documentElement.classList.add('app-mode');
     }
   } catch (e) {}
 })();
@@ -18,12 +18,14 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com https://docs.google.com https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;"><meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com https://docs.google.com https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
 <meta name="description" content="District Litigation Office Kupwara — Official Portal. Department of Law, Justice & Parliamentary Affairs, Government of Jammu & Kashmir.">
 <meta name="theme-color" content="#020408">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/dlo-kupwara-app-icon.jpeg">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1211,6 +1213,7 @@ html.app-mode .menu-label {
 .app-tabbar {
   display: none;
 }
+html.app-mode .app-home-greeting strong { display: block; font: inherit; }
 html.app-mode .app-topbar {
   display: flex !important;
   align-items: center;
@@ -1259,7 +1262,7 @@ html.app-mode .app-home {
 }
 html.app-mode .app-home-greeting {
   font-family: system-ui, -apple-system, sans-serif;
-  font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 4px;
+  font-size: 22px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px;
 }
 html.app-mode .app-home-greeting span {
   display: block; font-size: 11px; font-weight: 600; color: #C9A84C;
@@ -1316,22 +1319,26 @@ html.app-mode .app-home-actions a:nth-child(12) .ic { background: linear-gradien
 
 html.app-mode .app-tabbar {
   display: flex !important;
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 600;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 1400;
   background: #0B2545 !important;
   border-top: 2px solid #C9A84C;
   padding: 6px 4px max(8px, env(safe-area-inset-bottom));
   justify-content: space-around; align-items: center;
 }
-html.app-mode .app-tabbar a {
-  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+html.app-mode .app-tabbar :is(a,button) {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content:center; gap: 2px;
+  min-height: var(--app-tab-h); touch-action: manipulation; -webkit-tap-highlight-color: transparent;
   text-decoration: none; color: rgba(255,255,255,0.55);
   font-size: 10px; font-weight: 600; padding: 4px 0;
+  cursor:pointer;
 }
-html.app-mode .app-tabbar a svg {
-  width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2;
+html.app-mode .app-tabbar button { border:0; background:transparent; font-family:inherit; }
+html.app-mode .app-tabbar :is(a,button) svg {
+  width: 26px; height: 26px; stroke: currentColor; fill: none; stroke-width: 2;
 }
-html.app-mode .app-tabbar a.active { color: #E8C96A; }
-html.app-mode .app-tabbar a.active svg { stroke: #E8C96A; }
+html.app-mode .app-tabbar :is(a,button).active { color: #E8C96A; }
+html.app-mode .app-tabbar :is(a,button).active svg { stroke: #E8C96A; }
+html.app-mode .app-tabbar :is(a,button):active { transform:scale(.96); }
 
 @media (display-mode: standalone), (display-mode: fullscreen) {
   .topbar,
@@ -1373,6 +1380,202 @@ html.app-mode .app-tabbar a.active svg { stroke: #E8C96A; }
     justify-content: space-around;
   }
   body { background: #f4f6f9 !important; }
+}
+
+/* ── APP LOCK ─────────────────────────────────────────────────────────
+   The app always renders as ONE phone-style layout. Nothing below depends on
+   the browser's desktop/mobile view or window width: the app column is capped
+   at --app-max-w and centred, and all sizes are fixed (no vw units). ── */
+html.app-mode {
+  --app-max-w: 560px;      /* width of the app column                     */
+  --app-icon-box: 44px;    /* rounded tile behind each option icon        */
+  --app-icon-glyph: 24px;  /* the drawn icon inside that tile             */
+  --app-glance-glyph: 22px;/* icons in "Today at a glance"                */
+  --app-tab-glyph: 24px;   /* bottom navigation icons                     */
+  --app-tab-h: 56px;       /* bottom navigation item height               */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Responsive refinements for the installed app and direct app preview */
+html.app-mode,
+html.app-mode body { min-height: 100%; min-height: 100dvh; overflow-x: clip; }
+html.app-mode .app-topbar {
+  gap: 12px;
+  padding-left: max(14px, calc((100% - var(--app-max-w)) / 2));
+  padding-right: max(14px, calc((100% - var(--app-max-w)) / 2));
+}
+html.app-mode .app-topbar .at-brand img { flex: 0 0 40px; width: 40px; height: 40px; }
+html.app-mode .app-topbar .at-brand span { font-size: 14px; }
+html.app-mode .app-home {
+  width: 100%;
+  max-width: var(--app-max-w);
+  min-height: calc(100dvh - 60px);
+  padding: 18px 16px calc(96px + env(safe-area-inset-bottom));
+  background: transparent;
+}
+html.app-mode .app-home-greeting { font-size: 24px; line-height: 1.15; }
+html.app-mode .app-home-intro {
+  margin: 8px 0 20px;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.55;
+}
+html.app-mode .app-home-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 126px), 1fr));
+  gap: 10px;
+  margin: 18px 0 24px;
+}
+html.app-mode .app-home-stats .tile {
+  min-width: 0;
+  border-radius: 16px;
+  padding: 14px 10px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+html.app-mode .app-home-stats .tile b { font-size: 19px; }
+html.app-mode .app-home-stats .tile small { font-size: 10px; }
+html.app-mode .app-home-section-label { margin: 10px 0 14px; color: #64748b; }
+html.app-mode .app-home-actions {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 104px), 1fr));
+  gap: 12px;
+}
+html.app-mode .app-home-actions a {
+  min-width: 0;
+  min-height: 112px;
+  justify-content: center;
+  gap: 9px;
+  padding: 14px 8px;
+  border: 1px solid rgba(11,37,69,.08);
+  border-radius: 18px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 5px 18px rgba(15,23,42,.045);
+  font-size: 12px;
+  line-height: 1.3;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+html.app-mode .app-home-actions a .ic,
+html.app-mode .app-home-actions a:nth-child(n) .ic {
+  width: var(--app-icon-box);
+  height: var(--app-icon-box);
+  flex: 0 0 var(--app-icon-box);
+  border: 1px solid rgba(224,192,131,.52);
+  border-radius: 13px;
+  background: linear-gradient(145deg,#173d69,#0B2545 78%);
+  color: #E0C083;
+  box-shadow: 0 8px 16px rgba(11,37,69,.17);
+}
+html.app-mode .app-home-actions a .ic svg {
+  width: var(--app-icon-glyph);
+  height: var(--app-icon-glyph);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+html.app-mode .app-home-actions a:hover {
+  transform: translateY(-3px);
+  border-color: rgba(198,163,88,.55);
+  box-shadow: 0 12px 24px rgba(15,23,42,.09);
+}
+html.app-mode .app-home-actions a:focus-visible,
+html.app-mode .app-tabbar :is(a,button):focus-visible,
+html.app-mode .app-topbar .at-actions a:focus-visible,
+html.app-mode .app-topbar .at-actions button:focus-visible {
+  outline: 3px solid #C6A358;
+  outline-offset: 3px;
+}
+html.app-mode .app-tabbar {
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+html.app-mode .app-tabbar :is(a,button) { min-width: 0; }
+html.app-mode .app-tabbar :is(a,button) svg { flex: 0 0 var(--app-tab-glyph); width: var(--app-tab-glyph); height: var(--app-tab-glyph); }
+/* Same layout at every window width (no min-width / max-width switching). */
+html.app-mode .app-home-stats .tile:last-child:nth-child(odd) { grid-column: 1 / -1; }
+html.app-mode .app-home-actions a { min-height: 106px; }
+html.app-mode .app-tabbar {
+  left: 50%;
+  right: auto;
+  width: min(100%, var(--app-max-w));
+  transform: translateX(-50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.app-mode .app-home-actions a,
+  html.app-mode .app-home-stats .tile { transition: none !important; }
+}
+html.app-mode body { background: #081422 !important; color: #e5edf6 !important; }
+html.app-mode body.light-mode { background: #f4f6f9 !important; color: #1e293b !important; }
+html.app-mode .app-home-stats .tile {
+  color: #e5edf6;
+  background: #122238;
+  border-color: rgba(224,192,131,.16);
+}
+html.app-mode .app-home-stats .tile small { color: #aab8c9; }
+html.app-mode body.light-mode .app-home-stats .tile {
+  color: #1e293b;
+  background: #fff;
+  border-color: rgba(15,23,42,.06);
+}
+html.app-mode body.light-mode .app-home-stats .tile small { color: #64748b; }
+html.app-mode body.light-mode .app-home-greeting { color: #0f172a; }
+html.app-mode .app-home-actions a {
+  color: #e5edf6;
+  background: #122238;
+  border-color: rgba(224,192,131,.16);
+}
+html.app-mode body.light-mode .app-home-actions a {
+  color: #334155;
+  background: rgba(255,255,255,.94);
+  border-color: rgba(11,37,69,.08);
+}
+html.app-mode .app-home-intro,
+html.app-mode .app-home-section-label { color: #aab8c9; }
+html.app-mode body.light-mode .app-home-intro,
+html.app-mode body.light-mode .app-home-section-label { color: #64748b; }
+html.app-mode .app-home-data-status { min-height: 1.5em; margin: 0 0 10px; color: #aab8c9; font-size: 13px; }
+html.app-mode body.light-mode .app-home-data-status { color: #64748b; }
+html.app-mode .app-home-retry {
+  margin: 0 0 12px;
+  padding: 7px 12px;
+  border: 1px solid #C6A358;
+  border-radius: 999px;
+  background: transparent;
+  color: #E0C083;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+html.app-mode body.light-mode .app-home-retry { color: #0B2545; }
+html.app-mode .app-home-actions a .ic svg,
+html.app-mode .app-tabbar a svg,
+html.app-mode .app-topbar .at-actions svg { transition: transform .28s ease; }
+html.app-mode .app-home-actions a { animation: app-tile-enter .48s cubic-bezier(.2,.7,.2,1) both; }
+html.app-mode .app-home-actions a:nth-child(2) { animation-delay: 35ms; }
+html.app-mode .app-home-actions a:nth-child(3) { animation-delay: 70ms; }
+html.app-mode .app-home-actions a:nth-child(4) { animation-delay: 105ms; }
+html.app-mode .app-home-actions a:nth-child(5) { animation-delay: 140ms; }
+html.app-mode .app-home-actions a:nth-child(6) { animation-delay: 175ms; }
+html.app-mode .app-home-actions a:nth-child(7) { animation-delay: 210ms; }
+html.app-mode .app-home-actions a:nth-child(8) { animation-delay: 245ms; }
+html.app-mode .app-home-actions a:nth-child(9) { animation-delay: 280ms; }
+html.app-mode .app-home-actions a:nth-child(10) { animation-delay: 315ms; }
+html.app-mode .app-home-actions a:nth-child(11) { animation-delay: 350ms; }
+html.app-mode .app-home-actions a:nth-child(12) { animation-delay: 385ms; }
+html.app-mode .app-home-actions a:nth-child(13) { animation-delay: 420ms; }
+html.app-mode .app-home-actions a:hover .ic svg,
+html.app-mode .app-tabbar a:hover svg,
+html.app-mode .app-topbar .at-actions a:hover svg,
+html.app-mode .app-topbar .at-actions button:hover svg { transform: translateY(-2px) scale(1.1) rotate(-5deg); }
+@keyframes app-tile-enter {
+  from { opacity: 0; transform: translateY(10px) scale(.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.app-mode .app-home-actions a { animation: none !important; }
+  html.app-mode .app-home-actions a .ic svg,
+  html.app-mode .app-tabbar a svg,
+  html.app-mode .app-topbar .at-actions svg { transition: none !important; }
 }
 
 /* Updates entry point */
@@ -1445,277 +1648,391 @@ html.menu-open header.site-header {
   border-bottom: none;
 }
 
-/* Editorial homepage finish: full-bleed split hero with quiet controls. */
-:root {
-  --bg-black: #000000;
-  --bg-deep: #0a0a0a;
-  --k-curtain-bg: #0a0a0a;
-  --k-panel: #0a0a0a;
-  --k-text: #ffffff;
-  --k-text-silver: #d5d5d5;
-  --k-text-muted: #a6a6a6;
-  --k-text-dim: #777777;
-  --topbar-bg: #000000;
-  --header-bg: rgba(0, 0, 0, 0.97);
-  --page-shadow: rgba(0, 0, 0, 0.58);
-}
-body:not(.app-mode) { background: #000000; }
-
-@media (min-width: 1025px) {
-  body:not(.app-mode) .hero-layout { grid-template-columns: 1fr 1fr; }
-  body:not(.app-mode) .hero-navigation-row { left: 50%; }
-}
-html:not(.app-mode) body:not(.app-mode):not(.light-mode) .hero-layout { background: #000000 !important; }
-html:not(.app-mode) body:not(.app-mode):not(.light-mode) #editorialPanel { background: #000000 !important; }
-
-/* The shared toolbar sits over the hero while it is being moved into the
-   editorial panel during page initialization; it never paints a full-width bar. */
-body:not(.app-mode) .k-toolbar {
-  position: fixed;
-  top: max(1.2rem, env(safe-area-inset-top));
-  right: clamp(1rem, 3vw, 3rem);
-  z-index: 1200;
-  width: auto;
-  min-height: 0;
-  padding: 0;
-  gap: 0.45rem;
-  flex-wrap: nowrap;
-  background: transparent;
-  border: 0;
-}
-body:not(.app-mode) .hero-editorial-panel {
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: 8rem clamp(2rem, 5.2vw, 5rem) 7rem;
+/* ── App dashboard: grouped actions, live glance cards, and touch-friendly targets ── */
+html.app-mode .app-home { color: #edf3fb; }
+html.app-mode .app-welcome {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 1.08fr);
   align-items: center;
-  justify-content: center;
-  text-align: left;
+  gap: 20px;
+  overflow: hidden;
+  margin: 0 0 26px;
+  padding: 22px;
+  border: 1px solid rgba(145,180,218,.32);
+  border-radius: 24px;
+  background: radial-gradient(circle at 100% 0%, rgba(30,103,167,.32), transparent 42%), linear-gradient(122deg, #0c2543, #0b1a2e 74%);
+  box-shadow: 0 18px 50px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.05);
 }
-body:not(.app-mode):not(.light-mode) .hero-editorial-panel { background: #000000 !important; }
-body:not(.app-mode) .hero-editorial-panel > .k-toolbar {
+html.app-mode .app-welcome::after {
+  content: "";
   position: absolute;
-  top: max(1.4rem, env(safe-area-inset-top));
-  right: clamp(1.25rem, 3vw, 3rem);
-  width: auto;
-  min-height: 0;
-  padding: 0;
-  justify-content: flex-end;
-  gap: 0.45rem;
-  background: transparent;
-  border: 0;
+  z-index: -1;
+  width: 260px;
+  height: 260px;
+  right: 37%;
+  bottom: -210px;
+  border-radius: 50%;
+  background: rgba(224,192,131,.14);
+  filter: blur(30px);
 }
-body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn {
-  width: 34px;
-  height: 34px;
-  color: #f4f4f4;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  box-shadow: none;
+html.app-mode .app-welcome::before {
+  content:"";
+  position:absolute;
+  z-index:-1;
+  inset:0 49% 0 0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(4,18,34,.36),rgba(6,24,44,.8)),url("assets/images/hero/building-1.webp") center 42%/cover no-repeat;
+  opacity:.82;
 }
-body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn:hover {
-  color: #e3d1a6;
-  background: rgba(255, 255, 255, 0.045);
-  border-color: rgba(227, 209, 166, 0.62);
-  transform: none;
+html.app-mode .app-welcome-copy { min-width: 0; }
+html.app-mode .app-welcome-eyebrow,
+html.app-mode .app-group-kicker {
+  display: block;
+  margin: 0 0 8px;
+  color: #e3c36e;
+  font: 700 10px/1.3 system-ui, sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
 }
-body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn svg { width: 16px; height: 16px; }
-body:not(.app-mode) .hero-editorial-panel .k-menu-trigger {
-  width: auto;
-  height: 34px;
-  padding: 0 0 0 0.35rem;
-  gap: 0.55rem;
-  color: #f4f4f4;
-  background: transparent;
-  border: 0;
-  box-shadow: none;
+html.app-mode .app-welcome h1 {
+  margin: 0;
+  color: #f8faff !important;
+  font: 700 26px/1.12 system-ui, sans-serif;
+  letter-spacing: -.035em;
 }
-body:not(.app-mode) .hero-editorial-panel .k-menu-trigger:hover {
-  color: #e3d1a6;
-  border: 0;
-  transform: none;
+html.app-mode #appTodayDate { margin: 8px 0 0; color: #cfdaea !important; font-size: 13px; }
+html.app-mode .app-welcome-note { display: block; margin-top: 14px; color: #9eb1c8; font-size: 12px; }
+html.app-mode .app-glance { min-width: 0; }
+html.app-mode .app-glance-title {
+  margin-bottom: 12px;
+  color: #c3d2e5;
+  font: 700 10px/1.2 system-ui, sans-serif;
+  letter-spacing: .2em;
+  text-transform: uppercase;
 }
-body:not(.app-mode) .hero-editorial-panel .k-menu-label { color: currentColor; }
-body:not(.app-mode) .hero-editorial-panel .k-menu-lines { width: 17px; height: 11px; }
-body:not(.app-mode) .quote-book-stage {
-  width: min(100%, 31rem);
-  align-items: flex-start;
+html.app-mode .app-glance-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+html.app-mode .app-glance-item {
+  display: grid;
+  grid-template-columns: 26px minmax(0,1fr);
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 3px;
+  min-width: 0;
+  min-height: 70px;
+  padding: 12px 10px;
+  border: 1px solid rgba(164,190,220,.26);
+  border-radius: 15px;
+  background: rgba(4,18,34,.38);
+  transition: transform .22s ease,border-color .22s ease,background .22s ease;
 }
-body:not(.app-mode) .quote-page,
-body:not(.app-mode) .gold-category-label,
-body:not(.app-mode) .hero-serif-headline,
-body:not(.app-mode) .hero-description { text-align: left; }
-body:not(.app-mode) .gold-category-label {
-  margin-bottom: 1rem;
-  color: #b8b8b8;
+html.app-mode .app-glance-item:hover { transform: translateY(-3px); border-color: rgba(232,201,106,.64); background: rgba(8,34,60,.72); }
+html.app-mode .app-glance-item svg { grid-row: span 2; width: var(--app-glance-glyph); height: var(--app-glance-glyph); fill:none; stroke:#edca71; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+html.app-mode .app-glance-item b { align-self: end; color:#fff; font-size:17px; line-height:1; font-variant-numeric:tabular-nums; }
+html.app-mode .app-glance-item small { grid-column: 1/-1; color:#bdcadd; font-size:10px; line-height:1.25; }
+html.app-mode .app-glance-item small::before { content:""; display:inline-block; width:7px; height:7px; margin-right:6px; border-radius:50%; background:#ef6d65; vertical-align:1px; }
+html.app-mode .app-glance-item:nth-child(2) small::before { background:#4c96f5; }
+html.app-mode .app-glance-item:nth-child(3) small::before { background:#51cf92; }
+html.app-mode .app-action-group { margin: 0 0 28px; }
+html.app-mode .app-group-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  margin: 0 0 14px;
 }
-body:not(.app-mode) .hero-serif-headline {
-  max-width: 20em;
-  margin-left: 0;
-  margin-right: 0;
-  margin-bottom: 0.9rem;
-  font-size: clamp(1.35rem, 2.35vw, 1.9rem);
-  line-height: 1.35;
-  letter-spacing: -0.02em;
+html.app-mode .app-group-heading > div { position: relative; padding-left: 14px; }
+html.app-mode .app-group-heading > div::before { content:""; position:absolute; left:0; top:4px; bottom:3px; width:3px; border-radius:9px; background:#e8c96a; box-shadow:0 0 13px rgba(232,201,106,.45); }
+html.app-mode .app-group-kicker { margin-bottom: 3px; font-size: 9px; letter-spacing: .14em; color: #91a7c1; }
+html.app-mode .app-group-kicker { display:none; }
+html.app-mode .app-group-heading h2 { margin:0; color:#f0f5fc !important; font:700 16px/1.25 system-ui,sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+html.app-mode .app-group-heading > p { margin:0 2px 2px 0; color:#9eafc4 !important; font-size:12px; text-align:right; }
+html.app-mode .app-group-heading > p span { display:inline-block; margin-left:6px; color:#e8c96a; font-size:18px; vertical-align:-1px; }
+html.app-mode .app-action-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+html.app-mode .app-main-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+html.app-mode .app-admin-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+html.app-mode .app-action-card {
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:0;
+  min-height:112px;
+  padding:15px;
+  overflow:hidden;
+  border:1px solid rgba(140,173,208,.28);
+  border-radius:19px;
+  background:linear-gradient(145deg,rgba(20,55,90,.84),rgba(10,29,51,.96)) !important;
+  box-shadow:0 9px 24px rgba(0,0,0,.15),inset 0 1px rgba(255,255,255,.045);
+  color:#eef4fc !important;
+  text-decoration:none;
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease;
+  animation: app-card-enter .44s cubic-bezier(.2,.7,.2,1) both;
 }
-body:not(.app-mode) .hero-serif-headline em {
-  background: none;
-  color: #ffffff;
-  -webkit-text-fill-color: currentColor;
+html.app-mode .app-action-card::after { content:""; position:absolute; inset:auto -22px -54px auto; width:100px; height:100px; border-radius:50%; background:rgba(65,143,219,.1); filter:blur(3px); transition:transform .25s ease,background .25s ease; }
+html.app-mode .app-action-card:hover,
+html.app-mode .app-action-card:focus-visible {
+  z-index:1;
+  transform:translateY(-4px);
+  border-color:rgba(232,201,106,.72);
+  box-shadow:0 16px 32px rgba(0,0,0,.23),0 0 0 1px rgba(232,201,106,.08);
 }
-body:not(.app-mode) .hero-description {
-  max-width: 29em;
-  margin-left: 0;
-  margin-right: 0;
-  font-size: clamp(0.82rem, 0.95vw, 0.9rem);
-  line-height: 1.7;
-  color: #d0d0d0;
+html.app-mode .app-action-card:hover::after { transform:scale(1.35); background:rgba(65,143,219,.17); }
+html.app-mode .app-action-card:focus-visible { outline:2px solid #e8c96a; outline-offset:3px; }
+html.app-mode .app-action-featured {
+  grid-column:span 2;
+  min-height:172px;
+  border-color:rgba(74,148,225,.53);
+  background:radial-gradient(circle at 10% 0,rgba(39,125,206,.42),transparent 48%),linear-gradient(140deg,#123b66,#0a2039 82%) !important;
 }
-
-@media (max-width: 1024px) {
-  body:not(.app-mode):not(.light-mode) .hero-editorial-panel {
-    min-height: 360px;
-    padding: 5.75rem 1.5rem 4.5rem;
-  }
-  body:not(.app-mode):not(.light-mode) .hero-editorial-panel { background: #000000 !important; }
-  body:not(.app-mode) .hero-editorial-panel > .k-toolbar {
-    top: max(0.85rem, env(safe-area-inset-top));
-    right: 1rem;
-    gap: 0.25rem;
-  }
-  body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn {
-    width: 32px;
-    height: 32px;
-  }
-  body:not(.app-mode) .hero-editorial-panel .k-menu-trigger { height: 32px; }
-  body:not(.app-mode) .hero-serif-headline { font-size: clamp(1.3rem, 4vw, 1.6rem); }
+html.app-mode .app-action-icon {
+  position:relative;
+  z-index:1;
+  display:grid;
+  flex:0 0 var(--app-icon-box);
+  width:var(--app-icon-box);
+  height:var(--app-icon-box);
+  place-items:center;
+  border:1px solid rgba(232,201,106,.5);
+  border-radius:13px;
+  background:linear-gradient(145deg,rgba(29,86,137,.9),rgba(8,31,55,.9));
+  box-shadow:0 7px 18px rgba(0,0,0,.21),inset 0 1px rgba(255,255,255,.08);
+  color:#edcd78;
+  transition:transform .25s cubic-bezier(.2,.7,.2,1),box-shadow .25s ease;
 }
-
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel {
-  background: #ffffff !important;
-  color: #171717 !important;
+html.app-mode .app-action-icon svg { width:var(--app-icon-glyph); height:var(--app-icon-glyph); fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+html.app-mode .app-action-card:hover .app-action-icon { transform:translateY(-2px) rotate(-4deg) scale(1.04); box-shadow:0 11px 22px rgba(0,0,0,.26),0 0 16px rgba(232,201,106,.14); }
+html.app-mode .app-action-copy { position:relative; z-index:1; display:flex; flex:1 1 auto; flex-direction:column; gap:5px; min-width:0; }
+html.app-mode .app-action-copy strong { color:#f6f8fc; font-size:15px; line-height:1.22; }
+html.app-mode .app-action-copy small { color:#b4c4d9; font-size:11px; line-height:1.4; }
+html.app-mode .app-action-arrow { position:relative; z-index:1; flex:0 0 auto; display:grid; place-items:center; width:34px; height:34px; border:1px solid rgba(232,201,106,.35); border-radius:50%; color:#edcd78; font-size:17px; transition:transform .22s ease,background .22s ease; }
+html.app-mode .app-action-card:hover .app-action-arrow { transform:translateX(3px); background:rgba(232,201,106,.12); }
+html.app-mode .app-action-metrics { display:flex; gap:0; margin-top:10px; padding-top:10px; border-top:1px solid rgba(180,198,220,.2); }
+html.app-mode .app-action-metrics > span { display:flex; flex:1 1 0; flex-direction:column; gap:2px; padding:0 9px; color:#b7c8dc; font-size:10px; }
+html.app-mode .app-action-metrics > span:first-child { padding-left:0; }
+html.app-mode .app-action-metrics > span + span { border-left:1px solid rgba(180,198,220,.25); }
+html.app-mode .app-action-metrics b { color:#69d9ec; font-size:19px; line-height:1.1; font-variant-numeric:tabular-nums; }
+html.app-mode .app-action-metrics > span:nth-child(2) b { color:#72dfac; }
+html.app-mode .app-action-metrics > span:nth-child(3) b { color:#edcd78; }
+html.app-mode .app-home-data-status:not([hidden]) { display:block; margin:0 0 8px; padding:11px 13px; border-radius:12px; border:1px solid rgba(232,201,106,.3); background:rgba(232,201,106,.08); color:#d5e0ed; font-size:12px; }
+html.app-mode .app-home-retry[hidden], html.app-mode .app-home-data-status[hidden] { display:none !important; }
+html.app-mode .app-home-retry { margin:0 0 14px; padding:9px 13px; border:1px solid rgba(232,201,106,.5); border-radius:10px; background:rgba(232,201,106,.1); color:#f3d783; font-weight:700; }
+html.app-mode .app-home-alert { margin:0 0 18px; border:1px solid rgba(255,136,136,.3); border-radius:14px; background:rgba(139,35,45,.2); color:#ffd4d4; }
+html.app-mode .app-home-alert[hidden] { display:none !important; }
+html.app-mode body.light-mode .app-welcome { border-color:rgba(19,54,88,.15); background:radial-gradient(circle at 100% 0,rgba(63,145,218,.17),transparent 42%),linear-gradient(122deg,#fff,#e9f1fa 78%); box-shadow:0 16px 38px rgba(16,42,72,.09); }
+html.app-mode body.light-mode .app-welcome h1,
+html.app-mode body.light-mode .app-group-heading h2,
+html.app-mode body.light-mode .app-action-copy strong { color:#122b49 !important; }
+html.app-mode body.light-mode #appTodayDate,
+html.app-mode body.light-mode .app-welcome-note,
+html.app-mode body.light-mode .app-group-heading > p { color:#5c7189 !important; }
+/* Light theme: the hero photo overlay and the gold eyebrow were still dark-theme
+   values, leaving dark text on a dark band. Lighten the overlay, darken the gold. */
+html.app-mode body.light-mode .app-welcome::before {
+  background-image: linear-gradient(90deg, rgba(255,255,255,.74), rgba(238,245,252,.92)), url("assets/images/hero/building-1.webp");
+  opacity: .9;
 }
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .hero-serif-headline {
-  color: #171717 !important;
+html.app-mode body.light-mode .app-welcome-eyebrow { color: #8a6516; }
+html.app-mode body.light-mode .app-glance-title { color:#4d6580; }
+html.app-mode body.light-mode .app-glance-item { border-color:rgba(19,54,88,.16); background:rgba(255,255,255,.72); }
+html.app-mode body.light-mode .app-glance-item b { color:#173453; }
+html.app-mode body.light-mode .app-glance-item small { color:#586e86; }
+html.app-mode body.light-mode .app-action-card { border-color:rgba(22,61,99,.15); background:linear-gradient(145deg,#fff,#edf4fb) !important; color:#18283d !important; box-shadow:0 9px 25px rgba(19,54,88,.08),inset 0 1px #fff; }
+html.app-mode body.light-mode .app-action-featured { background:radial-gradient(circle at 10% 0,rgba(39,125,206,.2),transparent 48%),linear-gradient(140deg,#fff,#e3effb 82%) !important; }
+html.app-mode body.light-mode .app-action-copy small,
+html.app-mode body.light-mode .app-action-metrics > span { color:#5c7189; }
+html.app-mode body.light-mode .app-action-icon { background:linear-gradient(145deg,#fff,#e5edf6); color:#a37a24; }
+html.app-mode body.light-mode .app-action-metrics { border-color:rgba(22,61,99,.13); }
+html.app-mode body.light-mode .app-action-metrics > span + span { border-color:rgba(22,61,99,.15); }
+html.app-mode body.light-mode .app-action-metrics b { color:#087a91; }
+html.app-mode body.light-mode .app-action-metrics > span:nth-child(2) b { color:#16804c; }
+html.app-mode body.light-mode .app-action-metrics > span:nth-child(3) b { color:#a37a24; }
+html.app-mode .app-action-card:nth-child(2) { animation-delay:45ms; }
+html.app-mode .app-action-card:nth-child(3) { animation-delay:90ms; }
+html.app-mode .app-action-card:nth-child(4) { animation-delay:135ms; }
+html.app-mode .app-topbar .at-brand-text { display:flex; flex-direction:column; gap:1px; min-width:0; line-height:1.08; }
+html.app-mode .app-topbar .at-brand-text strong { color:#e8c96a; font-size:15px; font-weight:750; }
+html.app-mode .app-topbar .at-brand-text small { color:#b3c3d8; font-size:10px; font-weight:500; letter-spacing:.02em; }
+html.app-mode body.light-mode .app-topbar .at-brand-text small { color:#637991; }
+@keyframes app-card-enter { from { opacity:0; transform:translateY(10px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media all {
+  html.app-mode .app-welcome { grid-template-columns:1fr; gap:16px; padding:18px; border-radius:20px; }
+  html.app-mode .app-welcome::before { inset:0 0 53% 0; background-position:center 37%; }
+  html.app-mode .app-welcome-note { margin-top:9px; }
+  html.app-mode .app-glance-grid { gap:7px; }
+  html.app-mode .app-glance-item { grid-template-columns:26px minmax(0,1fr); column-gap:7px; min-height:66px; padding:9px 8px; }
+  html.app-mode .app-glance-item svg { width:var(--app-glance-glyph); height:var(--app-glance-glyph); }
+  html.app-mode .app-glance-item small { font-size:9px; }
+  html.app-mode .app-action-grid,
+  html.app-mode .app-admin-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  html.app-mode .app-main-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  html.app-mode .app-action-card { min-height:98px; padding:10px; gap:7px; border-radius:15px; }
+  html.app-mode .app-action-featured { grid-column:1/-1; min-height:128px; padding:14px; gap:11px; }
+  html.app-mode .app-action-icon { flex-basis:var(--app-icon-box); width:var(--app-icon-box); height:var(--app-icon-box); border-radius:13px; }
+  html.app-mode .app-action-icon svg { width:var(--app-icon-glyph); height:var(--app-icon-glyph); }
+  html.app-mode .app-action-copy strong { font-size:12px; }
+  html.app-mode .app-action-copy small { font-size:9px; }
+  html.app-mode .app-action-arrow { width:23px; height:23px; font-size:13px; }
+  html.app-mode .app-action-card:not(.app-action-featured) { flex-direction:column; align-items:flex-start; justify-content:space-between; }
+  html.app-mode .app-action-card:not(.app-action-featured) .app-action-copy { flex:0 1 auto; }
+  html.app-mode .app-action-card:not(.app-action-featured) .app-action-arrow { position:absolute; right:9px; bottom:9px; border:0; }
+  html.app-mode .app-group-heading > p { max-width:44%; font-size:10px; }
 }
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .hero-serif-headline em {
-  color: #8b7446 !important;
-  -webkit-text-fill-color: currentColor !important;
+@media (max-width: 390px) {
+  html.app-mode .app-home { padding-left:12px; padding-right:12px; }
+  html.app-mode .app-welcome { padding:17px; }
+  html.app-mode .app-glance-item { display:flex; flex-wrap:wrap; align-content:center; gap:4px 6px; }
+  html.app-mode .app-glance-item svg { flex:0 0 var(--app-glance-glyph); width:var(--app-glance-glyph); height:var(--app-glance-glyph); }
+  html.app-mode .app-glance-item b { font-size:17px; }
+  html.app-mode .app-glance-item small { flex:1 0 100%; }
+  html.app-mode .app-action-card:not(.app-action-featured) { min-height:92px; }
+  html.app-mode .app-action-featured { min-height:122px; padding:12px; gap:9px; }
+  html.app-mode .app-action-metrics > span { padding:0 6px; font-size:9px; }
+  html.app-mode .app-action-metrics b { font-size:16px; }
+  html.app-mode .app-group-heading > p { display:none; }
 }
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .gold-category-label {
-  color: #626262 !important;
+@media all {
+  html.app-mode .app-topbar .at-brand-text small { display:none; }
 }
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .hero-description {
-  color: #454545 !important;
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-toolbar-btn,
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-menu-trigger {
-  color: #202020 !important;
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-toolbar-btn {
-  border-color: rgba(0, 0, 0, 0.22) !important;
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-menu-lines span {
-  background-color: #8b7446 !important;
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .hero-navigation-row .btn-circle-arrow {
-  color: #303030;
-  border-color: rgba(20, 20, 20, 0.28);
-  background: rgba(0, 0, 0, 0.035);
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .hero-navigation-row .carousel-pause-btn {
-  color: #555555;
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .brand-lockup h1 {
-  color: #ffffff !important;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.58);
-}
-html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .brand-lockup p {
-  color: #f0dfb7 !important;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.58);
+@media (prefers-reduced-motion: reduce) {
+  html.app-mode .app-action-card,
+  html.app-mode .app-glance-item { animation:none !important; transition:none !important; }
 }
 </style>
 </head>
 <body>
-<script>DLO.injectMenu();</script>
+<script>if (!document.documentElement.classList.contains('app-mode')) DLO.injectMenu();</script>
 
 <!-- ═══ APP SHELL (visible only when installed as PWA) ═══ -->
 <div class="app-topbar" id="appTopbar" aria-hidden="true">
   <div class="at-brand">
     <img src="logo.png" alt="DLO Kupwara" onerror="this.style.display='none'">
-    <span>DLO Kupwara</span>
+    <span class="at-brand-text"><strong>DLO Kupwara</strong><small>District Litigation Office</small></span>
   </div>
-  <div class="at-actions">
-    <a href="search-filter-cases.html" title="Search cases" aria-label="Search">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-    </a>
-    <a href="latest-updates.html" title="Updates" aria-label="Updates">
-      <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
-    </a>
-    <button type="button" onclick="if(typeof openDeveloperModal==='function')openDeveloperModal();" title="About" aria-label="About">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
-    </button>
-  </div>
+  <div class="at-actions" aria-label="Page controls"></div>
 </div>
 
 <div class="app-home" id="appHome" aria-hidden="true">
-  <div class="app-home-greeting">
-    <span>District Litigation Office</span>
-    Welcome back
-  </div>
+  <section class="app-welcome" aria-labelledby="appGreeting">
+    <div class="app-welcome-copy">
+      <span class="app-welcome-eyebrow">District Litigation Office · Kupwara</span>
+      <h1 id="appGreeting">Good day</h1>
+      <p id="appTodayDate"></p>
+      <span class="app-welcome-note">Your workday, clearly organised.</span>
+    </div>
+    <div class="app-glance" aria-label="At a glance">
+      <div class="app-glance-title">Today at a glance</div>
+      <div class="app-glance-grid">
+        <div class="app-glance-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18M8 14h3m-3 3h6"/></svg>
+          <b id="appHomeHearings">—</b><small>Hearings this week</small>
+        </div>
+        <div class="app-glance-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h11l4 4v14H5z"/><path d="M15 3v5h5M8 12h8m-8 4h8"/></svg>
+          <b id="appHomeCases">—</b><small>Cases on record</small>
+        </div>
+        <div class="app-glance-item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 8-3 9h18s-3-1-3-9M10 21h4"/></svg>
+          <b id="appHomeUpdates">—</b><small>New updates</small>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <div class="app-home-stats">
-    <div class="tile"><b id="appHomeTotal">—</b><small>Total</small></div>
-    <div class="tile"><b id="appHomeActive">—</b><small>Active</small></div>
-    <div class="tile"><b id="appHomeCourts">13+</b><small>Courts</small></div>
-    <div class="tile"><b id="appHomeDisposed">—</b><small>Disposed</small></div>
-    <div class="tile"><b id="appHomeReplyFiled">—</b><small>Reply Filed</small></div>
-    <div class="tile"><b id="appHomeReplyPending">—</b><small>Reply Pending</small></div>
-    <div class="tile"><b id="appHomeExparte">—</b><small>Ex-parte</small></div>
-  </div>
+  <p class="app-home-data-status" id="appHomeDataStatus" role="status" aria-live="polite" hidden></p>
+  <button class="app-home-retry" id="appHomeDataRetry" type="button" hidden>Try again</button>
 
-  <div class="app-home-alert" id="appHomeAlert">
-    <span aria-hidden="true">⚠️</span>
-    <span id="appHomeAlertText"></span>
-  </div>
+  <section class="app-action-group app-action-group-main" aria-labelledby="appMainActionsTitle">
+    <div class="app-group-heading">
+      <div><span class="app-group-kicker">Start here</span><h2 id="appMainActionsTitle">Main Actions</h2></div>
+      <p>Quick access to your daily work <span aria-hidden="true">›</span></p>
+    </div>
+    <div class="app-action-grid app-main-grid">
+      <a class="app-action-card app-action-featured" href="search-filter-cases.html?app=1">
+        <span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h6l2 2h8v12H4z"/><path d="M8 12h7m-7 3h5"/></svg></span>
+        <span class="app-action-copy"><strong>My Cases</strong><small>Search and review case records</small>
+          <span class="app-action-metrics"><span><b id="appMainActive">—</b>Active</span><span><b id="appMainToday">—</b>Today</span><span><b id="appMainPending">—</b>Pending</span></span>
+        </span><span class="app-action-arrow" aria-hidden="true">↗</span>
+      </a>
+      <a class="app-action-card" href="hearings.html?app=1">
+        <span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18M8 14h3m-3 3h6"/></svg></span>
+        <span class="app-action-copy"><strong>Hearings</strong><small>View upcoming court dates</small></span><span class="app-action-arrow" aria-hidden="true">›</span>
+      </a>
+      <a class="app-action-card" href="causelist.html?app=1">
+        <span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h6"/></svg></span>
+        <span class="app-action-copy"><strong>Cause List</strong><small>Open the daily court list</small></span><span class="app-action-arrow" aria-hidden="true">›</span>
+      </a>
+    </div>
+  </section>
 
-  <div class="app-home-section-label">Quick Access</div>
-  <div class="app-home-actions">
-    <a href="about-office.html"><div class="ic">🏛️</div>About</a>
-    <a href="search-filter-cases.html"><div class="ic">📁</div>My Cases</a>
-    <a href="hearings.html"><div class="ic">📅</div>Hearings</a>
-    <a href="court-wise-distribution.html"><div class="ic">⚖️</div>Courts</a>
-    <a href="analytics.html"><div class="ic">📊</div>Analytics</a>
-    <a href="causelist.html"><div class="ic">📋</div>Cause List</a>
-    <a href="latest-updates.html"><div class="ic">🔔</div>Updates</a>
-    <a href="performance.html"><div class="ic">⭐</div>Performance</a>
-    <a href="history.html"><div class="ic">📖</div>Case History</a>
-    <a href="our-officials.html"><div class="ic">👥</div>Team</a>
-    <a href="operator.html"><div class="ic">🔐</div>Staff Login</a>
-    <a href="contact.html"><div class="ic">✉️</div>Contact</a>
+  <section class="app-action-group" aria-labelledby="appCaseManagementTitle">
+    <div class="app-group-heading">
+      <div><span class="app-group-kicker">Casework</span><h2 id="appCaseManagementTitle">Case Management</h2></div>
+      <p>Records, courts and insights <span aria-hidden="true">›</span></p>
+    </div>
+    <div class="app-action-grid">
+      <a class="app-action-card" href="court-wise-distribution.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v18M7 6h10M5 21h14M7 6 3 13h8L7 6Zm10 0-4 7h8l-4-7Z"/></svg></span><span class="app-action-copy"><strong>Courts</strong><small>Court-wise case details</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="history.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6c-2-2-5-2-9-1v15c4-1 7-1 9 1 2-2 5-2 9-1V5c-4-1-7-1-9 1Zm0 0v15"/></svg></span><span class="app-action-copy"><strong>Case History</strong><small>Review proceedings</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="analytics.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V10m6 10V4m6 16v-7m6 7H2"/></svg></span><span class="app-action-copy"><strong>Analytics</strong><small>Statistics and insights</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+    </div>
+  </section>
+
+  <section class="app-action-group" aria-labelledby="appOfficeTitle">
+    <div class="app-group-heading">
+      <div><span class="app-group-kicker">Stay informed</span><h2 id="appOfficeTitle">Office &amp; Updates</h2></div>
+      <p>News, performance and people <span aria-hidden="true">›</span></p>
+    </div>
+    <div class="app-action-grid">
+      <a class="app-action-card" href="latest-updates.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 8-3 9h18s-3-1-3-9M10 21h4"/></svg></span><span class="app-action-copy"><strong>Updates</strong><small>Latest official notices</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="performance.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.5 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3Z"/></svg></span><span class="app-action-copy"><strong>Performance</strong><small>Department insights</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="our-officials.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m1-14a3 3 0 0 1 0 6m2 2a5 5 0 0 1 3 5v1"/></svg></span><span class="app-action-copy"><strong>Team</strong><small>Meet our officials</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+    </div>
+  </section>
+
+  <section class="app-action-group" aria-labelledby="appAdminTitle">
+    <div class="app-group-heading">
+      <div><span class="app-group-kicker">More resources</span><h2 id="appAdminTitle">Administration</h2></div>
+      <p>Office details and access <span aria-hidden="true">›</span></p>
+    </div>
+    <div class="app-action-grid app-admin-grid">
+      <a class="app-action-card" href="about-office.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 12h.01M15 12h.01"/></svg></span><span class="app-action-copy"><strong>About</strong><small>About the office</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="contact.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></svg></span><span class="app-action-copy"><strong>Contact</strong><small>Get in touch</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="operator.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 1 1 8 0v3m-4 4v3"/></svg></span><span class="app-action-copy"><strong>Staff Login</strong><small>Authorised staff access</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+      <a class="app-action-card" href="department.html?app=1"><span class="app-action-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 9h.01M15 9h.01M9 12h.01M15 12h.01"/></svg></span><span class="app-action-copy"><strong>Department Login</strong><small>Department access</small></span><span class="app-action-arrow" aria-hidden="true">›</span></a>
+    </div>
+  </section>
+
+  <div class="app-home-alert" id="appHomeAlert" role="status" aria-live="polite" hidden>
+    <span aria-hidden="true">!</span><span id="appHomeAlertText"></span>
   </div>
 </div>
 
 <nav class="app-tabbar" id="appTabbar" aria-label="App navigation" aria-hidden="true">
-  <a href="index.html" class="active">
+  <a href="app.html?app=1" class="active">
     <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
     Home
   </a>
-  <a href="search-filter-cases.html">
+  <a href="causelist.html?app=1">
+    <svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6m-6 4h6m-6 4h6"/></svg>
+    Cause List
+  </a>
+  <a href="search-filter-cases.html?app=1">
     <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
     Cases
   </a>
-  <a href="hearings.html">
+  <a href="hearings.html?app=1">
     <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
     Hearings
   </a>
-  <a href="history.html">
+  <a href="history.html?app=1">
     <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/></svg>
     History
   </a>
-  <a href="contact.html">
-    <svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3z"/></svg>
-    Contact
-  </a>
+  <button type="button" id="appMoreTab" aria-label="Open more options">
+    <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+    More
+  </button>
 </nav>
 <!-- ═══ END APP SHELL ═══ -->
 
@@ -1750,13 +2067,13 @@ html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .brand-lockup p {
       <div class="geometric-frame">
         <div class="geometric-clip-box">
           <img src="assets/images/hero/building-1.webp" alt="DC Office Complex Kupwara" class="hero-slide-img active" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
-          <img src="assets/images/hero/building-2.webp" alt="Administrative Wing Kupwara" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
-          <img src="assets/images/hero/office-entrance.webp" alt="District Litigation Office Signage" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
-          <img src="assets/images/hero/office-interior-1.webp" alt="Litigation Registry & Verification Desk" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
-          <img src="assets/images/hero/office-interior-2.webp" alt="Executive Legal Consultation Chamber" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
-          <img src="assets/images/hero/law-library.webp" alt="Law Library & Legal Reference Archive" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
-          <img src="assets/images/hero/staff-1.webp" alt="Administrative Legal Staff" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
-          <img src="assets/images/hero/staff-2.webp" alt="Litigation Coordination Team" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/building-2.webp" alt="Administrative Wing Kupwara" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/office-entrance.webp" alt="District Litigation Office Signage" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
+          <img src="assets/images/hero/office-interior-1.webp" alt="Litigation Registry & Verification Desk" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/office-interior-2.webp" alt="Executive Legal Consultation Chamber" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
+          <img src="assets/images/hero/law-library.webp" alt="Law Library & Legal Reference Archive" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/staff-1.webp" alt="Administrative Legal Staff" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
+          <img src="assets/images/hero/staff-2.webp" alt="Litigation Coordination Team" class="hero-slide-img" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
           
           <div class="geometric-vignette"></div>
           <div class="site-notice-overlay" id="siteNoticeOverlay" hidden aria-hidden="true">
@@ -1975,6 +2292,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // ── SYNCHRONIZED SLIDE & 3D BOOK-PAGE TRANSITION ENGINE ──────
 // Runs inside DOMContentLoaded so querySelectorAll finds the elements.
 document.addEventListener('DOMContentLoaded', function () {
+  // The app dashboard replaces the public homepage carousel. Skip its timers,
+  // overlays and slide work entirely in app mode.
+  if (document.documentElement.classList.contains('app-mode')) return;
   var slides = document.querySelectorAll('.hero-slide-img');
   var pages  = document.querySelectorAll('.quote-page');
   var progressTrackEl = document.getElementById('carouselProgressTrack');
@@ -2185,31 +2505,108 @@ document.addEventListener('DOMContentLoaded', function () {
   updateCarouselProgress(activeIdx);
   slideTimer = setInterval(window.nextSlide, 8500);
 
-  // ── Populate app-home stats tiles from Supabase ───────────
-  if (window.DLO && typeof DLO.fetchCaseDiary === 'function') {
-    DLO.fetchCaseDiary().then(function (rows) {
-      var stats = DLO.calculateStats(rows);
-      function set(id, val) {
-        var el = document.getElementById(id);
-        if (el) el.textContent = val !== undefined ? val : '—';
-      }
-      set('appHomeTotal',        stats.total);
-      set('appHomeActive',       stats.active);
-      set('appHomeDisposed',     stats.disposed);
-      set('appHomeReplyFiled',   stats.replyFiled);
-      set('appHomeReplyPending', stats.replyPending);
-      set('appHomeExparte',      stats.exparte);
+});
 
-      // Show overdue alert if any
-      if (stats.overdue > 0) {
-        var alert = document.getElementById('appHomeAlert');
-        var alertText = document.getElementById('appHomeAlertText');
-        if (alert && alertText) {
-          alertText.textContent = stats.overdue + ' case' + (stats.overdue > 1 ? 's have' : ' has') + ' an overdue hearing date.';
-          alert.classList.add('is-visible');
-        }
+// Keep the app dashboard loader outside the public homepage carousel handler.
+// The carousel handler returns early in app mode, so dashboard work must have
+// its own DOM-ready callback to run in the installed app.
+document.addEventListener('DOMContentLoaded', function () {
+  // Use the same shared case loader and statistics calculation as the website analytics.
+  var dashboardStatus = document.getElementById('appHomeDataStatus');
+  var dashboardRetry = document.getElementById('appHomeDataRetry');
+  var greeting = document.getElementById('appGreeting');
+  var dateLabel = document.getElementById('appTodayDate');
+  function setDashboardDate() {
+    var hour = Number(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: 'Asia/Kolkata' }).format(new Date()));
+    if (greeting) greeting.textContent = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    if (dateLabel) dateLabel.textContent = new Intl.DateTimeFormat('en-IN', {
+      weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata'
+    }).format(new Date());
+  }
+  setDashboardDate();
+
+  function setDashboardCount(id, value) {
+    var node = document.getElementById(id);
+    if (node) node.textContent = Number(value || 0).toLocaleString('en-IN');
+  }
+  function countTodaysHearings(rows) {
+    var today = new Intl.DateTimeFormat('en-CA', { timeZone:'Asia/Kolkata', year:'numeric', month:'2-digit', day:'2-digit' }).format(new Date());
+    return (rows || []).filter(function (row) {
+      var hearing = String(row.nextHearing || '').slice(0, 10);
+      var status = String(row.status || '').toLowerCase();
+      return hearing === today && !status.includes('dispos');
+    }).length;
+  }
+  function renderDashboardStats(stats, rows) {
+    if (!stats) return;
+    setDashboardCount('appHomeHearings', stats.hearingSoon);
+    setDashboardCount('appHomeCases', stats.total);
+    setDashboardCount('appMainActive', stats.active);
+    setDashboardCount('appMainToday', countTodaysHearings(rows));
+    setDashboardCount('appMainPending', stats.replyPending);
+    setDashboardCount('appMainTotal', stats.total);
+    var alert = document.getElementById('appHomeAlert');
+    var alertText = document.getElementById('appHomeAlertText');
+    if (alert && alertText) {
+      if (Number(stats.overdue) > 0) {
+        alertText.textContent = Number(stats.overdue).toLocaleString('en-IN') + ' case' + (Number(stats.overdue) === 1 ? ' has' : 's have') + ' an overdue hearing date.';
+        alert.hidden = false;
+        alert.classList.add('is-visible');
+      } else {
+        alert.hidden = true;
+        alert.classList.remove('is-visible');
       }
-    }).catch(function () {});
+    }
+  }
+  document.addEventListener('dlo:case-diary-updated', function (event) {
+    if (!document.documentElement.classList.contains('app-mode') || !event.detail || !Array.isArray(event.detail.rows)) return;
+    renderDashboardStats(DLO.calculateStats(event.detail.rows), event.detail.rows);
+  });
+  // Uses the shared, cached, fully paged case_diary loader (DLO.fetchCaseDiary):
+  // cached rows show immediately and fresh rows arrive via 'dlo:case-diary-updated'.
+  async function fetchAppDashboardRows(force) {
+    if (!window.DLO || typeof DLO.fetchCaseDiary !== 'function') {
+      throw new Error('The case service is unavailable.');
+    }
+    return DLO.fetchCaseDiary(!!force);
+  }
+  async function loadDashboardStats(force) {
+    if (dashboardRetry) dashboardRetry.disabled = true;
+    try {
+      if (!window.DLO || typeof DLO.calculateStats !== 'function') {
+        throw new Error('Dashboard data is unavailable.');
+      }
+      var rows = await fetchAppDashboardRows(force);
+      if (!Array.isArray(rows) || !rows.length) throw new Error('No case data was returned.');
+      var stats = DLO.calculateStats(rows);
+      if (!stats || !Number.isFinite(Number(stats.total))) throw new Error('Dashboard totals are unavailable.');
+      renderDashboardStats(stats, rows);
+      if (dashboardStatus) dashboardStatus.hidden = true;
+      if (dashboardRetry) dashboardRetry.hidden = true;
+    } catch (error) {
+      console.error('[App dashboard] Could not load case statistics:', error);
+      if (dashboardStatus) {
+        dashboardStatus.textContent = 'Current case information is temporarily unavailable. Please try again shortly.';
+        dashboardStatus.hidden = false;
+      }
+      if (dashboardRetry) dashboardRetry.hidden = false;
+    } finally {
+      if (dashboardStatus) dashboardStatus.setAttribute('aria-busy', 'false');
+      if (dashboardRetry) dashboardRetry.disabled = false;
+    }
+
+    // Updates load independently so a slow sheet never holds back case totals.
+    if (window.DLO && typeof DLO.fetchSiteUpdates === 'function') {
+      DLO.fetchSiteUpdates(!!force).then(function (items) {
+        setDashboardCount('appHomeUpdates', Array.isArray(items) ? items.length : 0);
+      }).catch(function () {});
+    }
+  }
+  // The regular editorial homepage does not need app dashboard data. Only
+  // installed/app-mode visits request the same case data used by analytics.
+  if (document.documentElement.classList.contains('app-mode')) {
+    if (dashboardRetry) dashboardRetry.addEventListener('click', function () { loadDashboardStats(true); });
+    loadDashboardStats(false);
   }
 });
 </script>
@@ -2515,7 +2912,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   ['.topbar','header.site-header','main.hero-minimal','.fullscreen-curtain',
     '.news-dock-strip','footer.site-footer',
-   '.k-menu-trigger','.k-curtain'].forEach(function(sel){
+    '.k-menu-trigger'].forEach(function(sel){
     document.querySelectorAll(sel).forEach(function(el){
       el.style.display = 'none';
     });

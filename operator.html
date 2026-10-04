@@ -12,6 +12,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+  // This is a staff 2FA login surface — deliberately excluded from the
+  // shared site-wide curtain menu (see common.js → injectMenu()) to keep
+  // the authentication flow minimal and distraction-free.
+  window.DLO_NO_MENU = true;
+</script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -283,8 +290,8 @@ tr:hover td{background:rgba(166,118,61,0.045)}
 //  The anon key is safe to expose client-side; it only ever
 //  works within the RLS policies you've defined.
 // ═══════════════════════════════════════════════
-const SUPABASE_URL = 'https://ibicsdsehxlsaygjnefk.supabase.co';       // e.g. https://xxxxx.supabase.co
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU';
+const SUPABASE_URL = window.DLO_CONFIG.supabase.url;       // centralized — see config.js
+const SUPABASE_ANON_KEY = window.DLO_CONFIG.supabase.anonKey;  // centralized — see config.js
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -583,8 +590,8 @@ async function requestPasswordReset() {
 
   btn.disabled = true; btn.textContent = 'Sending...';
   const { error } = await sb.auth.resetPasswordForEmail(email, {
-  redirectTo: 'https://dlokupwara.in/reset-password.html'
-});
+    redirectTo: window.location.origin + window.location.pathname
+  });
   btn.disabled = false; btn.textContent = 'Send Reset Link';
 
   if (error) { showAuthError(error.message); return; }
@@ -1347,5 +1354,14 @@ if (window.location.hash && window.location.hash.includes('type=recovery')) {
   checkExistingSession();
 }
 </script>
+
+
+<script src="common.js" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) { DLO.registerSW(); }
+});
+</script>
+
 </body>
 </html>

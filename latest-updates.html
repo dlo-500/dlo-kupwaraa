@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="Orders, Notices & Circulars — District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Latest Updates | Orders, Notices & Circulars | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;}
+.section-title{font-family:'Playfair Display',serif!important}
+.update-card{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:12px;padding:18px 22px;margin-bottom:14px;transition:all .2s}
+.update-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px)}
+.update-meta{font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.update-type{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;background:rgba(198,163,88,0.15);color:var(--gold)}
+</style>
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<meta property="og:title" content="Latest Updates — Orders, Notices & Circulars | DLO Kupwara">
+<meta property="og:description" content="Official orders, notices and circulars issued by District Litigation Office Kupwara">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+  </div>
+</div>
+
+<section style="background:var(--surface);padding:60px 0 80px" id="updates">
+  <div class="container">
+    <div style="margin-bottom:40px">
+      <span class="section-eyebrow">Latest Updates</span>
+      <h2 class="section-title">Orders, Notices &amp; Circulars</h2>
+      <div class="divider"></div>
+      <p style="font-size:14px;color:var(--muted)">Official orders, notices and circulars issued by / relevant to the District Litigation Office Kupwara. Click “View Document” to open attached files (when available).</p>
+    </div>
+
+    <div id="updatesLoading" class="loading-spinner">⏳ Loading updates...</div>
+    <div id="updatesList">
+      <!-- Dynamic cards will be injected here by the portal JS.
+           Example structure (kept for reference):
+      <div class="update-card">
+        <span class="update-type">Circular</span>
+        <h3 style="font-size:16px;margin:10px 0 6px;color:var(--text)">Title of Circular / Order</h3>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Brief summary...</p>
+        <div class="update-meta">
+          <span>📅 12 Sep 2025</span>
+          <span>📄 PDF</span>
+          <a href="#" style="color:var(--gold);font-weight:600">View Document →</a>
+        </div>
+      </div>
+      -->
+    </div>
+    <div id="noUpdates" style="display:none;text-align:center;padding:48px;color:var(--muted);font-style:italic;font-size:15px">
+      No updates available at this time.
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

@@ -33,19 +33,19 @@
   W.__DLO_ASSISTANT_MOUNTED = true;
 
   const VERSION = "NK.2.6-LR-ACCURATE";
-  const HEADER_SUBTITLE = "Public view · 392 cases live";
-  // Calibrated Baseline: 392 cases live, 365 Active, 261 Reply Not Filed, 131 Reply Filed, 47 Ex-parte, 27 Disposed
+  const HEADER_SUBTITLE = "Public view · loading registry…";
+  // Offline fallback only — never shown once live rows are loaded
   const BASELINE_REGISTRY = {
-    total: 392,
-    active: 365,
-    disposed: 27,
-    replyPending: 261,
-    replyFiled: 131,
-    exparte: 47,
-    overdue: 33,
-    missingReply: 56,
-    todayHearings: 11,
-    weekHearings: 87
+    total: 0,
+    active: 0,
+    disposed: 0,
+    replyPending: 0,
+    replyFiled: 0,
+    exparte: 0,
+    overdue: 0,
+    missingReply: 0,
+    todayHearings: 0,
+    weekHearings: 0
   };
   // Fallback connection (used only if the page's own client/constants are not present). Public anon key — same as index.html.
   const EMBED_URL = "https://ibicsdsehxlsaygjnefk.supabase.co";
@@ -479,18 +479,22 @@
     return mock;
   }
 
-  function setRows(list) {
+  function setRows(list, opts) {
     const seen = Object.create(null), rows = [];
-    const sourceList = (list && Array.isArray(list) && list.length >= 350) ? list : generateCalibratedBaseline();
+    const forceBaseline = opts && opts.forceBaseline;
+    const hasLive = list && Array.isArray(list) && list.length > 0;
+    // Use live page/Supabase rows whenever present. Baseline only when explicitly forced (offline).
+    const sourceList = hasLive ? list : (forceBaseline ? generateCalibratedBaseline() : []);
     
     sourceList.forEach((raw, idx) => {
       if (!raw || typeof raw !== "object") return;
       const r = toRow(raw);
-      if (!r.title) return;
-      // Precision deduplication: ensure cases awaiting CNR are uniquely preserved
-      const dedupeKey = (r.number && r.number !== "—" && r.number !== "-")
-        ? (r.number + "|" + r.courtId)
-        : (r.title + "|" + r.courtId + "|" + (r.subject || "") + "|" + idx);
+      // Keep rows even if title is thin — use subject/number fallback so counts match registry
+      if (!r.title) {
+        r.title = r.subject || r.number || ("Case " + (idx + 1));
+      }
+      // Unique per source index so legitimate parallel matters are not collapsed
+      const dedupeKey = String(idx) + "|" + (r.number || "") + "|" + (r.title || "") + "|" + (r.courtId || r.court || "");
       if (seen[dedupeKey]) return;
       seen[dedupeKey] = 1;
       rows.push(r);
@@ -502,6 +506,9 @@
       r._tok.forEach((t) => { TITLE_VOCAB[t.t] = 1; });
     });
     DATA.rows = rows;
+    DATA.source = hasLive ? "live" : (forceBaseline ? "baseline" : "none");
+    DATA.at = Date.now();
+    try { if (typeof W.__dloAssistantOnRows === "function") W.__dloAssistantOnRows(rows.length); } catch (e) {}
   }
 
   const hasData = () => DATA.rows.length > 0;
@@ -625,7 +632,7 @@
           DATA.pageLen = DATA.pageRef ? DATA.pageRef.length : 0;
         }
       })
-      .catch(() => { setRows(generateCalibratedBaseline()); })
+      .catch(() => { setRows([], { forceBaseline: true }); })
       .then(() => { DATA.at = Date.now(); DATA.loading = null; });
     return DATA.loading;
   }
@@ -711,25 +718,38 @@
     return res;
   }
 
-  const BASELINE_STATS = { total: 392, active: 365, disposed: 27, pending_reply: 261, filed_reply: 131, exparte: 47 };
+  const BASELINE_STATS = { total: 0, active: 0, disposed: 0, pending_reply: 0, filed_reply: 0, exparte: 0 };
 
   function computeStats(rows) {
     if (!rows || !rows.length) {
       return {
-        total: BASELINE_STATS.total,
-        active: BASELINE_STATS.active,
-        disposed: BASELINE_STATS.disposed,
-        pendingStatus: BASELINE_STATS.active,
-        replyPending: BASELINE_STATS.pending_reply,
-        replyFiled: BASELINE_STATS.filed_reply,
-        exparte: BASELINE_STATS.exparte,
-        rate: Math.round((BASELINE_STATS.disposed / BASELINE_STATS.total) * 100) + "%"
+        total: 0,
+        active: 0,
+        disposed: 0,
+        pendingStatus: 0,
+        replyPending: 0,
+        replyFiled: 0,
+        replyPendingActive: 0,
+        replyFiledActive: 0,
+        exparte: 0,
+        rate: "0%"
       };
     }
-    const s = { total: rows.length, active: 0, disposed: 0, pendingStatus: 0, replyPending: 0, replyFiled: 0, exparte: 0 };
+    const s = {
+      total: rows.length, active: 0, disposed: 0, pendingStatus: 0,
+      replyPending: 0, replyFiled: 0,
+      replyPendingActive: 0, replyFiledActive: 0,
+      exparte: 0
+    };
     rows.forEach((r) => {
       if (r.disposed) s.disposed++; else s.active++;
-      if (r.replyState === "pending") s.replyPending++; else if (r.replyState === "filed") s.replyFiled++;
+      if (r.replyState === "pending") s.replyPending++;
+      else if (r.replyState === "filed") s.replyFiled++;
+      // Reply stats for ACTIVE cases only (as requested)
+      if (!r.disposed) {
+        if (r.replyState === "filed") s.replyFiledActive++;
+        else s.replyPendingActive++;
+      }
       if (r.exparte) s.exparte++;
     });
     s.rate = s.total ? Math.round((s.disposed / s.total) * 100) + "%" : "0%";
@@ -753,7 +773,7 @@
     };
   }
 
-  // Pre-seed calibrated baseline immediately so data is ready at load
+  // Start empty — live rows arrive from page bridge / Supabase; avoid fake 392 baseline
   setRows([]);
 
   /* ───────────── 5. REPLIES & INTENTS ───────────── */
@@ -766,17 +786,37 @@
     return R("I can't reach the live case registry from this page right now, so I can't search or count cases.\n\nOffice information and the Law Desk knowledge base are still fully available.", { link: PAGES.search, chips: [C("Law desk", "law desk"), C("Office info", "office hours and address"), MENU] });
   }
 
+  function barLine(label, n, total, fill) {
+    const pct = total > 0 ? Math.round((n / total) * 100) : 0;
+    const width = Math.max(0, Math.min(12, Math.round(pct / 8.33)));
+    const filled = (fill || "█").repeat(width);
+    const empty = "░".repeat(12 - width);
+    return label + " " + filled + empty + " " + n + " (" + pct + "%)";
+  }
+
   function openingReply() {
     const s = snapshot();
     const st = computeStats(DATA.rows);
-    const tot = st.total || 392, act = st.active || 365, disp = st.disposed || 27;
-    const rPend = st.replyPending || 261, rFiled = st.replyFiled || 131, exp = st.exparte || 47;
-    let t = "Welcome to the " + OFFICE.name + " Legal & Litigation Desk.\n\n";
-    t += "**Live Registry Overview (" + tot + " Cases):**\n" +
-         "• **Active:** " + act + " · **Disposed:** " + disp + "\n" +
-         "• **Reply Not Filed:** " + rPend + " · **Reply Filed:** " + rFiled + "\n" +
-         "• **Ex-Parte:** " + exp + " · **Overdue:** " + (s ? s.overdue : 33) + "\n\n" +
-         "Ask any case title, case number / CNR, court, department, or procedural question from the DLO Kupwara Legal Training Manual (e.g. “Caveat on restoration”, “120-day commercial WS”, “Section 80 notice”, “Infrastructure injunction bar”).";
+    const tot = st.total, act = st.active, disp = st.disposed;
+    const rPendA = st.replyPendingActive, rFiledA = st.replyFiledActive, exp = st.exparte;
+    const overdue = s ? s.overdue : 0;
+    let t = "Welcome to the **" + OFFICE.name + "** Legal & Litigation Desk.\n\n";
+    if (!tot) {
+      t += "Connecting to the live case registry…\n\nYou can still use **Law Desk** and office information while cases load.";
+      return R(t, { chips: [C("Law desk", "law desk"), C("Office info", "office hours and address"), MENU] });
+    }
+    t += "**Live Registry · " + tot + " cases**\n";
+    t += "• **Active:** " + act + " · **Disposed:** " + disp + "\n";
+    t += "• **Reply not filed (active):** " + rPendA + " · **Reply filed (active):** " + rFiledA + "\n";
+    t += "• **Ex-parte:** " + exp + " · **Overdue:** " + overdue + "\n\n";
+    t += "```\n";
+    t += barLine("Active        ", act, tot) + "\n";
+    t += barLine("Disposed      ", disp, tot) + "\n";
+    t += barLine("Reply due(A)  ", rPendA, act || tot) + "\n";
+    t += barLine("Reply filed(A)", rFiledA, act || tot) + "\n";
+    t += "```\n";
+    t += "Hearings **today:** " + (s ? s.today : 0) + " · **this week:** " + (s ? s.week : 0) + "\n\n";
+    t += "Search by case title, CNR, court, department — or ask a procedural question (e.g. “Caveat on restoration”, “Section 80 notice”).";
     return R(t, { chips: MAIN_CHIPS });
   }
 
@@ -932,14 +972,27 @@
 
     if (/\b(stat|stats|statistics|summary|overview|dashboard|total|how many|disposal)\b/.test(q)) {
       const st = computeStats(rows), sn = snapshot();
-      const tot = st.total || 392, act = st.active || 365, disp = st.disposed || 27;
-      const rPend = st.replyPending || 261, rFiled = st.replyFiled || 131, exp = st.exparte || 47;
-      const rate = st.rate || Math.round((disp / tot) * 100) + "%";
-      return R("**DLO Kupwara — Official Registry Baseline**\n" +
-               "Total Cases: **" + tot + "** · Active: **" + act + "** · Disposed: **" + disp + "** (" + rate + " disposal rate)\n" +
-               "Reply Not Filed: **" + rPend + "** · Reply Filed: **" + rFiled + "** · Ex-Parte: **" + exp + "**\n\n" +
-               "Hearings Today: **" + (sn ? sn.today : 11) + "** · Next 7 Days: **" + (sn ? sn.week : 87) + "**\n" +
-               "Overdue Cases: **" + (sn ? sn.overdue : 33) + "** · Urgent Reply Missing (≤ 7 days): **" + (sn ? sn.missing : 56) + "**",
+      const tot = st.total, act = st.active, disp = st.disposed;
+      const rPend = st.replyPending, rFiled = st.replyFiled, exp = st.exparte;
+      const rate = st.rate;
+      const bar = (label, n) => {
+        const pct = tot > 0 ? Math.round((n / tot) * 100) : 0;
+        const w = Math.max(0, Math.min(10, Math.round(pct / 10)));
+        return label + " " + "█".repeat(w) + "░".repeat(10 - w) + " " + n;
+      };
+      const rPendA = st.replyPendingActive, rFiledA = st.replyFiledActive;
+      return R("**DLO Kupwara — Live Registry (" + tot + " cases)**\n" +
+               "Active: **" + act + "** · Disposed: **" + disp + "** (" + rate + ")\n" +
+               "Reply not filed (**active**): **" + rPendA + "** · Reply filed (**active**): **" + rFiledA + "**\n" +
+               "Ex-parte: **" + exp + "**\n" +
+               "```\n" +
+               bar("Active        ", act) + "\n" +
+               bar("Disposed      ", disp) + "\n" +
+               bar("Reply due(A)  ", rPendA) + "\n" +
+               bar("Reply filed(A)", rFiledA) + "\n" +
+               "```\n" +
+               "Hearings **today:** " + (sn ? sn.today : 0) + " · **Next 7 days:** " + (sn ? sn.week : 0) + "\n" +
+               "**Overdue:** " + (sn ? sn.overdue : 0) + " · **Urgent reply missing (≤7d):** " + (sn ? sn.missing : 0),
                { link: PAGES.analytics, chips: [C("Overdue cases", "overdue cases"), C("Missing replies", "missing reply hearing soon"), C("Department rankings", "which department has most pending cases"), MENU] });
     }
 
@@ -982,7 +1035,17 @@
     { id: "enquiry", re: /\b(enquir\w*|inquir\w*|complaint form|send (a )?message|feedback|suggestion)\b/, kw: kwset("enquiry enquiries inquiry complaint form send message feedback suggestion"),
       run: () => R("Use the contact form for enquiries, feedback or corrections to a case record. Include the case number so the office can trace it quickly.", { link: PAGES.contact, chips: [MENU] }) },
     { id: "history", re: /\b(case history|history|audit trail|timeline|tracker)\b/, kw: kwset("case history audit trail timeline tracker"),
-      run: () => R("Case History lists the proceedings recorded for each hearing. Ask “history of <party name>” and I'll show the latest entries.", { link: PAGES.history, chips: [MENU] }) },
+      run: (q) => {
+        // If the user already named a party/CNR, try histReply instead of the generic tip
+        try {
+          const words = String(q || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w && w !== "history" && w !== "of" && w !== "case" && w.length > 1);
+          if (words.length) {
+            const hh = histReply(words);
+            if (hh) return hh;
+          }
+        } catch (e) {}
+        return R("Case History lists the proceedings recorded for each hearing. Ask “history of <party name>” or open a case card and tap **Search history in chat**.", { link: PAGES.history, chips: [MENU] });
+      } },
     { id: "calendar", re: /\bcalendar\b/, kw: kwset("calendar hearing"), run: () => R("The hearing calendar shows every listed date month by month.", { link: PAGES.calendar, chips: [MENU] }) },
     { id: "updates", re: /\b(circulars?|notices?|updates?|notifications?|announcements?|notice board|latest orders?|court orders?)\b/, kw: kwset("circular circulars notice notices updates update notification notifications announcement announcements board latest orders order court"),
       run: () => {
@@ -2353,15 +2416,40 @@
 
   const PLACES = ["handwara", "kupwara"];
   function histReply(rem) {
-    const hr = pageHist(); if (!hr || !hasData()) return null;
-    const res = runSearch(rem, null); if (!res.exact.length) return null;
-    const row = res.exact[0].row, nk = normKey(row.title), ck = normKey(row.number);
-    const ents = hr.filter((h) => (ck && normKey(h.cnr || "") === ck) || normKey(h.title || "") === nk).sort((a, b) => (b.entryDate || 0) - (a.entryDate || 0));
-    S.last = row;
-    if (!ents.length) return R("No proceedings history is recorded yet for **" + trunc(row.title, 70) + "**.", { link: PAGES.history, chips: [MENU] });
-    const fd = (d) => (d instanceof Date && !isNaN(d) ? d.getDate() + " " + MON[d.getMonth()] + " " + d.getFullYear() : "—");
-    const lines = ents.slice(0, 4).map((h, i) => (i + 1) + ". " + fd(h.hearingDate || h.entryDate) + " — " + trunc(h.proceedings || "No summary recorded", 150) + (S.staff && h.counsel ? " (" + h.counsel + ")" : ""));
-    return R("**Proceedings history — " + trunc(row.title, 60) + "**\n" + ents.length + " entr" + (ents.length > 1 ? "ies" : "y") + ", latest first:\n\n" + lines.join("\n") + (res.exact.length > 1 ? "\n\nShowing the closest match — add the case number to be exact." : ""), { link: PAGES.history, chips: [MENU] });
+    if (!hasData()) return null;
+    const res = runSearch(rem, null);
+    if (!res.exact.length && !res.partial.length) return null;
+    const hit = (res.exact[0] || res.partial[0]);
+    if (!hit) return null;
+    const row = hit.row;
+    const hr = pageHist();
+    if (hr && hr.length) {
+      const nk = normKey(row.title), ck = normKey(row.number);
+      const ents = hr.filter((h) => {
+        const ht = normKey(h.title || h.case_title || "");
+        const hn = normKey(h.caseNo || h.cnr || h.cnr_case_no || "");
+        return (ck && hn && ck === hn) || (nk && ht && (ht === nk || ht.indexOf(nk) !== -1 || nk.indexOf(ht) !== -1));
+      }).slice(0, 12);
+      if (ents.length) {
+        const lines = ents.map((h, i) => {
+          const d = h.date || h.hearing_date || h.next_hearing_date || "";
+          const note = h.proceedings || h.last_proceedings || h.note || h.remarks || "";
+          return (i + 1) + ". " + (d ? d + " — " : "") + trunc(String(note || "Entry recorded"), 120);
+        });
+        return R("**Proceedings history — " + trunc(row.title, 60) + "**\n" + ents.length + " entr" + (ents.length > 1 ? "ies" : "y") + ", latest first:\n\n" + lines.join("\n") + (res.exact.length > 1 ? "\n\nShowing the closest match — add the case number to be exact." : ""), { link: PAGES.history, chips: [MENU] });
+      }
+    }
+    // Fallback when HISTORY_ROWS is not published on this site
+    let t = "**Case record — " + trunc(row.title, 60) + "**\n";
+    t += "• **CNR:** " + (row.number || "Not on record") + "\n";
+    t += "• **Court:** " + courtLabel(row) + "\n";
+    t += "• **Department:** " + deptLabel(row) + "\n";
+    t += "• **Status:** " + (row.disposed ? "Disposed" : "Active") + "\n";
+    t += "• **Reply:** " + (row.reply || (row.replyState === "filed" ? "Filed" : "Not filed")) + "\n";
+    t += "• **Next hearing:** " + (row.next ? fmtDate(row.next) + " (" + rel(row.next) + ")" : "Awaited") + "\n";
+    t += "• **Last proceedings:** " + (row.last || "Not recorded in the live diary snapshot") + "\n\n";
+    t += "Hearing-by-hearing audit trail opens on the **Case History** page.";
+    return R(t, { link: PAGES.history, chips: [C("Open case history page", "menu"), MENU] });
   }
 
   function followUp(q, rem, ent) {
@@ -2685,18 +2773,25 @@
     "@keyframes fullScreenAuraPulse{0%,100%{box-shadow:inset 0 0 80px 20px rgba(245,158,11,.22),inset 0 0 140px 40px rgba(139,92,246,.16),inset 0 0 200px 60px rgba(244,63,94,.12)}50%{box-shadow:inset 0 0 110px 30px rgba(245,158,11,.35),inset 0 0 180px 60px rgba(139,92,246,.26),inset 0 0 240px 80px rgba(244,63,94,.20)}}",
     
     ".dlo-bubble-action{display:inline-block;margin-top:6px;padding:5px 10px;background:#eff6ff;color:#1e3a8a;border-radius:6px;font-weight:600;text-decoration:none;font-size:11px;border:1px solid #bfdbfe}",
-    ".dlo-card{white-space:normal;background:#f8fafc;border:1px solid #dbe4f0;border-left:3px solid #1e3a8a;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:11.5px;line-height:1.4}",
-    ".dlo-card-title{font-weight:700;color:#0c2340;font-size:12.5px}",
-    ".dlo-card-title mark{background:#fde68a;color:inherit;border-radius:2px;padding:0 1px}",
-    ".dlo-card-sub{color:#64748b;font-size:10.5px;margin:1px 0 4px}",
-    ".dlo-kv{display:flex;gap:8px;justify-content:space-between;border-top:1px dashed #e2e8f0;padding:3px 0}",
-    ".dlo-kv span{color:#64748b;flex-shrink:0}.dlo-kv b{font-weight:600;color:#0f172a;text-align:right}",
-    ".dlo-kv b.red{color:#b91c1c}.dlo-kv b.amber{color:#b45309}.dlo-kv b.green{color:#15803d}",
-    ".dlo-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}",
-    ".dlo-pill{font-size:10px;font-weight:600;padding:2px 7px;border-radius:999px;background:#e2e8f0;color:#334155}",
-    ".dlo-pill.ok{background:#dcfce7;color:#166534}.dlo-pill.bad{background:#fee2e2;color:#991b1b}.dlo-pill.warn{background:#fef3c7;color:#92400e}",
-    ".dlo-card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}",
-    ".dlo-mini{font-size:10.5px;border:1px solid #cbd5e1;background:#fff;color:#0c2340;border-radius:6px;padding:3px 8px;cursor:pointer;text-decoration:none;font-family:inherit}.dlo-mini:hover{background:#0c2340;color:#fff}",
+    ".dlo-card{white-space:normal;background:linear-gradient(145deg,#0b1e36 0%,#0f2744 55%,#122c4d 100%);border:1px solid rgba(201,168,84,.35);border-left:3px solid #c9a84c;border-radius:12px;padding:10px 12px;margin-top:8px;font-size:11.5px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.04);color:#e8eef7}",
+    ".dlo-card-title{font-weight:700;color:#f8fafc;font-size:13px;letter-spacing:.01em}",
+    ".dlo-card-title mark{background:rgba(251,191,36,.35);color:#fff7ed;border-radius:3px;padding:0 2px}",
+    ".dlo-card-sub{color:#c9a84c;font-size:11px;font-weight:600;margin:2px 0 6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.03em}",
+    ".dlo-kv{display:flex;gap:10px;justify-content:space-between;align-items:baseline;border-top:1px solid rgba(148,163,184,.2);padding:5px 0}",
+    ".dlo-kv span{color:#94a3b8;flex-shrink:0;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}.dlo-kv b{font-weight:650;color:#f1f5f9;text-align:right;font-size:12px}",
+    ".dlo-kv b.red{color:#fca5a5}.dlo-kv b.amber{color:#fcd34d}.dlo-kv b.green{color:#86efac}",
+    ".dlo-pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}",
+    ".dlo-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(148,163,184,.2);color:#e2e8f0;border:1px solid rgba(148,163,184,.25)}",
+    ".dlo-pill.ok{background:rgba(22,163,74,.2);color:#86efac;border-color:rgba(34,197,94,.35)}.dlo-pill.bad{background:rgba(220,38,38,.2);color:#fca5a5;border-color:rgba(248,113,113,.35)}.dlo-pill.warn{background:rgba(217,119,6,.2);color:#fcd34d;border-color:rgba(251,191,36,.35)}",
+    ".dlo-card-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}",
+    ".dlo-dossier{margin-top:8px;padding:10px;border-radius:10px;background:rgba(2,8,20,.45);border:1px solid rgba(201,168,84,.28)}",
+    ".dlo-dossier h4{margin:0 0 8px;font-size:12px;color:#c9a84c;font-weight:700;letter-spacing:.03em}",
+    ".dlo-dossier .dlo-kv span{color:#94a3b8}.dlo-dossier .dlo-kv b{color:#f8fafc}",
+    ".dlo-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}",
+    ".dlo-stat-tile{background:rgba(15,39,68,.9);border:1px solid rgba(201,168,84,.22);border-radius:10px;padding:8px 6px;text-align:center}",
+    ".dlo-stat-tile b{display:block;font-size:16px;font-weight:800;color:#e8c96a;line-height:1.1}",
+    ".dlo-stat-tile small{display:block;font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin-top:3px}",
+    ".dlo-mini{font-size:10.5px;border:1px solid rgba(201,168,84,.45);background:rgba(12,35,64,.55);color:#f8fafc;border-radius:8px;padding:5px 10px;cursor:pointer;text-decoration:none;font-family:inherit;font-weight:600;transition:background .15s,border-color .15s,transform .12s}.dlo-mini:hover{background:rgba(201,168,84,.2);border-color:#c9a84c;color:#fff}",
     ".dlo-typing{display:inline-flex;gap:4px;align-items:center;padding:6px 10px}",
     ".dlo-typing span{width:5px;height:5px;background:#94a3b8;border-radius:50%;animation:dloBounce 1.2s infinite ease-in-out}.dlo-typing span:nth-child(2){animation-delay:.2s}.dlo-typing span:nth-child(3){animation-delay:.4s}",
     "@keyframes dloBounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}",
@@ -2748,6 +2843,7 @@
   }
 
   let closeHook = null;
+  let askHook = null; // set inside mount() so card buttons can trigger chat
   const pageRowFor = (r) => {
     const pr = pageRows();
     return pr ? (pr.filter((x) => x.title === r.title && (x.caseNo || "") === r.number)[0] || pr.filter((x) => x.title === r.title)[0] || null) : null;
@@ -2778,7 +2874,7 @@
     // Interactive Action Cards (Dossier, Copy CNR, WhatsApp Brief)
     const act = h("div", "dlo-card-actions");
     
-    // 1. [📂 Dossier]
+    // 1. [📂 Dossier] — site popup if available, else rich in-chat dossier
     const dosBtn = h("button", "dlo-mini", "📂 Dossier");
     dosBtn.type = "button";
     dosBtn.title = "View case dossier and proceedings audit trail";
@@ -2786,13 +2882,75 @@
       const caseRef = r.number || r.caseNo || r.title;
       if (typeof W.dloOpenDossier === "function" && r.number) {
         W.dloOpenDossier(r.number);
-      } else if (typeof openCasePopup === "function" && pageRowFor(r)) {
+        return;
+      }
+      if (typeof openCasePopup === "function" && pageRowFor(r)) {
         const pr = pageRowFor(r);
         if (closeHook) closeHook();
         openCasePopup(pr);
-      } else {
-        ask("Audit history: " + caseRef, "history " + caseRef);
+        return;
       }
+      // In-chat dossier panel (always works)
+      let panel = c.querySelector(".dlo-dossier");
+      if (panel) { panel.remove(); return; }
+      panel = h("div", "dlo-dossier");
+      const hd = h("h4", "", "Case dossier");
+      panel.appendChild(hd);
+      const add = (k, v) => { if (v) kv(panel, k, String(v)); };
+      add("CNR / Case no.", r.number || "Not on record");
+      add("Title", r.title);
+      add("Subject", r.subject);
+      add("Court", courtLabel(r));
+      add("Department", deptLabel(r));
+      add("Type", r.type);
+      add("Status", r.disposed ? "Disposed" : "Active");
+      add("Reply", r.reply || (r.replyState === "filed" ? "Filed" : "Not filed"));
+      add("Ex-parte", r.exparte ? "Yes" : "No");
+      add("Next hearing", r.next ? (fmtDate(r.next) + " · " + rel(r.next)) : "Awaited");
+      add("Last proceedings", r.last);
+      add("Counsel", r.counsel);
+      const histBtn = h("button", "dlo-mini", "🔎 Search history in chat");
+      histBtn.type = "button";
+      histBtn.style.marginTop = "8px";
+      histBtn.addEventListener("click", (ev) => {
+        if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+        const qRef = (r.number && String(r.number).trim()) ? String(r.number).trim() : trunc(r.title, 48);
+        const q = "history of " + qRef;
+        // askHook is wired in mount(); fall back to inline histReply if unavailable
+        if (typeof askHook === "function") {
+          askHook("History: " + qRef, q);
+          return;
+        }
+        try {
+          const rem = String(qRef).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+          const hh = histReply(rem) || R(
+            "**Case record — " + trunc(r.title, 60) + "**\n" +
+            "• **CNR:** " + (r.number || "Not on record") + "\n" +
+            "• **Last proceedings:** " + (r.last || "Not recorded") + "\n" +
+            "• **Next hearing:** " + (r.next ? fmtDate(r.next) : "Awaited") + "\n\n" +
+            "Open the Case History page for the full audit trail.",
+            { link: PAGES.history, chips: [MENU] }
+          );
+          // Best-effort: show as a new bot bubble if chat body exists
+          const body = document.getElementById("dlo-chat-body");
+          if (body) {
+            const row = h("div", "dlo-msg-row bot dlo-msg");
+            const b = h("div", "dlo-bubble dlo-bot-bubble");
+            rich(b, hh.text);
+            if (hh.link && hh.link.url) {
+              b.appendChild(document.createElement("br"));
+              const a = h("a", "dlo-bubble-action", (hh.link.text || "Open Case History") + " →");
+              a.href = hh.link.url;
+              b.appendChild(a);
+            }
+            row.appendChild(b);
+            body.appendChild(row);
+            body.scrollTop = body.scrollHeight;
+          }
+        } catch (e) { /* ignore */ }
+      });
+      panel.appendChild(histBtn);
+      c.appendChild(panel);
     });
     act.appendChild(dosBtn);
 
@@ -2864,8 +3022,8 @@
     const left = h("div", "dlo-header-left"), dot = h("span", "dlo-status-dot off"), titles = h("div");
     titles.appendChild(h("div", "dlo-header-title", "DLO Kupwara Assistant"));
     
-    // Header displays strictly locked 392 baseline
-    const sub = h("div", "dlo-header-sub", "Public view · 392 cases live");
+    // Header subtitle updates from live DATA.rows.length
+    const sub = h("div", "dlo-header-sub", "Public view · loading registry…");
     titles.appendChild(sub);
     left.appendChild(dot); left.appendChild(titles);
     
@@ -2879,8 +3037,28 @@
     const chips = h("div"); chips.id = "dlo-chips-container";
     const bar = h("div"); bar.id = "dlo-input-bar";
     const inputRow = h("div", "dlo-input-row");
-    const input = h("input"); input.id = "dlo-user-input"; input.type = "text"; input.maxLength = 200; input.autocomplete = "off"; input.placeholder = "Case title, case no., court, or legal procedure Q…"; input.setAttribute("aria-label", "Ask the assistant");
+    const input = h("input");
+    input.id = "dlo-user-input";
+    input.type = "search";           // less likely to trigger email autofill than type=text/email
+    input.name = "dlo-assistant-q";  // non-email field name
+    input.maxLength = 200;
+    input.placeholder = "Case title, case no., court, or legal procedure Q…";
+    input.setAttribute("aria-label", "Ask the assistant");
     input.setAttribute("enterkeyhint", "send");
+    input.setAttribute("autocomplete", "off");
+    input.setAttribute("autocapitalize", "off");
+    input.setAttribute("autocorrect", "off");
+    input.setAttribute("spellcheck", "false");
+    input.setAttribute("inputmode", "search");
+    input.setAttribute("data-form-type", "other");
+    input.setAttribute("data-lpignore", "true");      // LastPass
+    input.setAttribute("data-1p-ignore", "true");     // 1Password
+    input.setAttribute("data-bwignore", "true");      // Bitwarden
+    // Block browser autofill of email/password until the user focuses the field
+    input.setAttribute("readonly", "readonly");
+    input.addEventListener("focus", function clearRo() {
+      input.removeAttribute("readonly");
+    }, { once: false });
     const send = h("button", "", "➤"); send.id = "dlo-send-btn"; send.type = "button"; send.setAttribute("aria-label", "Send");
     inputRow.appendChild(input); inputRow.appendChild(send);
 
@@ -2912,9 +3090,12 @@
     let opened = false, started = false;
     function refreshHeader() {
       const ok = hasData();
+      const n = DATA.rows.length;
       dot.className = "dlo-status-dot" + (ok ? "" : " off");
-      sub.textContent = ok ? (S.staff ? "Staff view" : "Public view") + " · " + (DATA.rows.length || 392) + " cases live" : "Public view · 392 cases live";
+      if (ok) sub.textContent = (S.staff ? "Staff view" : "Public view") + " · " + n + " cases live";
+      else sub.textContent = "Public view · loading registry…";
     }
+    W.__dloAssistantOnRows = function () { refreshHeader(); };
 
     let lastChips = [], sugTimer = null;
     function renderChips(list, keep) {
@@ -3034,6 +3215,8 @@
         addBot(R("I encountered a connection error. The offline procedural knowledge base is still accessible.", { chips: [MENU] }));
       });
     }
+    askHook = ask;
+    try { W.__dloAsk = ask; } catch (e) {}
 
     function start(reset) {
       if (reset) {

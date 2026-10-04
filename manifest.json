@@ -1,72 +1,65 @@
 {
+  "id": "./index.html?app=1",
   "name": "District Litigation Office Kupwara",
   "short_name": "DLO Kupwara",
-  "description": "Official case management app for the District Litigation Office, Kupwara \u2014 track cases, hearings, and litigation statistics.",
-  "start_url": "/dlo-kupwaraa/index.html",
-  "scope": "/dlo-kupwaraa/",
+  "description": "Official portal of the District Litigation Office Kupwara — case search, hearings, performance and analytics.",
+  "start_url": "./app.html?app=1",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#0D1B2A",
-  "theme_color": "#1B2A4A",
+  "orientation": "any",
+  "background_color": "#0B2545",
+  "theme_color": "#0B2545",
+  "lang": "en-IN",
   "icons": [
     {
-      "src": "logo.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "logo.png",
+      "src": "icons/dlo-kupwara-app-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "logo.png",
+      "src": "icons/dlo-kupwara-app-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     },
     {
-      "src": "logo.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "src": "icons/dlo-kupwara-app-icon.jpeg",
+      "sizes": "426x426",
+      "type": "image/jpeg",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
-      "name": "My Cases",
-      "short_name": "Cases",
-      "url": "/dlo-kupwaraa/index.html#live-data",
-      "icons": [
-        {
-          "src": "logo.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Search Cases",
+      "short_name": "Search",
+      "url": "./search-filter-cases.html",
+      "icons": [{ "src": "icons/shortcut-cases.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Upcoming Hearings",
       "short_name": "Hearings",
-      "url": "/dlo-kupwaraa/index.html#hearings",
-      "icons": [
-        {
-          "src": "logo.png",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "./hearings.html",
+      "icons": [{ "src": "icons/shortcut-hearings.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
-      "name": "Case History",
-      "short_name": "History",
-      "url": "/dlo-kupwaraa/index.html#history",
-      "icons": [
-        {
-          "src": "logo.png",
-          "sizes": "192x192"
-        }
-      ]
+      "name": "Performance",
+      "short_name": "Performance",
+      "url": "./performance.html",
+      "icons": [{ "src": "icons/shortcut-performance.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "url": "./analytics.html",
+      "icons": [{ "src": "icons/shortcut-analytics.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Department Login",
+      "short_name": "Department",
+      "url": "./department.html",
+      "icons": [{ "src": "icons/shortcut-department.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]
 }

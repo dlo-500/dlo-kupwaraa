@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
+<meta name="description" content="Public Enquiries — District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Public Enquiries | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;--gold-light:#E0C083;}
+.section-title{font-family:'Playfair Display',serif!important}
+.contact-form-box{background:rgba(255,255,255,0.04);border:1px solid rgba(201,162,74,0.2);border-radius:16px;padding:36px}
+.btn-primary{background:linear-gradient(135deg,var(--gold-light),var(--gold))!important;color:var(--navy)!important}
+</style>
+<meta property="og:title" content="Public Enquiries | DLO Kupwara">
+<meta property="og:description" content="Submit a public enquiry to the District Litigation Office Kupwara">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+  </div>
+</div>
+
+<section class="contact-section chess-bg" id="enquiries" style="padding-top:60px">
+  <div class="container">
+    <div style="max-width:640px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:36px">
+        <span class="section-eyebrow" style="color:var(--gold-light)">Public Enquiries</span>
+        <h2 class="section-title light" style="color:#fff">Submit an Enquiry</h2>
+        <div class="divider" style="margin:16px auto"></div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.6">
+          Stakeholder departments and authorised personnel may submit case-related enquiries through this secure form.
+          All submissions are logged and reviewed by the District Litigation Office.
+        </p>
+      </div>
+
+      <div class="contact-form-box">
+        <h3 style="color:#fff;margin-bottom:24px;font-family:'Playfair Display',serif">Enquiry Form</h3>
+
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="formName" placeholder="Your full name" maxlength="80" required autocomplete="name">
+        </div>
+        <div class="form-group">
+          <label>Official Email *</label>
+          <input type="email" id="formEmail" placeholder="name@department.gov.in" maxlength="100" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label>Department / Organisation *</label>
+          <input type="text" id="formDept" placeholder="e.g. Revenue Department, Kupwara" maxlength="100" required>
+        </div>
+        <div class="form-group">
+          <label>Mobile Number</label>
+          <input type="tel" id="formPhone" placeholder="10-digit mobile" maxlength="15" pattern="[0-9+\-\s]{10,15}" autocomplete="tel">
+        </div>
+        <div class="form-group">
+          <label>Case Number (if known)</label>
+          <input type="text" id="formCaseNo" placeholder="e.g. CMR/001/2024" maxlength="40">
+        </div>
+        <div class="form-group">
+          <label>Message *</label>
+          <textarea id="formMessage" placeholder="Describe your enquiry clearly..." maxlength="1000" required rows="5"></textarea>
+        </div>
+
+        <!-- Honeypot — invisible to real users -->
+        <input type="text" id="formHoneypot" name="hp_field_9f3" autocomplete="off" tabindex="-1"
+               style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
+
+        <!-- Cloudflare Turnstile -->
+        <div class="cf-turnstile" id="turnstileWidget"
+             data-sitekey="0x4AAAAAAD38NcE80jDBylNv"
+             data-callback="onTurnstileVerify"
+             data-expired-callback="onTurnstileExpire"
+             style="margin-bottom:14px"></div>
+
+        <button type="button" class="btn-primary" id="submitBtn" style="width:100%;border:none;font-size:14px;padding:13px">
+          Submit Enquiry
+        </button>
+        <div id="formStatus" style="margin-top:14px;font-size:13px;text-align:center;display:none"></div>
+      </div>
+
+      <p style="text-align:center;margin-top:24px;font-size:12px;color:rgba(255,255,255,0.4)">
+        This form is protected by Cloudflare Turnstile and a honeypot field against automated spam.
+        Do not submit sensitive personal data of private citizens.
+      </p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+<script>
+let turnstileToken = null;
+function onTurnstileVerify(token){ turnstileToken = token; }
+function onTurnstileExpire(){ turnstileToken = null; }
+
+document.getElementById('submitBtn')?.addEventListener('click', function(){
+  // Wire to your existing submitEnquiry() function.
+  // Always validate: honeypot empty, turnstileToken present, required fields filled.
+  const hp = document.getElementById('formHoneypot');
+  if (hp && hp.value) { return; } // bot
+  if (!turnstileToken) {
+    const st = document.getElementById('formStatus');
+    if (st){ st.style.display='block'; st.style.color='#FCA5A5'; st.textContent='Please complete the security check.'; }
+    return;
+  }
+  // call submitEnquiry() here
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

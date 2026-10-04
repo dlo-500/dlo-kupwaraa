@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0B2545"/>
+  <rect x="40" y="40" width="432" height="432" rx="88" fill="none" stroke="#C6A358" stroke-width="8"/>
+  <path d="M256 108 112 184h288L256 108Z" fill="#E0C083"/>
+  <path d="M130 204h252M150 220v130m66-130v130m80-130v130m66-130v130M126 370h260M104 400h304" fill="none" stroke="#E0C083" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="256" y="452" text-anchor="middle" font-family="Arial,sans-serif" font-size="36" font-weight="700" letter-spacing="6" fill="#fff">DLO KUPWARA</text>
+</svg>

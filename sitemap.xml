@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-<loc>https://dlokupwara.in/</loc>
+    <loc>https://dlokupwara.in/</loc>
     <priority>1.0</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/search-filter-cases.html</loc>
+    <priority>0.95</priority>
     <changefreq>daily</changefreq>
   </url>
   <url>
@@ -16,6 +21,16 @@
     <changefreq>daily</changefreq>
   </url>
   <url>
+    <loc>https://dlokupwara.in/analytics.html</loc>
+    <priority>0.85</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/statistics.html</loc>
+    <priority>0.85</priority>
+    <changefreq>daily</changefreq>
+  </url>
+  <url>
     <loc>https://dlokupwara.in/performance.html</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
@@ -24,5 +39,75 @@
     <loc>https://dlokupwara.in/history.html</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/court-wise-distribution.html</loc>
+    <priority>0.75</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/areas-of-practice.html</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/our-officials.html</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/about-office.html</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/latest-updates.html</loc>
+    <priority>0.8</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/public-enquiries.html</loc>
+    <priority>0.75</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/contact.html</loc>
+    <priority>0.75</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/website-policies.html</loc>
+    <priority>0.65</priority>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/privacy-policy.html</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/terms.html</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/hyperlinking-policy.html</loc>
+    <priority>0.55</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/copyright-policy.html</loc>
+    <priority>0.55</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/accessibility-statement.html</loc>
+    <priority>0.6</priority>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://dlokupwara.in/faq.html</loc>
+    <priority>0.65</priority>
+    <changefreq>monthly</changefreq>
   </url>
 </urlset>

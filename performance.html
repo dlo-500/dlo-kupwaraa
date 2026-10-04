@@ -7,7 +7,9 @@
 <title>Standing Counsel Performance — District Litigation Office Kupwara</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <style>
@@ -298,8 +300,8 @@ div[style*="overflow-x: auto"]::-webkit-scrollbar-track{
 // ═══════════════════════════════════════════════
 //  CONFIG — same Supabase project as index.html
 // ═══════════════════════════════════════════════
-const SUPABASE_URL = 'https://ibicsdsehxlsaygjnefk.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU';
+const SUPABASE_URL = window.DLO_CONFIG.supabase.url;       // centralized — see config.js
+const SUPABASE_ANON_KEY = window.DLO_CONFIG.supabase.anonKey;  // centralized — see config.js
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let PERF_LOG_ROWS = [];
@@ -345,15 +347,51 @@ function logStatusIsReplyFiled(status) {
 // ═══════════════════════════════════════════════
 //  FETCH
 // ═══════════════════════════════════════════════
+// Reads every row, page by page. A bare select() is capped by the API (1,000
+// rows by default) and would silently drop the rest. `make(first)` builds the
+// query (with its existing ordering); the exact count is requested once.
+async function pagedAll(make) {
+  const PAGE = 1000, rows = [];
+  let total = null;
+  for (let from = 0; ; ) {
+    const res = await make(from === 0).range(from, from + PAGE - 1);
+    if (res.error) throw res.error;
+    const data = res.data || [];
+    if (from === 0 && Number.isFinite(res.count)) total = res.count;
+    rows.push.apply(rows, data);
+    from += data.length;
+    if (!data.length || (total !== null ? rows.length >= total : data.length < PAGE)) break;
+  }
+  return rows;
+}
+// (case_diary columns are not used on this page)
+const CASE_DIARY_COLUMNS = 's_no,cnr_case_no,case_title,subject_matter,department,court_name,last_proceedings,next_hearing_date,reply_status,case_status,case_type,advocate_name,exparte_status';
+const CASE_HISTORY_COLUMNS = 'created_at,hearing_date,proceedings_summary,advocate_name,attendance,case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)';
+
+const PERF_LOG_COLUMNS = 'logged_at,cnr_case_no,advocate_name,proceedings_snapshot,case_diary(case_title, department, court_name)';
+// Calendar date (YYYY-MM-DD) of a timestamp in Indian time, not the UTC date.
+function istDateKey(ts) {
+  const d = new Date(ts);
+  return isNaN(d.getTime()) ? String(ts).split('T')[0] : d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+}
+
+// Chart axis colours follow the active theme (menu.css --muted / --border).
+function chartTextColor() { return (getComputedStyle(document.documentElement).getPropertyValue('--muted') || '').trim() || '#64748B'; }
+function chartGridColor() { return (getComputedStyle(document.documentElement).getPropertyValue('--border') || '').trim() || 'rgba(0,0,0,.1)'; }
+
 async function fetchPerformanceLog() {
   try {
-    const { data, error } = await sb
-      .from('performance_log')
-      .select('*, case_diary(case_title, department, court_name)')
-      .order('logged_at', { ascending: false });
-    if (error) throw error;
+    const perfQuery = (first, tiebreak) => {
+      let q = sb.from('performance_log')
+        .select(PERF_LOG_COLUMNS, first ? { count: 'exact' } : undefined)
+        .order('logged_at', { ascending: false });
+      return tiebreak ? q.order('id', { ascending: true }) : q;
+    };
+    let data;
+    try { data = await pagedAll(first => perfQuery(first, true)); }
+    catch (e) { data = await pagedAll(first => perfQuery(first, false)); }
     PERF_LOG_ROWS = (data || []).map(r => ({
-      dateLogged: r.logged_at ? new Date(r.logged_at.split('T')[0] + 'T00:00:00') : null,
+      dateLogged: r.logged_at ? new Date(istDateKey(r.logged_at) + 'T00:00:00') : null,
       caseId:     r.cnr_case_no || '',
       title:      r.case_diary ? r.case_diary.case_title : '',
       dept:       r.case_diary ? r.case_diary.department : '',
@@ -369,13 +407,17 @@ async function fetchPerformanceLog() {
 
 async function fetchHistoryLog() {
   try {
-    const { data, error } = await sb
-      .from('case_history')
-      .select('*, case_diary(case_title, cnr_case_no, department, court_name, exparte_status, case_status)')
-      .order('created_at', { ascending: false });
-    if (error) throw error;
+    const historyQuery = (first, tiebreak) => {
+      let q = sb.from('case_history')
+        .select(CASE_HISTORY_COLUMNS, first ? { count: 'exact' } : undefined)
+        .order('created_at', { ascending: false });
+      return tiebreak ? q.order('id', { ascending: true }) : q;
+    };
+    let data;
+    try { data = await pagedAll(first => historyQuery(first, true)); }
+    catch (e) { data = await pagedAll(first => historyQuery(first, false)); }
     HISTORY_ROWS = (data || []).map(r => ({
-      entryDate: r.created_at ? new Date(r.created_at.split('T')[0] + 'T00:00:00') : null,
+      entryDate: r.created_at ? new Date(istDateKey(r.created_at) + 'T00:00:00') : null,
       title:      r.case_diary ? r.case_diary.case_title : '',
       counsel:    r.advocate_name || '',
       attendance: r.attendance || '',
@@ -527,7 +569,8 @@ function downloadCounselPerfPDF() {
   <button onclick="window.print()" style="margin-bottom:12px;padding:8px 16px;background:#1B2A4A;color:#fff;border:none;border-radius:4px;cursor:pointer">Print</button>
   <table><thead><tr><th>#</th><th>Date of Court Order</th><th>CNR/Case ID</th><th>Title</th><th>Dept.</th><th>Standing Counsel</th><th>Forum</th><th>Next Hearing Date</th><th>Status/Proceedings</th><th>Remarks</th></tr></thead>
   <tbody>${COUNSEL_PERF_ROWS.map((r,i)=>`<tr><td>${i+1}</td><td>${r.dateLogged instanceof Date ? r.dateLogged.toLocaleString('en-IN') : ''}</td><td>${r.caseId||''}</td><td>${r.title||''}</td><td>${r.dept||''}</td><td>${r.counsel||''}</td><td>${r.forum||''}</td><td>${formatDDMMYYYY(r.orderDate)}</td><td>${r.status||''}</td><td>${r.remarks||''}</td></tr>`).join('')}</tbody></table>
-  </body></html>`);
+  
+</body></html>`);
   win.document.close();
 }
 
@@ -579,7 +622,9 @@ function renderHistoryAttendanceStats() {
         borderRadius: 6
       }]
     },
-    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: {
+      y: { beginAtZero: true, ticks: { precision: 0, color: chartTextColor() }, grid: { color: chartGridColor() } },
+      x: { ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } } } }
   });
 }
 
@@ -662,6 +707,14 @@ init();
     if (scans > 8) clearInterval(scanTimer);
   }, 1000);
 })();
+</script>
+
+
+<script src="common.js" defer></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) { DLO.registerSW(); }
+});
 </script>
 
 </body>

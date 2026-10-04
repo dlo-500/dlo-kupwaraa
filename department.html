@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co https://*.functions.supabase.co; frame-src https://docs.google.com https://forms.gle https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#12141A">
+<title>Department Portal — District Litigation Office Kupwara</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Supabase client — centralized config, see config.js -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --paper:#12141A;--paper-2:#171A22;--paper-3:#1D212C;--surface:#1B1E27;
+  --ink:#232B4E;--brass:#D9A54D;--brass-light:#F0C878;--brass-dim:#C99A56;
+  --seal-red:#E0554A;--seal-red-ink:#FF8A7A;--seal-green:#3FB37F;--seal-green-ink:#6FE0A8;
+  --text:#E9E4D6;--muted:#9C9585;--line:#333849;--white:#F7F3E8;
+  --font-display:'Fraunces',Georgia,serif;--font-body:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);color:var(--text);min-height:100vh;
+  background:
+    radial-gradient(ellipse at top left, rgba(166,118,61,0.07), transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(27,35,64,0.06), transparent 55%),
+    var(--paper);
+}
+a{color:var(--brass-light);text-decoration:none}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{
+  outline:2px solid var(--brass);outline-offset:2px;
+}
+
+/* Top bar */
+.topbar{
+  background:var(--ink);border-bottom:3px solid var(--brass);
+  padding:14px 26px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;box-shadow:0 2px 0 rgba(166,118,61,0.35);
+}
+.topbar .brand{display:flex;align-items:center;gap:12px;min-width:0}
+.back-btn{
+  display:flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border-radius:8px;border:1px solid rgba(217,165,77,0.35);color:var(--brass-light);
+  background:rgba(217,165,77,0.08);flex-shrink:0;
+}
+.back-btn:hover{background:rgba(217,165,77,0.18)}
+.seal-emblem{
+  width:40px;height:40px;border-radius:50%;background:linear-gradient(145deg,var(--brass-light),var(--brass));
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 0 0 2px rgba(217,165,77,0.25);
+}
+.topbar h1{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--white);line-height:1.2}
+.topbar .brand p{font-family:var(--font-mono);font-size:10px;color:var(--brass-light);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px}
+.btn-logout{
+  font-family:var(--font-body);font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;
+  border:1px solid rgba(217,165,77,0.4);background:transparent;color:var(--brass-light);cursor:pointer;
+}
+.btn-logout:hover{background:rgba(217,165,77,0.12)}
+.role-badge{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:5px 10px;border-radius:999px;background:rgba(63,179,127,0.15);color:var(--seal-green-ink);
+  border:1px solid rgba(63,179,127,0.35);margin-right:10px;
+}
+
+/* Login */
+.login-screen{min-height:calc(100vh - 72px);display:flex;align-items:center;justify-content:center;padding:24px}
+.login-card{
+  background:var(--surface);border-radius:4px;width:100%;max-width:400px;overflow:hidden;
+  border:1px solid var(--line);box-shadow:0 30px 70px rgba(0,0,0,0.5);position:relative;
+}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:repeating-linear-gradient(90deg,var(--brass) 0 10px,var(--brass-light) 10px 20px)}
+.login-card .hd{background:var(--ink);padding:32px 28px 22px;text-align:center;border-bottom:3px solid var(--brass)}
+.login-card .hd .seal-emblem{margin:0 auto 14px;width:54px;height:54px}
+.login-card .hd h2{font-family:var(--font-display);font-size:20px;color:var(--white)}
+.login-card .hd p{font-family:var(--font-mono);font-size:10px;color:var(--brass-light);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px}
+.login-card .bd{padding:28px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:6px}
+.field input,.field select{
+  width:100%;padding:11px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--paper-2);color:var(--text);font-family:var(--font-body);font-size:14px;
+}
+.field input:focus,.field select:focus{border-color:var(--brass)}
+.hp-field{position:absolute!important;left:-9999px!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important}
+.btn-primary{
+  width:100%;padding:12px 16px;border:none;border-radius:8px;cursor:pointer;
+  background:linear-gradient(135deg,var(--brass-light),var(--brass));color:#1B2340;
+  font-weight:700;font-size:14px;font-family:var(--font-body);
+}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-primary:disabled{opacity:0.55;cursor:not-allowed}
+.auth-note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:14px;text-align:center}
+.auth-error{display:none;background:rgba(224,85,74,0.12);border:1px solid rgba(224,85,74,0.35);color:var(--seal-red-ink);padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:14px}
+
+/* Dashboard */
+.dashboard{display:none;padding:22px 18px 48px}
+.dashboard.visible{display:block}
+.wrap{max-width:1100px;margin:0 auto}
+.welcome-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.welcome-bar h2{font-family:var(--font-display);font-size:22px;color:var(--white)}
+.welcome-bar .sub{font-size:13px;color:var(--muted);margin-top:4px}
+.today{font-family:var(--font-mono);font-size:11px;color:var(--brass-light);letter-spacing:0.08em;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--paper-2)}
+.btn-secondary{
+  font-size:12px;font-weight:600;padding:8px 12px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--line);background:var(--paper-2);color:var(--text);font-family:var(--font-body);
+}
+.btn-secondary:hover{border-color:var(--brass-dim);color:var(--brass-light)}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.tab-btn{
+  font-family:var(--font-body);font-size:12px;font-weight:600;padding:9px 14px;border-radius:8px;
+  border:1px solid transparent;background:transparent;color:var(--muted);cursor:pointer;
+}
+.tab-btn:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+.tab-btn.active{color:#1B2340;background:linear-gradient(135deg,var(--brass-light),var(--brass));border-color:transparent}
+.panel{display:none}
+.panel.active{display:block}
+
+/* Cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:22px}
+.card{
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 14px;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
+}
+.card .num{font-family:var(--font-display);font-size:26px;font-weight:700;color:var(--brass-light);line-height:1.1}
+.card .lbl{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-top:6px;font-weight:600}
+.card.warn .num{color:var(--seal-red-ink)}
+.card.ok .num{color:var(--seal-green-ink)}
+
+.section-title{font-family:var(--font-display);font-size:16px;margin:8px 0 12px;color:var(--white)}
+.search-box{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.search-box input{
+  flex:1;min-width:200px;padding:11px 14px;border-radius:8px;border:1px solid var(--line);
+  background:var(--paper-2);color:var(--text);font-size:14px;font-family:var(--font-body);
+}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.filters select{
+  width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);
+  background:var(--paper-2);color:var(--text);font-size:13px;
+}
+
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  text-align:left;padding:11px 12px;background:var(--ink);color:var(--brass-light);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;
+  border-bottom:2px solid var(--brass);white-space:nowrap;
+}
+td{padding:10px 12px;border-bottom:1px solid var(--line-soft,#242835);color:var(--text);vertical-align:top}
+tr:hover td{background:rgba(217,165,77,0.04)}
+.pill{
+  display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:600;
+  background:rgba(217,165,77,0.12);color:var(--brass-light);border:1px solid rgba(217,165,77,0.3);
+}
+.pill.pending{background:rgba(224,85,74,0.12);color:var(--seal-red-ink);border-color:rgba(224,85,74,0.3)}
+.pill.filed{background:rgba(63,179,127,0.12);color:var(--seal-green-ink);border-color:rgba(63,179,127,0.3)}
+.empty{padding:28px;text-align:center;color:var(--muted);font-size:13px}
+.muted{color:var(--muted);font-size:12px}
+
+/* Forms / submissions */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.form-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.form-card h3{font-family:var(--font-display);font-size:15px;color:var(--white)}
+.form-card p{font-size:13px;color:var(--muted);line-height:1.55;flex:1}
+.form-card .formats{display:flex;flex-wrap:wrap;gap:6px}
+.form-card .formats span{
+  font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;
+  padding:4px 8px;border-radius:6px;border:1px solid var(--line);color:var(--brass-light);background:var(--paper-2);
+}
+.form-card a.btn-open{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 14px;border-radius:8px;font-weight:700;font-size:13px;
+  background:linear-gradient(135deg,var(--brass-light),var(--brass));color:#1B2340;text-align:center;
+}
+.form-card a.btn-open[aria-disabled="true"]{opacity:0.45;pointer-events:none;cursor:not-allowed}
+.form-card .status{font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:0.06em}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;
+  background:var(--ink);color:var(--white);padding:12px 18px;border-radius:10px;
+  border:1px solid var(--brass-dim);font-size:13px;box-shadow:0 12px 32px rgba(0,0,0,0.4);
+  display:none;max-width:90vw;
+}
+.toast.show{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+
+.skeleton{height:14px;border-radius:6px;background:linear-gradient(90deg,rgba(255,255,255,0.04),rgba(255,255,255,0.1),rgba(255,255,255,0.04));background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+@media(max-width:680px){
+  .topbar{padding:12px 14px}
+  .topbar h1{font-size:14px}
+  .cards{grid-template-columns:repeat(2,1fr)}
+  .welcome-bar{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">
+    <a href="index.html" class="back-btn" title="Back to main site" aria-label="Back to main site">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="seal-emblem" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#1B2340" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M12 3v18M5 8l-3 6a4 4 0 0 0 8 0l-3-6M19 8l-3 6a4 4 0 0 0 8 0l-3-6M5 8h14M8 21h8"/></svg>
+    </div>
+    <div>
+      <h1>Department Portal</h1>
+      <p>District Litigation Office · Kupwara</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center">
+    <span class="role-badge" id="roleBadge" style="display:none">Department</span>
+    <button type="button" class="btn-logout" id="logoutBtn" style="display:none" onclick="deptLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- LOGIN (Supabase auth to be wired later) -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="hd">
+      <div class="seal-emblem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#F2EAD3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M12 3v18M5 8l-3 6a4 4 0 0 0 8 0l-3-6M19 8l-3 6a4 4 0 0 0 8 0l-3-6M5 8h14M8 21h8"/></svg>
+      </div>
+      <h2>Department Sign In</h2>
+      <p>Stakeholder Access</p>
+    </div>
+    <div class="bd">
+      <div class="auth-error" id="authError" role="alert"></div>
+      <form id="deptLoginForm" autocomplete="on" onsubmit="return handleDeptLogin(event)">
+        <div class="hp-field" aria-hidden="true">
+          <label>Leave blank <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+        <div class="field">
+          <label for="deptSelect">Department</label>
+          <select id="deptSelect" required>
+            <option value="">— Select department —</option>
+            <option value="Revenue">Revenue</option>
+            <option value="Police">Police</option>
+            <option value="Forest">Forest</option>
+            <option value="PWD">PWD / R&amp;B</option>
+            <option value="Education">Education</option>
+            <option value="Health">Health</option>
+            <option value="Irrigation">Irrigation / Jal Shakti</option>
+            <option value="Social Welfare">Social Welfare</option>
+            <option value="ULB">Urban Local Bodies</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="deptEmail">Official email</label>
+          <input type="email" id="deptEmail" maxlength="120" autocomplete="username" required placeholder="name@department.gov.in">
+        </div>
+        <div class="field">
+          <label for="deptPassword">Password</label>
+          <input type="password" id="deptPassword" maxlength="128" autocomplete="current-password" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn-primary" id="loginBtn">Sign In</button>
+      </form>
+      <p class="auth-note">Authentication will be verified via Supabase. Until then, use the temporary access button below for layout preview only.</p>
+      <button type="button" class="btn-secondary" style="width:100%;margin-top:12px" onclick="enterPreviewMode()">Preview dashboard (no live auth)</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="wrap">
+    <div class="welcome-bar">
+      <div>
+        <h2 id="welcomeGreeting">Welcome</h2>
+        <p class="sub" id="welcomeSub">Department view — performance, cases &amp; submissions</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="today" id="todayDate"></div>
+        <button type="button" class="btn-secondary" onclick="refreshAll()" title="Refresh data">⟳ Refresh</button>
+      </div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Department sections">
+      <button type="button" class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+      <button type="button" class="tab-btn" data-tab="performance" onclick="switchTab('performance')">Counsel Performance</button>
+      <button type="button" class="tab-btn" data-tab="cases" onclick="switchTab('cases')">Case Search</button>
+      <button type="button" class="tab-btn" data-tab="submit" onclick="switchTab('submit')">Submit Documents</button>
+    </div>
+
+    <!-- OVERVIEW / STATS -->
+    <section class="panel active" id="panel-overview" role="tabpanel">
+      <div class="cards">
+        <div class="card"><div class="num" id="statTotal">—</div><div class="lbl">Dept. Cases</div></div>
+        <div class="card"><div class="num" id="statActive">—</div><div class="lbl">Active</div></div>
+        <div class="card ok"><div class="num" id="statDisposed">—</div><div class="lbl">Disposed</div></div>
+        <div class="card"><div class="num" id="statReplyFiled">—</div><div class="lbl">Reply Filed</div></div>
+        <div class="card warn"><div class="num" id="statReplyPending">—</div><div class="lbl">Reply Pending</div></div>
+        <div class="card warn"><div class="num" id="statExparte">—</div><div class="lbl">Ex-parte</div></div>
+      </div>
+      <h3 class="section-title">Department snapshot</h3>
+      <p class="muted" id="overviewNote">Figures update when case data is linked from Supabase / master sheet for your department.</p>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead>
+            <tr><th>Metric</th><th>Value</th><th>Note</th></tr>
+          </thead>
+          <tbody id="overviewTableBody">
+            <tr><td colspan="3" class="empty">Sign in to load department statistics.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- COUNSEL PERFORMANCE -->
+    <section class="panel" id="panel-performance" role="tabpanel">
+      <h3 class="section-title">Standing Counsel performance</h3>
+      <p class="muted" style="margin-bottom:12px">Attendance and disposal indicators for counsel handling matters of your department (read-only).</p>
+      <div class="filters">
+        <select id="perfCounselFilter" onchange="renderPerformance()">
+          <option value="">All counsel</option>
+        </select>
+        <select id="perfRangeFilter" onchange="renderPerformance()">
+          <option value="all">All dates</option>
+          <option value="30">Last 30 days</option>
+          <option value="90">Last 90 days</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Counsel</th>
+              <th>Appearances</th>
+              <th>Attended</th>
+              <th>Not attended</th>
+              <th>Disposed</th>
+            </tr>
+          </thead>
+          <tbody id="perfBody">
+            <tr><td colspan="6" class="empty">No performance rows loaded yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CASE SEARCH -->
+    <section class="panel" id="panel-cases" role="tabpanel">
+      <h3 class="section-title">Case search</h3>
+      <p class="muted" style="margin-bottom:12px">Search is limited to cases tagged to your department once auth is connected.</p>
+      <div class="search-box">
+        <input type="search" id="caseSearchInput" maxlength="120" placeholder="Search by case no., title, court, counsel…" onkeydown="if(event.key==='Enter')runCaseSearch()">
+        <button type="button" class="btn-primary" style="width:auto;padding:11px 18px" onclick="runCaseSearch()">Search</button>
+        <button type="button" class="btn-secondary" onclick="clearCaseSearch()">Clear</button>
+      </div>
+      <div class="filters">
+        <select id="caseStatusFilter" onchange="runCaseSearch()">
+          <option value="">All statuses</option>
+          <option value="Active">Active</option>
+          <option value="Disposed">Disposed</option>
+          <option value="Ex-parte">Ex-parte</option>
+        </select>
+        <select id="caseReplyFilter" onchange="runCaseSearch()">
+          <option value="">Reply: all</option>
+          <option value="Filed">Filed</option>
+          <option value="Pending">Pending</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Case No.</th>
+              <th>Title</th>
+              <th>Court</th>
+              <th>Counsel</th>
+              <th>Next hearing</th>
+              <th>Reply</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="casesBody">
+            <tr><td colspan="8" class="empty">No cases to display.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SUBMIT DOCUMENTS / GOOGLE FORMS -->
+    <section class="panel" id="panel-submit" role="tabpanel">
+      <h3 class="section-title">Submit replies &amp; documents</h3>
+      <p class="muted" style="margin-bottom:14px">
+        Official submission forms (Word, Excel, PDF or any format accepted by the form) will open from links stored in Supabase.
+        Embeds / URLs are loaded at runtime — nothing is hard-coded for production.
+      </p>
+      <div class="form-grid" id="formsGrid">
+        <!-- Populated by loadSubmissionForms() from Supabase -->
+        <div class="form-card">
+          <h3>Parawise / written statement</h3>
+          <p>Upload or link the department’s reply / WS for listed matters.</p>
+          <div class="formats"><span>PDF</span><span>DOCX</span><span>DOC</span></div>
+          <span class="status" data-form-status="reply">Link pending from Supabase</span>
+          <a class="btn-open" href="#" id="formLinkReply" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open form</a>
+        </div>
+        <div class="form-card">
+          <h3>Compliance / affidavit</h3>
+          <p>Submit compliance reports or affidavits directed by the court.</p>
+          <div class="formats"><span>PDF</span><span>DOCX</span></div>
+          <span class="status" data-form-status="compliance">Link pending from Supabase</span>
+          <a class="btn-open" href="#" id="formLinkCompliance" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open form</a>
+        </div>
+        <div class="form-card">
+          <h3>Tabular data / annexures</h3>
+          <p>Excel or CSV annexures supporting the departmental reply.</p>
+          <div class="formats"><span>XLSX</span><span>XLS</span><span>CSV</span></div>
+          <span class="status" data-form-status="annexure">Link pending from Supabase</span>
+          <a class="btn-open" href="#" id="formLinkAnnexure" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open form</a>
+        </div>
+        <div class="form-card">
+          <h3>General document upload</h3>
+          <p>Any other format required by DLO Kupwara for the case file.</p>
+          <div class="formats"><span>PDF</span><span>DOCX</span><span>XLSX</span><span>ZIP</span></div>
+          <span class="status" data-form-status="general">Link pending from Supabase</span>
+          <a class="btn-open" href="#" id="formLinkGeneral" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open form</a>
+        </div>
+      </div>
+      <p class="muted" style="margin-top:16px">
+        When Supabase is connected, store rows in a table such as <code style="color:var(--brass-light)">department_forms</code>
+        with columns <code style="color:var(--brass-light)">form_key</code>, <code style="color:var(--brass-light)">title</code>, <code style="color:var(--brass-light)">url</code>, <code style="color:var(--brass-light)">department</code>, <code style="color:var(--brass-light)">active</code>.
+      </p>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Config: centralized in config.js (window.DLO_CONFIG.supabase) ──
+  const SUPABASE_URL = window.DLO_CONFIG.supabase.url;
+  const SUPABASE_ANON_KEY = window.DLO_CONFIG.supabase.anonKey;
+
+  const SESSION_KEY = 'dlo_dept_session_v1';
+  let sb = null;
+  let currentDept = '';
+  let CASE_ROWS = [];
+  let PERF_ROWS = [];
+
+  function $(id) { return document.getElementById(id); }
+
+  function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function showToast(msg, ms) {
+    const t = $('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function () { t.classList.remove('show'); }, ms || 3200);
+  }
+
+  function initSupabase() {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+    if (typeof supabase === 'undefined') return null;
+    try {
+      sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      return sb;
+    } catch (e) {
+      console.warn('Supabase init failed', e);
+      return null;
+    }
+  }
+
+  // ── Session (temporary until full Supabase Auth) ───────────────────
+  function saveSession(data) {
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function loadSession() {
+    try {
+      const raw = sessionStorage.getItem(SESSION_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function clearSession() {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+  }
+
+  function showDashboard(dept, email) {
+    currentDept = dept || '';
+    $('loginScreen').style.display = 'none';
+    $('dashboard').classList.add('visible');
+    $('logoutBtn').style.display = 'inline-block';
+    $('roleBadge').style.display = 'inline-block';
+    $('roleBadge').textContent = currentDept || 'Department';
+    $('welcomeGreeting').textContent = 'Welcome' + (email ? ', ' + email.split('@')[0] : '');
+    $('welcomeSub').textContent = (currentDept ? currentDept + ' · ' : '') + 'Department portal';
+    $('todayDate').textContent = new Date().toLocaleDateString('en-IN', {
+      weekday: 'short', day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata'
+    });
+    refreshAll();
+  }
+
+  function showLogin() {
+    $('loginScreen').style.display = 'flex';
+    $('dashboard').classList.remove('visible');
+    $('logoutBtn').style.display = 'none';
+    $('roleBadge').style.display = 'none';
+  }
+
+  window.deptLogout = function () {
+    clearSession();
+    if (sb) {
+      try { sb.auth.signOut(); } catch (e) {}
+    }
+    showLogin();
+    showToast('Signed out');
+  };
+
+  window.enterPreviewMode = function () {
+    const dept = $('deptSelect').value || 'Revenue';
+    saveSession({ preview: true, department: dept, email: 'preview@local' });
+    showDashboard(dept, 'preview@local');
+    showToast('Preview mode — connect Supabase for real auth & data');
+  };
+
+  window.handleDeptLogin = function (e) {
+    e.preventDefault();
+    const hp = e.target.querySelector('input[name="website"]');
+    if (hp && hp.value) {
+      showToast('Submission blocked');
+      return false;
+    }
+    const dept = $('deptSelect').value;
+    const email = ($('deptEmail').value || '').trim();
+    const password = $('deptPassword').value || '';
+    const err = $('authError');
+    err.style.display = 'none';
+
+    if (!dept || !email || !password) {
+      err.textContent = 'Please fill department, email and password.';
+      err.style.display = 'block';
+      return false;
+    }
+
+    // ── Wire Supabase Auth here later ──
+    // Example:
+    // const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    // then verify department claim / profile row matches `dept`
+
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      err.textContent = 'Supabase is not configured yet. Use “Preview dashboard” or add SUPABASE_URL / ANON_KEY in this file.';
+      err.style.display = 'block';
+      return false;
+    }
+
+    err.textContent = 'Auth is prepared for Supabase but not fully connected. Use preview or complete signInWithPassword in this file.';
+    err.style.display = 'block';
+    return false;
+  };
+
+  // ── Tabs ───────────────────────────────────────────────────────────
+  window.switchTab = function (name) {
+    document.querySelectorAll('.tab-btn').forEach(function (b) {
+      b.classList.toggle('active', b.getAttribute('data-tab') === name);
+    });
+    document.querySelectorAll('.panel').forEach(function (p) {
+      p.classList.toggle('active', p.id === 'panel-' + name);
+    });
+  };
+
+  // ── Stats helpers ──────────────────────────────────────────────────
+  function calcStats(rows) {
+    rows = rows || [];
+    var total = rows.length, active = 0, disposed = 0, filed = 0, pending = 0, exparte = 0;
+    rows.forEach(function (r) {
+      var st = String(r.status || r.Status || '').toLowerCase();
+      var rp = String(r.reply || r.replyStatus || r.Reply || '').toLowerCase();
+      if (st.indexOf('dispos') >= 0) disposed++; else active++;
+      if (rp.indexOf('filed') >= 0 || rp === 'yes') filed++;
+      else pending++;
+      if (st.indexOf('ex') >= 0 || String(r.exparte || '').toLowerCase() === 'yes') exparte++;
+    });
+    return { total: total, active: active, disposed: disposed, filed: filed, pending: pending, exparte: exparte };
+  }
+
+  function renderOverview() {
+    var s = calcStats(CASE_ROWS);
+    $('statTotal').textContent = s.total;
+    $('statActive').textContent = s.active;
+    $('statDisposed').textContent = s.disposed;
+    $('statReplyFiled').textContent = s.filed;
+    $('statReplyPending').textContent = s.pending;
+    $('statExparte').textContent = s.exparte;
+    var tb = $('overviewTableBody');
+    tb.innerHTML =
+      '<tr><td>Total cases (dept)</td><td><strong>' + s.total + '</strong></td><td>Scoped to signed-in department</td></tr>' +
+      '<tr><td>Active</td><td>' + s.active + '</td><td>Not disposed</td></tr>' +
+      '<tr><td>Disposed</td><td>' + s.disposed + '</td><td></td></tr>' +
+      '<tr><td>Reply filed</td><td>' + s.filed + '</td><td></td></tr>' +
+      '<tr><td>Reply pending</td><td>' + s.pending + '</td><td class="pending">Action may be required</td></tr>' +
+      '<tr><td>Ex-parte</td><td>' + s.exparte + '</td><td></td></tr>';
+  }
+
+  // ── Performance ────────────────────────────────────────────────────
+  function aggregatePerf(rows) {
+    var map = {};
+    rows.forEach(function (r) {
+      var name = r.counsel || r.Counsel || 'Unknown';
+      if (!map[name]) map[name] = { counsel: name, total: 0, attended: 0, missed: 0, disposed: 0 };
+      map[name].total++;
+      var att = String(r.attendance || r.Attendance || '').toLowerCase();
+      if (att.indexOf('not') >= 0) map[name].missed++;
+      else if (att) map[name].attended++;
+      var st = String(r.status || r.caseStatus || '').toLowerCase();
+      if (st.indexOf('dispos') >= 0) map[name].disposed++;
+    });
+    return Object.keys(map).map(function (k) { return map[k]; }).sort(function (a, b) { return b.total - a.total; });
+  }
+
+  window.renderPerformance = function () {
+    var counselF = $('perfCounselFilter').value;
+    var range = $('perfRangeFilter').value;
+    var rows = PERF_ROWS.slice();
+    if (range !== 'all') {
+      var days = parseInt(range, 10) || 90;
+      var cut = Date.now() - days * 86400000;
+      rows = rows.filter(function (r) {
+        var d = r.date || r.entryDate || r.dateLogged;
+        var t = d ? new Date(d).getTime() : 0;
+        return t >= cut;
+      });
+    }
+    if (counselF) {
+      rows = rows.filter(function (r) { return (r.counsel || r.Counsel) === counselF; });
+    }
+    var agg = aggregatePerf(rows);
+    var tb = $('perfBody');
+    if (!agg.length) {
+      tb.innerHTML = '<tr><td colspan="6" class="empty">No performance data for this filter. Connect Supabase PERFORMANCE_LOG (or equivalent) to populate.</td></tr>';
+      return;
+    }
+    tb.innerHTML = agg.map(function (r, i) {
+      return '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(r.counsel) + '</td><td>' + r.total +
+        '</td><td>' + r.attended + '</td><td>' + r.missed + '</td><td>' + r.disposed + '</td></tr>';
+    }).join('');
+  };
+
+  function fillCounselFilter() {
+    var sel = $('perfCounselFilter');
+    var names = {};
+    PERF_ROWS.forEach(function (r) {
+      var n = r.counsel || r.Counsel;
+      if (n) names[n] = true;
+    });
+    var cur = sel.value;
+    sel.innerHTML = '<option value="">All counsel</option>' +
+      Object.keys(names).sort().map(function (n) {
+        return '<option value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</option>';
+      }).join('');
+    sel.value = cur;
+  }
+
+  // ── Case search ────────────────────────────────────────────────────
+  window.runCaseSearch = function () {
+    var q = ($('caseSearchInput').value || '').trim().toLowerCase();
+    var st = $('caseStatusFilter').value;
+    var rp = $('caseReplyFilter').value;
+    var rows = CASE_ROWS.filter(function (r) {
+      if (st) {
+        var s = String(r.status || '').toLowerCase();
+        if (st === 'Ex-parte' && s.indexOf('ex') < 0 && String(r.exparte || '').toLowerCase() !== 'yes') return false;
+        if (st === 'Active' && s.indexOf('dispos') >= 0) return false;
+        if (st === 'Disposed' && s.indexOf('dispos') < 0) return false;
+      }
+      if (rp) {
+        var reply = String(r.reply || r.replyStatus || '').toLowerCase();
+        if (rp === 'Filed' && reply.indexOf('filed') < 0 && reply !== 'yes') return false;
+        if (rp === 'Pending' && (reply.indexOf('filed') >= 0 || reply === 'yes')) return false;
+      }
+      if (!q) return true;
+      var blob = [r.caseNo, r.title, r.court, r.counsel, r.dept, r.status].join(' ').toLowerCase();
+      return blob.indexOf(q) >= 0;
+    });
+    var tb = $('casesBody');
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="8" class="empty">No matching cases.</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.slice(0, 200).map(function (r, i) {
+      var reply = r.reply || r.replyStatus || '—';
+      var replyClass = String(reply).toLowerCase().indexOf('filed') >= 0 ? 'filed' : 'pending';
+      return '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(r.caseNo || '') + '</td><td>' +
+        escapeHtml(r.title || '') + '</td><td>' + escapeHtml(r.court || '') + '</td><td>' +
+        escapeHtml(r.counsel || '') + '</td><td>' + escapeHtml(r.nextHearing || r.hearingDate || '—') +
+        '</td><td><span class="pill ' + replyClass + '">' + escapeHtml(reply) + '</span></td><td>' +
+        escapeHtml(r.status || '') + '</td></tr>';
+    }).join('');
+  };
+
+  window.clearCaseSearch = function () {
+    $('caseSearchInput').value = '';
+    $('caseStatusFilter').value = '';
+    $('caseReplyFilter').value = '';
+    runCaseSearch();
+  };
+
+  // ── Google Forms from Supabase ─────────────────────────────────────
+  function setFormLink(anchorId, statusSel, url, title) {
+    var a = $(anchorId);
+    var st = document.querySelector(statusSel);
+    if (!a) return;
+    if (url && /^https:\/\//i.test(url)) {
+      a.href = url;
+      a.setAttribute('aria-disabled', 'false');
+      a.removeAttribute('aria-disabled');
+      if (st) st.textContent = title ? ('Ready · ' + title) : 'Form ready';
+    } else {
+      a.href = '#';
+      a.setAttribute('aria-disabled', 'true');
+      if (st) st.textContent = 'Link pending from Supabase';
+    }
+  }
+
+  async function loadSubmissionForms() {
+    // Expected table: department_forms (form_key, title, url, department, active)
+    if (!sb) return;
+    try {
+      var q = sb.from('department_forms').select('form_key,title,url,department,active').eq('active', true);
+      if (currentDept) q = q.or('department.eq.' + currentDept + ',department.is.null');
+      var res = await q;
+      if (res.error) throw res.error;
+      var rows = res.data || [];
+      var map = {};
+      rows.forEach(function (r) { map[r.form_key] = r; });
+      setFormLink('formLinkReply', '[data-form-status="reply"]', map.reply && map.reply.url, map.reply && map.reply.title);
+      setFormLink('formLinkCompliance', '[data-form-status="compliance"]', map.compliance && map.compliance.url, map.compliance && map.compliance.title);
+      setFormLink('formLinkAnnexure', '[data-form-status="annexure"]', map.annexure && map.annexure.url, map.annexure && map.annexure.title);
+      setFormLink('formLinkGeneral', '[data-form-status="general"]', map.general && map.general.url, map.general && map.general.title);
+    } catch (e) {
+      console.warn('Forms load', e);
+    }
+  }
+
+  async function loadCaseData() {
+    // Hook: fetch cases for currentDept from Supabase or existing sheet API
+    // Leave empty arrays until backend is ready
+    CASE_ROWS = CASE_ROWS || [];
+    PERF_ROWS = PERF_ROWS || [];
+    renderOverview();
+    fillCounselFilter();
+    renderPerformance();
+    runCaseSearch();
+  }
+
+  window.refreshAll = function () {
+    loadCaseData();
+    loadSubmissionForms();
+    showToast('Refreshed');
+  };
+
+  // ── Boot ───────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function () {
+    initSupabase();
+    var sess = loadSession();
+    if (sess && (sess.preview || sess.email)) {
+      showDashboard(sess.department, sess.email);
+    } else {
+      showLogin();
+    }
+  });
+})();
+</script>
+</body>
+</html>

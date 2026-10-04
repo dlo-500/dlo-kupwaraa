@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="Live Case Statistics — District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Statistics | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"></script>
+<script src="common.js"></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;--gold-light:#E0C083;}
+.section-title{font-family:'Playfair Display',serif!important}
+.home-stat-tile{position:relative;background:rgba(255,255,255,0.05)!important;border:1px solid rgba(198,163,88,0.22)!important;backdrop-filter:blur(8px);transition:transform .25s ease,border-color .25s ease;border-radius:14px;padding:22px 12px;text-align:center}
+.home-stat-tile:hover{transform:translateY(-3px);border-color:rgba(198,163,88,0.5)!important}
+.home-stat-tile b{font-family:'Plus Jakarta Sans','Roboto Condensed',sans-serif!important;font-size:28px!important;color:var(--gold-light);display:block}
+.home-stat-tile small{display:block;font-size:11px;color:rgba(255,255,255,0.65);text-transform:uppercase;letter-spacing:0.6px;margin-top:6px}
+.stat-page-hero{background:linear-gradient(135deg,#08111F 0%,#0F1524 38%,#1B2C52 100%);padding:48px 0 56px}
+</style>
+<meta property="og:title" content="Statistics | DLO Kupwara">
+<meta property="og:description" content="Live counters — active, disposed, total cases, courts covered, reply filed/pending, ex-parte">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+    <div class="live-badge"><span class="live-dot"></span> Live Data</div>
+  </div>
+</div>
+
+<section class="stat-page-hero" id="statistics">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:36px">
+      <h2 style="font-family:'Playfair Display',serif;color:#fff;font-size:26px;font-weight:700;margin:0">District Litigation Office Kupwara</h2>
+      <p style="color:var(--gold-light);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;margin-top:8px">Live Case Statistics</p>
+    </div>
+
+    <!-- ALL DYNAMIC COUNTERS -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px;max-width:980px;margin:0 auto">
+      <div class="home-stat-tile">
+        <b id="homeStatTotal">—</b>
+        <small>Total Cases</small>
+      </div>
+      <div class="home-stat-tile">
+        <b id="homeStatActive">—</b>
+        <small>Active</small>
+      </div>
+      <div class="home-stat-tile">
+        <b id="homeStatDisposed">—</b>
+        <small>Disposed</small>
+      </div>
+      <div class="home-stat-tile">
+        <b id="homeStatCourts">—</b>
+        <small>Courts Covered</small>
+      </div>
+      <div class="home-stat-tile">
+        <b id="homeStatReplyFiled">—</b>
+        <small>Reply Filed</small>
+      </div>
+      <div class="home-stat-tile">
+        <b id="homeStatReplyPending">—</b>
+        <small>Reply Pending</small>
+      </div>
+      <div class="home-stat-tile">
+        <b id="homeStatExparte">—</b>
+        <small>Ex-parte</small>
+      </div>
+    </div>
+
+    <p style="text-align:center;margin-top:28px;font-size:13px;color:rgba(255,255,255,0.45)">
+      Figures update automatically from the live master sheet. Last refresh is shown on the main portal.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  if (!window.DLO) return;
+  const els = {
+    total: document.getElementById('homeStatTotal'),
+    active: document.getElementById('homeStatActive'),
+    disposed: document.getElementById('homeStatDisposed'),
+    courts: document.getElementById('homeStatCourts'),
+    replyFiled: document.getElementById('homeStatReplyFiled'),
+    replyPending: document.getElementById('homeStatReplyPending'),
+    exparte: document.getElementById('homeStatExparte')
+  };
+  try {
+    const rows = await DLO.fetchCaseDiary();
+    const stats = DLO.calculateStats(rows);
+    if (els.total) els.total.textContent = stats.total;
+    if (els.active) els.active.textContent = stats.active;
+    if (els.disposed) els.disposed.textContent = stats.disposed;
+    if (els.courts) els.courts.textContent = stats.courtsCovered;
+    if (els.replyFiled) els.replyFiled.textContent = stats.replyFiled;
+    if (els.replyPending) els.replyPending.textContent = stats.replyPending;
+    if (els.exparte) els.exparte.textContent = stats.exparte;
+    if (!rows.length) DLO.showToast('No case data returned — check Supabase connection', 'warn', 5000);
+  } catch (e) {
+    console.error('[Statistics] failed to load case data:', e);
+    Object.values(els).forEach(el => { if (el) el.textContent = '—'; });
+  }
+});
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

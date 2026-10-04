@@ -1,0 +1,1107 @@
+/**
+ * DLO Kupwara — Shared Navigation Component
+ * ────────────────────────────────────────────────────────────────
+ * One curtain-style menu, injected by common.js (injectMenu()).
+ * Warm off-white surface (#F5F3ED), dark charcoal text, gold accents.
+ * Faint topographic/map-line texture in background.
+ * Two-column grouped layout on desktop; single scrollable column on mobile.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ── Component-scoped tokens ── */
+:root {
+  --k-menu-bg:          #F5F3ED;
+  --k-menu-surface:     #FFFFFF;
+  --k-menu-border:      rgba(45, 40, 28, 0.12);
+  --k-menu-text:        #1C1A15;
+  --k-menu-charcoal:    #2E2C26;
+  --k-menu-muted:       #6B6558;
+  --k-menu-gold:        #B8922A;
+  --k-menu-gold-pale:   rgba(184, 146, 42, 0.14);
+  --k-menu-hover-bg:    rgba(184, 146, 42, 0.09);
+  --k-menu-separator:   rgba(45, 40, 28, 0.09);
+  /* Keep panel + toolbar consistent with existing pages */
+  --k-curtain-bg:       #F5F3ED;
+  --k-panel:            #FFFFFF;
+  --k-gold:             #c5a059;
+  --k-gold-light:       #ad8548;
+  --k-gold-hairline:    rgba(197, 160, 89, 0.4);
+  --k-border:           rgba(15, 23, 42, 0.10);
+  --k-text:             #0f172a;
+  --k-text-silver:      #334155;
+  --k-text-muted:       #64748b;
+}
+
+/* ── TOOLBAR — fixed top-right on every page ── */
+.k-toolbar {
+  position: sticky;
+  top: 0;
+  right: auto;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 52px;
+  padding: 7px max(12px, env(safe-area-inset-right)) 7px max(12px, env(safe-area-inset-left));
+  background: #0B2545;
+  border-bottom: 1px solid rgba(224,192,131,.34);
+}
+.k-toolbar-item { position: relative; display: flex; }
+
+.k-toolbar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--k-menu-surface);
+  border: 1px solid var(--k-menu-border);
+  color: var(--k-menu-charcoal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+.k-toolbar-btn:hover {
+  border-color: var(--k-menu-gold);
+  transform: translateY(-1px);
+  background: var(--k-menu-hover-bg);
+}
+.k-toolbar-btn:focus-visible {
+  outline: 2px solid var(--k-menu-gold);
+  outline-offset: 2px;
+}
+.k-toolbar-btn svg { width: 17px; height: 17px; }
+.k-size-icon {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Popover — language / size */
+.k-popover {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 150px;
+  background: var(--k-menu-surface);
+  border: 1px solid var(--k-menu-border);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.16);
+  padding: 6px;
+  z-index: 1210;
+}
+.k-popover.open { display: block; pointer-events: auto; }
+.k-popover-item {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--k-menu-charcoal);
+  cursor: pointer;
+  text-align: left;
+}
+.k-popover-item:hover { background: var(--k-menu-gold-pale); color: var(--k-menu-gold); }
+.k-popover-item-sub { font-size: 11px; font-weight: 500; color: var(--k-menu-muted); }
+
+/* Menu trigger pill */
+.k-menu-trigger {
+  background: var(--k-menu-surface);
+  border: 1px solid var(--k-menu-border);
+  border-radius: 999px;
+  padding: 8px 16px 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+  color: var(--k-menu-charcoal);
+  flex-shrink: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.k-menu-trigger:hover { transform: translateY(-1px); border-color: var(--k-menu-gold); }
+.k-menu-trigger:focus-visible {
+  outline: 2px solid var(--k-menu-gold);
+  outline-offset: 2px;
+}
+.k-menu-lines {
+  width: 20px;
+  height: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.k-menu-lines span {
+  width: 100%;
+  height: 2px;
+  background-color: var(--k-menu-gold);
+  border-radius: 1px;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+.k-menu-trigger.is-active .k-menu-lines span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.k-menu-trigger.is-active .k-menu-lines span:nth-child(2) { opacity: 0; }
+.k-menu-trigger.is-active .k-menu-lines span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
+.k-menu-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k-menu-charcoal);
+}
+
+/* ── CURTAIN OVERLAY ── */
+.k-curtain {
+  position: fixed;
+  inset: 0;
+  /* Warm off-white base + very faint topographic/map-line texture */
+  background-color: var(--k-menu-bg);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='700' viewBox='0 0 900 700'%3E%3Cg fill='none' stroke='%23B8922A' stroke-width='0.7' stroke-opacity='0.10'%3E%3C!-- Contour lines suggesting Kupwara valley terrain --%3E%3Cpath d='M-20 180 Q 120 140, 240 175 T 520 180 T 820 160 T 1020 175'/%3E%3Cpath d='M-20 220 Q 100 195, 240 215 T 500 225 T 800 210 T 1020 220'/%3E%3Cpath d='M-20 260 Q 110 240, 250 255 T 510 265 T 810 255 T 1020 262'/%3E%3Cpath d='M-20 300 Q 130 285, 260 298 T 530 305 T 820 296 T 1020 302'/%3E%3Cpath d='M-20 340 Q 150 325, 280 338 T 560 346 T 840 334 T 1020 342'/%3E%3Cpath d='M-20 380 Q 140 368, 270 379 T 540 384 T 830 376 T 1020 381'/%3E%3Cpath d='M-20 420 Q 120 410, 250 421 T 520 425 T 820 418 T 1020 422'/%3E%3Cpath d='M-20 460 Q 130 450, 260 462 T 530 466 T 830 460 T 1020 463'/%3E%3Cpath d='M-20 500 Q 110 490, 240 501 T 510 505 T 810 499 T 1020 503'/%3E%3Cpath d='M-20 540 Q 100 531, 230 542 T 500 546 T 800 540 T 1020 543'/%3E%3C!-- River-like flowing line (Kupwara stream) --%3E%3Cpath d='M-20 355 Q 80 340, 180 360 Q 280 380, 380 355 Q 480 330, 580 348 Q 680 366, 780 350 Q 880 334, 1020 345' stroke-opacity='0.18' stroke-width='1.2'/%3E%3C!-- Subtle grid for map feel --%3E%3Cline x1='200' y1='0' x2='200' y2='700' stroke-opacity='0.05'/%3E%3Cline x1='450' y1='0' x2='450' y2='700' stroke-opacity='0.05'/%3E%3Cline x1='700' y1='0' x2='700' y2='700' stroke-opacity='0.05'/%3E%3Cline x1='0' y1='175' x2='900' y2='175' stroke-opacity='0.05'/%3E%3Cline x1='0' y1='350' x2='900' y2='350' stroke-opacity='0.05'/%3E%3Cline x1='0' y1='525' x2='900' y2='525' stroke-opacity='0.05'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2%);
+  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.k-curtain.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── Curtain top bar ── */
+.k-curtain-topbar {
+  flex-shrink: 0;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--k-menu-separator);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.k-curtain-brand {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  color: var(--k-menu-charcoal);
+  text-transform: uppercase;
+}
+.k-curtain-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+.k-theme-toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--k-menu-border);
+  background: transparent;
+  color: var(--k-menu-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.k-theme-toggle:hover { border-color: var(--k-menu-gold); color: var(--k-menu-gold); }
+.k-theme-toggle:focus-visible { outline: 2px solid var(--k-menu-gold); outline-offset: 2px; }
+.k-theme-toggle svg { width: 17px; height: 17px; }
+.k-curtain-close {
+  background: transparent;
+  border: 1px solid var(--k-menu-border);
+  color: var(--k-menu-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.k-curtain-close:hover {
+  border-color: var(--k-menu-gold);
+  color: var(--k-menu-charcoal);
+  background: var(--k-menu-gold-pale);
+}
+.k-curtain-close:focus-visible { outline: 2px solid var(--k-menu-gold); outline-offset: 2px; }
+
+/* ── Curtain body: two-column on desktop ── */
+.k-curtain-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 2rem 2.5rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 3rem;
+  align-content: start;
+}
+
+/* ── Group header ── */
+.k-nav-group {
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.k-curtain.open .k-nav-group { opacity: 1; transform: translateY(0); }
+/* Stagger by group index */
+.k-curtain.open .k-nav-group:nth-child(1) { transition-delay: 0.04s; }
+.k-curtain.open .k-nav-group:nth-child(2) { transition-delay: 0.09s; }
+.k-curtain.open .k-nav-group:nth-child(3) { transition-delay: 0.14s; }
+.k-curtain.open .k-nav-group:nth-child(4) { transition-delay: 0.19s; }
+
+.k-nav-group-label {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--k-menu-gold);
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--k-menu-separator);
+  display: block;
+}
+
+.k-curtain-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.k-curtain-item {
+  margin-bottom: 0.1rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+.k-curtain.open .k-curtain-item { opacity: 1; transform: translateY(0); }
+/* Per-item stagger (up to 16 items across all groups) */
+.k-curtain.open .k-curtain-item:nth-child(1)  { transition-delay: 0.06s; }
+.k-curtain.open .k-curtain-item:nth-child(2)  { transition-delay: 0.09s; }
+.k-curtain.open .k-curtain-item:nth-child(3)  { transition-delay: 0.12s; }
+.k-curtain.open .k-curtain-item:nth-child(4)  { transition-delay: 0.15s; }
+.k-curtain.open .k-curtain-item:nth-child(5)  { transition-delay: 0.18s; }
+.k-curtain.open .k-curtain-item:nth-child(6)  { transition-delay: 0.21s; }
+
+.k-curtain-link {
+  pointer-events: auto;
+  touch-action: manipulation;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.42rem 0.55rem;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--k-menu-charcoal);
+  transition: color 0.22s ease, background 0.22s ease, transform 0.28s cubic-bezier(0.16,1,0.3,1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.k-curtain-link::before {
+  content: '';
+  display: block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--k-menu-gold);
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.k-curtain-link:hover {
+  color: var(--k-menu-charcoal);
+  background: var(--k-menu-hover-bg);
+  transform: translateX(3px);
+}
+.k-curtain-link:hover::before {
+  opacity: 1;
+  transform: scale(1.5);
+}
+.k-curtain-link:focus-visible {
+  outline: 2px solid var(--k-menu-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+/* Gold underline on hover */
+.k-curtain-link::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0.55rem;
+  right: 0.55rem;
+  height: 1.5px;
+  background: var(--k-menu-gold);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.28s cubic-bezier(0.16,1,0.3,1);
+}
+.k-curtain-link:hover::after { transform: scaleX(1); }
+
+/* Current page: gold, non-interactive */
+.k-curtain-link[aria-current="page"] {
+  color: var(--k-menu-gold);
+  pointer-events: none;
+  cursor: default;
+  background: var(--k-menu-gold-pale);
+}
+.k-curtain-link[aria-current="page"]::before { opacity: 1; }
+
+/* ── Install App footer inside curtain ── */
+.k-curtain-footer {
+  flex-shrink: 0;
+  padding: 1rem 2.5rem 1.4rem;
+  border-top: 1px solid var(--k-menu-separator);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.k-curtain-install-btn {
+  display: none;   /* shown by JS only when install is available */
+  align-items: center;
+  gap: 8px;
+  background: var(--k-menu-bg);
+  border: 1.5px solid var(--k-menu-gold);
+  color: var(--k-menu-charcoal);
+  border-radius: 8px;
+  padding: 9px 18px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+.k-curtain-install-btn.k-install-visible {
+  display: inline-flex;
+}
+.k-curtain-install-btn:hover {
+  background: var(--k-menu-gold);
+  color: #fff;
+  transform: translateY(-1px);
+}
+.k-curtain-install-btn:focus-visible {
+  outline: 2px solid var(--k-menu-gold);
+  outline-offset: 2px;
+}
+.k-curtain-install-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+/* Full-width on mobile */
+@media (max-width: 640px) {
+  .k-curtain-install-btn { width: 100%; justify-content: center; }
+}
+
+/* Dev icon — bottom-left of curtain footer area */
+.k-dev-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--k-menu-border);
+  background: transparent;
+  color: var(--k-menu-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+.k-dev-icon:hover { border-color: var(--k-menu-gold); color: var(--k-menu-gold); }
+.k-dev-icon:focus-visible { outline: 2px solid var(--k-menu-gold); outline-offset: 2px; }
+.k-dev-icon svg { width: 15px; height: 15px; }
+
+/* ── DEVELOPER MODAL ── */
+.k-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 13, 9, 0.72);
+  backdrop-filter: blur(10px);
+  z-index: 1400;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.k-modal-overlay.open { display: flex; }
+.k-modal-card {
+  background: var(--k-menu-surface);
+  border: 1px solid var(--k-menu-border);
+  max-width: 420px;
+  width: 100%;
+  padding: 2.2rem;
+  position: relative;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.28);
+}
+.k-modal-close {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--k-menu-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.k-modal-close:hover { color: var(--k-menu-charcoal); }
+.k-dev-eyebrow {
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--k-menu-gold);
+  font-weight: 700;
+}
+.k-dev-name {
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  color: var(--k-menu-charcoal);
+  margin: 8px 0 4px;
+}
+.k-dev-role {
+  font-size: 0.82rem;
+  color: var(--k-menu-gold);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.k-dev-desc {
+  font-size: 0.8rem;
+  color: var(--k-menu-muted);
+  line-height: 1.6;
+}
+
+/* ── Responsive ── */
+@media (max-width: 800px) {
+  .k-curtain-body {
+    grid-template-columns: 1fr;
+    padding: 1.5rem 1.5rem 0;
+    gap: 0;
+  }
+  .k-curtain-footer {
+    padding: 0.9rem 1.5rem 1.2rem;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .k-nav-group { margin-bottom: 1.4rem; }
+}
+
+@media (max-width: 640px) {
+  .k-curtain-topbar { padding: 0.85rem 1.25rem; }
+  .k-curtain-link { font-size: 0.88rem; padding: 0.48rem 0.55rem; }
+  .k-toolbar { gap: 4px; min-height: 48px; padding-top: 6px; padding-bottom: 6px; }
+  .k-toolbar-btn { width: 34px; height: 34px; }
+  .k-menu-trigger { padding: 8px; gap: 0; }
+  .k-menu-label { display: none; }
+  .k-popover { right: -6px; }
+}
+
+/* Very small screens: tighten gaps further to prevent overflow */
+@media (max-width: 380px) {
+  .k-toolbar { gap: 3px; }
+  .k-toolbar-btn { width: 32px; height: 32px; }
+}
+
+/* ── Reduced-motion: skip all transitions ── */
+@media (prefers-reduced-motion: reduce) {
+  .k-curtain,
+  .k-nav-group,
+  .k-curtain-item,
+  .k-curtain-link,
+  .k-curtain-link::after,
+  .k-curtain-link::before,
+  .k-menu-trigger,
+  .k-toolbar-btn {
+    transition: none !important;
+    animation: none !important;
+  }
+  .k-curtain { transform: none !important; }
+  .k-nav-group, .k-curtain-item { transform: none !important; }
+}
+/* Prevent the closed menu curtain from intercepting page clicks. */
+.k-curtain {
+  visibility: hidden;
+  transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+              visibility 0s linear 0.42s;
+}
+.k-curtain.open {
+  visibility: visible;
+  transition-delay: 0s;
+}
+.k-curtain:not(.open) * {
+  pointer-events: none !important;
+}
+
+/* Shared page theme. Variables plus semantic component rules make the common
+   toggle affect content pages that don't have their own .light-mode styles. */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --dlo-page-bg: #081422;
+  --dlo-panel-bg: #122238;
+  --dlo-panel-raised: #182d45;
+  --dlo-page-text: #e5edf6;
+  --dlo-heading: #f1f5f9;
+  --dlo-muted: #aab8c9;
+  --dlo-border: rgba(224,192,131,.18);
+  --case-bg: #081422;
+  --case-panel: #122238;
+  --case-panel-raised: #182d45;
+  --case-line: rgba(224,192,131,.18);
+  --case-text: #e5edf6;
+  --case-muted: #aab8c9;
+  --bg-black: #020408;
+  --bg-deep: #050811;
+  --k-curtain-bg: #071321;
+  --k-panel: #122238;
+  --k-menu-bg: #071321;
+  --k-menu-surface: #122238;
+  --k-menu-border: rgba(224,192,131,.2);
+  --k-menu-text: #e5edf6;
+  --k-menu-charcoal: #e5edf6;
+  --k-menu-muted: #aab8c9;
+  --k-menu-gold: #e0c083;
+  --k-menu-gold-pale: rgba(224,192,131,.12);
+  --k-menu-hover-bg: rgba(224,192,131,.1);
+  --k-menu-separator: rgba(224,192,131,.16);
+  --k-text: #f1f5f9;
+  --k-text-silver: #cbd5e1;
+  --k-text-muted: #aab8c9;
+  --k-text-dim: #94a3b8;
+  --text: #e5edf6;
+  --muted: #aab8c9;
+  --border: rgba(224,192,131,.18);
+  --active-fg: #e0c083;
+}
+html[data-theme="light"] {
+  color-scheme: light;
+  --dlo-page-bg: #f4f6f9;
+  --dlo-panel-bg: #ffffff;
+  --dlo-panel-raised: #f8fafc;
+  --dlo-page-text: #1e293b;
+  --dlo-heading: #0f172a;
+  --dlo-muted: #64748b;
+  --dlo-border: rgba(15,23,42,.12);
+  --case-bg: #f5f7fb;
+  --case-panel: #ffffff;
+  --case-panel-raised: #f8fafd;
+  --case-line: rgba(24,48,79,.14);
+  --case-text: #1d3557;
+  --case-muted: #64748b;
+  --k-menu-bg: #F5F3ED;
+  --k-menu-surface: #FFFFFF;
+  --k-menu-border: rgba(45,40,28,.12);
+  --k-menu-text: #1C1A15;
+  --k-menu-charcoal: #2E2C26;
+  --k-menu-muted: #6B6558;
+  --k-menu-gold: #B8922A;
+  --k-menu-gold-pale: rgba(184,146,42,.14);
+  --k-menu-hover-bg: rgba(184,146,42,.09);
+  --k-menu-separator: rgba(45,40,28,.09);
+  --k-text: #0f172a;
+  --k-text-silver: #334155;
+  --k-text-muted: #64748b;
+  --k-text-dim: #64748b;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: rgba(15,23,42,.12);
+  --active-fg: #0B2545;
+}
+html[data-theme="dark"]:not(.app-mode) body {
+  color-scheme: dark;
+  background-color: var(--dlo-page-bg) !important;
+  color: var(--dlo-page-text) !important;
+}
+html[data-theme="light"]:not(.app-mode) body {
+  color-scheme: light;
+  background-color: var(--dlo-page-bg) !important;
+  color: var(--dlo-page-text) !important;
+}
+html[data-theme="dark"]:not(.app-mode) body :is(h1,h2,h3,h4,h5,h6,.section-title,.page-title) {
+  color: var(--dlo-heading) !important;
+}
+html[data-theme="light"]:not(.app-mode) body :is(h1,h2,h3,h4,h5,h6,.section-title,.page-title) {
+  color: var(--dlo-heading) !important;
+}
+html[data-theme="dark"]:not(.app-mode) body p { color: var(--dlo-muted) !important; }
+html[data-theme="light"]:not(.app-mode) body p { color: var(--dlo-muted) !important; }
+html[data-theme="dark"]:not(.app-mode) body :is([class*="-card"],[class*="-panel"],[class*="-box"]) {
+  background-color: var(--dlo-panel-bg) !important;
+  color: var(--dlo-page-text) !important;
+  border-color: var(--dlo-border) !important;
+}
+html[data-theme="light"]:not(.app-mode) body :is([class*="-card"],[class*="-panel"],[class*="-box"]) {
+  background-color: var(--dlo-panel-bg) !important;
+  color: var(--dlo-page-text) !important;
+  border-color: var(--dlo-border) !important;
+}
+html[data-theme="dark"]:not(.app-mode) body :is(input,select,textarea) {
+  color-scheme: dark;
+  color: #e5edf6 !important;
+  background-color: #132840 !important;
+  border-color: rgba(224,192,131,.35) !important;
+}
+html[data-theme="light"]:not(.app-mode) body :is(input,select,textarea) {
+  color-scheme: light;
+  color: #1e293b !important;
+  background-color: #ffffff !important;
+  border-color: rgba(15,23,42,.18) !important;
+}
+html[data-theme="dark"]:not(.app-mode) body :is(th,td) { border-color: var(--dlo-border); }
+html[data-theme="light"]:not(.app-mode) body :is(th,td) { border-color: var(--dlo-border); }
+
+/* The app has a branded header. Reuse its action slot for the shared toolbar. */
+html.app-mode .app-topbar .at-actions.k-toolbar {
+  position: static;
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  flex-wrap: nowrap;
+}
+@media all {
+  html.app-mode .app-topbar { gap: 8px; padding-left: max(10px, calc((100% - var(--app-max-w, 560px)) / 2)); padding-right: max(10px, calc((100% - var(--app-max-w, 560px)) / 2)); }
+  html.app-mode .app-topbar .k-menu-label { display: none; }
+  html.app-mode .app-topbar .k-menu-trigger { padding: 8px; gap: 0; }
+  html.app-mode .app-topbar .k-popover { right: -6px; }
+  html.app-mode .app-topbar .at-brand { gap: 6px; }
+  html.app-mode .app-topbar .at-brand img { width: 34px; height: 34px; flex-basis: 34px; }
+  html.app-mode .app-topbar .at-brand span { font-size: 12px; }
+  html.app-mode .app-topbar .at-actions.k-toolbar { gap: 3px; }
+  html.app-mode .app-topbar .at-actions.k-toolbar .k-toolbar-btn { width: 30px; height: 30px; }
+}
+
+/* App pages share a persistent, responsive bottom navigation. */
+html.app-mode body.dlo-app-subpage {
+  min-height: 100dvh;
+  padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important;
+  box-sizing: border-box;
+}
+html.app-mode body.dlo-app-subpage:not(.light-mode) {
+  color-scheme: dark;
+  background: #061426 !important;
+  color: #e9f0fa !important;
+}
+html.app-mode body.dlo-app-subpage.light-mode {
+  color-scheme: light;
+  background: #f3f6fb !important;
+  color: #18283d !important;
+}
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(h1,h2,h3,h4,h5,h6) { color: #f5f7fc !important; }
+html.app-mode body.dlo-app-subpage.light-mode :is(h1,h2,h3,h4,h5,h6) { color: #122b49 !important; }
+html.app-mode body.dlo-app-subpage:not(.light-mode) p { color: #b7c5d8 !important; }
+html.app-mode body.dlo-app-subpage.light-mode p { color: #5a6b80 !important; }
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is([class*="-card"],[class*="-panel"],[class*="-box"]) {
+  background-color: #0d2037 !important;
+  color: #e9f0fa !important;
+  border-color: rgba(149,177,210,.24) !important;
+}
+html.app-mode body.dlo-app-subpage.light-mode :is([class*="-card"],[class*="-panel"],[class*="-box"]) {
+  background-color: #fff !important;
+  color: #18283d !important;
+  border-color: rgba(25,54,88,.14) !important;
+}
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(input,select,textarea) {
+  color-scheme: dark;
+  color: #edf3fb !important;
+  background: #10243b !important;
+  border-color: rgba(149,177,210,.34) !important;
+}
+html.app-mode body.dlo-app-subpage.light-mode :is(input,select,textarea) {
+  color-scheme: light;
+  color: #18283d !important;
+  background: #fff !important;
+  border-color: rgba(25,54,88,.18) !important;
+}
+html.app-mode body.dlo-app-subpage .k-toolbar { z-index: 1100; }
+.dlo-app-bottom-nav { display: none; }
+/* Toasts (e.g. "Light theme activated") used to sit on top of the bottom tab bar. */
+html.app-mode #dlo-toast-container {
+  bottom: calc(var(--app-tab-h, 56px) + 24px + env(safe-area-inset-bottom)) !important;
+  left: 12px !important;
+  right: 12px !important;
+  max-width: none !important;
+  align-items: center;
+}
+/* Old website-era tab bar copied into sub-pages (hearings.html, history.html, ...).
+   common.js removes it; this hides it instantly so it never flashes. The app home
+   (which contains #appHome) is not affected. App mode only. */
+html.app-mode body:not(:has(#appHome)) #appTabbar { display: none !important; }
+/* Sub-page bottom bar: pixel-identical to the home page's .app-tabbar
+   (same colours, border, padding, icon size, label size, active colour). */
+html.app-mode .dlo-app-bottom-nav {
+  display: flex;
+  position: fixed;
+  z-index: 1400;
+  left: 50%;
+  right: auto;
+  top: auto;
+  bottom: 0;
+  width: min(100%, var(--app-max-w, 560px));
+  height: auto;
+  max-height: none;
+  margin: 0;
+  transform: translateX(-50%);
+  flex-direction: row;
+  gap: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 0;
+  opacity: 1;
+  visibility: visible;
+  overflow: visible;
+  justify-content: space-around;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 6px max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  border-top: 2px solid #C9A84C;
+  background: #0B2545 !important;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html.app-mode .dlo-app-bottom-nav :is(a,button) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  text-transform: none;
+  letter-spacing: normal;
+  position: static;
+  height: auto;
+  width: auto;
+  margin: 0;
+  font-family: "Plus Jakarta Sans", -apple-system, sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: normal;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+html.app-mode .dlo-app-bottom-nav :is(a,button) svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  transition: transform .28s ease;
+}
+html.app-mode .dlo-app-bottom-nav :is(a,button).active { color: #E8C96A; background: transparent; }
+html.app-mode .dlo-app-bottom-nav :is(a,button).active svg { stroke: #E8C96A; }
+html.app-mode .dlo-app-bottom-nav :is(a,button):active { transform: scale(.96); }
+html.app-mode .dlo-app-bottom-nav :is(a,button):hover svg { transform: translateY(-2px) scale(1.1) rotate(-5deg); }
+html.app-mode .dlo-app-bottom-nav :is(a,button):focus-visible { outline: 3px solid #C6A358; outline-offset: 3px; }
+html.app-mode .dlo-app-bottom-nav :is(a,button)::before,
+html.app-mode .dlo-app-bottom-nav :is(a,button)::after { content: none !important; display: none !important; }
+html.app-navigating::before {
+  content: "";
+  position: fixed;
+  z-index: 2000;
+  inset: 0 auto auto 0;
+  width: 36%;
+  height: 3px;
+  background: linear-gradient(90deg,#e8c96a,#7ab6ff,#e8c96a);
+  box-shadow: 0 0 12px rgba(224,192,131,.7);
+  animation: dlo-app-nav-progress .7s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes dlo-app-nav-progress { from { transform: translateX(0); } to { transform: translateX(180%); } }
+@media (prefers-reduced-motion: reduce) {
+  html.app-mode .dlo-app-bottom-nav :is(a,button),
+  html.app-mode .dlo-app-bottom-nav :is(a,button) svg { transition: none !important; }
+  html.app-navigating::before { animation: none !important; }
+}
+
+/* The navigation curtain stays editorial white in either page theme, with
+   stronger flowing contour lines inspired by (but distinct from) the reference. */
+.k-curtain {
+  --k-menu-bg: #ffffff;
+  --k-menu-surface: #ffffff;
+  --k-menu-border: rgba(25, 29, 34, 0.16);
+  --k-menu-text: #202124;
+  --k-menu-charcoal: #292a2d;
+  --k-menu-muted: #62666b;
+  --k-menu-gold: #927744;
+  --k-menu-gold-pale: rgba(146, 119, 68, 0.12);
+  --k-menu-hover-bg: rgba(146, 119, 68, 0.08);
+  --k-menu-separator: rgba(25, 29, 34, 0.12);
+  --k-curtain-bg: #ffffff;
+  --k-panel: #ffffff;
+  --k-gold: #927744;
+  --k-gold-light: #806633;
+  --k-gold-hairline: rgba(146, 119, 68, 0.3);
+  --k-border: rgba(25, 29, 34, 0.12);
+  --k-text: #202124;
+  --k-text-silver: #3e4145;
+  --k-text-muted: #62666b;
+  background-color: #ffffff !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 1100'%3E%3Cg fill='none' stroke='%23707878' stroke-width='1.2' stroke-opacity='.22'%3E%3Cpath d='M-100 75 C100 5 250 155 440 95 S780 20 970 90 1310 170 1690 50'/%3E%3Cpath d='M-100 125 C110 55 260 205 455 145 S790 70 980 140 1320 220 1690 100'/%3E%3Cpath d='M-100 175 C120 105 270 255 470 195 S800 120 990 190 1330 270 1690 150'/%3E%3Cpath d='M-100 225 C130 155 285 305 485 245 S810 170 1000 240 1340 320 1690 200'/%3E%3Cpath d='M-100 275 C140 205 300 355 500 295 S820 220 1010 290 1350 370 1690 250'/%3E%3Cpath d='M-100 325 C150 255 315 405 515 345 S830 270 1020 340 1360 420 1690 300'/%3E%3Cpath d='M-100 600 C120 510 300 710 520 625 S820 530 1030 615 1360 710 1690 570'/%3E%3Cpath d='M-100 650 C130 560 315 760 535 675 S830 580 1040 665 1370 760 1690 620'/%3E%3Cpath d='M-100 700 C140 610 330 810 550 725 S840 630 1050 715 1380 810 1690 670'/%3E%3Cpath d='M-100 750 C150 660 345 860 565 775 S850 680 1060 765 1390 860 1690 720'/%3E%3Cpath d='M-100 800 C160 710 360 910 580 825 S860 730 1070 815 1400 910 1690 770'/%3E%3Cpath d='M-100 850 C170 760 375 960 595 875 S870 780 1080 865 1410 960 1690 820'/%3E%3C/g%3E%3Cg fill='none' stroke='%23927744' stroke-width='1.5' stroke-opacity='.22'%3E%3Cpath d='M-80 455 C140 385 310 530 500 465 S800 390 990 460 1320 535 1680 420'/%3E%3Cpath d='M-80 485 C150 415 320 560 510 495 S810 420 1000 490 1330 565 1680 450'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* App icon sizing — standard app proportions, identical at every window width.
+   Values come from the tokens on html.app-mode (defined in the app page):
+     option tile 44px · option glyph 24px · glance glyph 22px · tab glyph 24px */
+html.app-mode .app-action-icon {
+  flex: 0 0 var(--app-icon-box, 44px) !important;
+  width: var(--app-icon-box, 44px) !important;
+  height: var(--app-icon-box, 44px) !important;
+}
+html.app-mode .app-action-icon svg {
+  width: var(--app-icon-glyph, 24px) !important;
+  height: var(--app-icon-glyph, 24px) !important;
+}
+html.app-mode .app-glance-item svg {
+  width: var(--app-glance-glyph, 22px) !important;
+  height: var(--app-glance-glyph, 22px) !important;
+}
+html.app-mode .app-home-actions a .ic {
+  width: var(--app-icon-box, 44px) !important;
+  height: var(--app-icon-box, 44px) !important;
+  flex: 0 0 var(--app-icon-box, 44px) !important;
+  font-size: 22px !important;
+}
+html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) {
+  min-width: 0;
+  min-height: var(--app-tab-h, 56px) !important;
+}
+html.app-mode :is(.app-tabbar, .dlo-app-bottom-nav) :is(a, button) svg {
+  flex: 0 0 var(--app-tab-glyph, 24px) !important;
+  width: var(--app-tab-glyph, 24px) !important;
+  height: var(--app-tab-glyph, 24px) !important;
+}
+
+
+/* App pages must override the public site's generic app-mode nav hiding. */
+html.app-mode .dlo-app-bottom-nav {
+  display: flex !important;
+}
+html.app-mode body.dlo-app-subpage {
+  padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+}
+
+/* ── Theme readability corrections ───────────────────────────────────────
+   Corrections only: no palette, layout or typography change. The shared rules
+   above force every [class*="-card|-panel|-box"] to the panel colour and every
+   heading/paragraph to the theme text colour, while the pages still paint their
+   own sections, navy blocks, striped rows, stat numbers, badges and gold labels
+   with fixed light-theme colours. That left parts of each page unreadable in one
+   theme or the other. Each rule below repairs one of those, for the website AND
+   the installed-app sub-pages, using the existing --dlo-* tokens. */
+html[data-theme="light"]:not(.app-mode) body .whatsapp-btn,
+html.app-mode body.dlo-app-subpage.light-mode .whatsapp-btn,
+html[data-theme="dark"]:not(.app-mode) body .whatsapp-btn,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .whatsapp-btn {
+  color:#04361a !important
+}
+html[data-theme="light"]:not(.app-mode) body footer .footer-inner > div:not(.footer-dept),
+html.app-mode body.dlo-app-subpage.light-mode footer .footer-inner > div:not(.footer-dept),
+html[data-theme="dark"]:not(.app-mode) body footer .footer-inner > div:not(.footer-dept),
+html.app-mode body.dlo-app-subpage:not(.light-mode) footer .footer-inner > div:not(.footer-dept) {
+  color:rgba(255,255,255,.68) !important
+}
+html[data-theme="light"]:not(.app-mode) body [style*="background:#FEE2E2"],
+html.app-mode body.dlo-app-subpage.light-mode [style*="background:#FEE2E2"],
+html[data-theme="dark"]:not(.app-mode) body [style*="background:#FEE2E2"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="background:#FEE2E2"] {
+  color:#b91c1c !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-box,
+html[data-theme="light"]:not(.app-mode) body .popup-header,
+html.app-mode body.dlo-app-subpage.light-mode .filter-box,
+html.app-mode body.dlo-app-subpage.light-mode .popup-header {
+  background-color:var(--navy) !important;
+  border-color:transparent !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-box .filter-title,
+html[data-theme="light"]:not(.app-mode) body .filter-box :is(h1,h2,h3),
+html[data-theme="light"]:not(.app-mode) body .popup-header :is(h1,h2,h3),
+html[data-theme="light"]:not(.app-mode) body .page-header :is(h1,h2,h3,.page-title),
+html[data-theme="light"]:not(.app-mode) body [style*="background:var(--navy)"] :is(h1,h2,h3),
+html.app-mode body.dlo-app-subpage.light-mode .filter-box .filter-title,
+html.app-mode body.dlo-app-subpage.light-mode .filter-box :is(h1,h2,h3),
+html.app-mode body.dlo-app-subpage.light-mode .popup-header :is(h1,h2,h3),
+html.app-mode body.dlo-app-subpage.light-mode .page-header :is(h1,h2,h3,.page-title),
+html.app-mode body.dlo-app-subpage.light-mode [style*="background:var(--navy)"] :is(h1,h2,h3) {
+  color:#ffffff !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-box label,
+html.app-mode body.dlo-app-subpage.light-mode .filter-box label {
+  color:var(--gold-light,#E0BC6E) !important
+}
+html[data-theme="light"]:not(.app-mode) body .page-header :is(p,span),
+html[data-theme="light"]:not(.app-mode) body [style*="background:var(--navy)"] p,
+html.app-mode body.dlo-app-subpage.light-mode .page-header :is(p,span),
+html.app-mode body.dlo-app-subpage.light-mode [style*="background:var(--navy)"] p {
+  color:rgba(255,255,255,.8) !important
+}
+html[data-theme="light"]:not(.app-mode) body .filter-btn.btn-clear:not(.filter-box *),
+html.app-mode body.dlo-app-subpage.light-mode .filter-btn.btn-clear:not(.filter-box *) {
+  color:var(--navy) !important;
+  background-color:rgba(11,37,69,.08) !important;
+  border:1px solid rgba(11,37,69,.28) !important
+}
+html[data-theme="light"]:not(.app-mode) body #histCaseTitle,
+html.app-mode body.dlo-app-subpage.light-mode #histCaseTitle {
+  color:#ffffff !important
+}
+html[data-theme="light"]:not(.app-mode) body .progress-label,
+html.app-mode body.dlo-app-subpage.light-mode .progress-label,
+html[data-theme="dark"]:not(.app-mode) body .progress-label,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .progress-label {
+  text-shadow:0 1px 2px rgba(0,0,0,.55)
+}
+html[data-theme="light"]:not(.app-mode) body .section-eyebrow,
+html[data-theme="light"]:not(.app-mode) body .hist-back-btn,
+html[data-theme="light"]:not(.app-mode) body .lbl,
+html[data-theme="light"]:not(.app-mode) body label:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html[data-theme="light"]:not(.app-mode) body [style*="color:var(--gold)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html[data-theme="light"]:not(.app-mode) body [style*="color:var(--gold-light)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html[data-theme="light"]:not(.app-mode) body [style*="color:#C9A24A"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode .section-eyebrow,
+html.app-mode body.dlo-app-subpage.light-mode .hist-back-btn,
+html.app-mode body.dlo-app-subpage.light-mode .lbl,
+html.app-mode body.dlo-app-subpage.light-mode label:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode [style*="color:var(--gold)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode [style*="color:var(--gold-light)"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *),
+html.app-mode body.dlo-app-subpage.light-mode [style*="color:#C9A24A"]:not(.filter-box *):not(.page-header *):not(.case-filter-card *):not([style*="background:var(--navy)"] *) {
+  color:#7a5a14 !important
+}
+html[data-theme="dark"]:not(.app-mode) body :is(.analytics-section,.hearings-section,.cause-list-section,.courts-section,.live-section,.about,.services,#calendar):not(#updates),
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(.analytics-section,.hearings-section,.cause-list-section,.courts-section,.live-section,.about,.services,#calendar):not(#updates) {
+  background-color:var(--dlo-page-bg) !important
+}
+html[data-theme="dark"]:not(.app-mode) body .hrf-stat,
+html[data-theme="dark"]:not(.app-mode) body .hist-summary-grid,
+html[data-theme="dark"]:not(.app-mode) body .hist-prompt,
+html[data-theme="dark"]:not(.app-mode) body .about-feature,
+html[data-theme="dark"]:not(.app-mode) body #causeListContent > div:not([style*="background:var(--navy)"]),
+html[data-theme="dark"]:not(.app-mode) body #calendar .container > .reveal:has(.cal-header),
+html.app-mode body.dlo-app-subpage:not(.light-mode) .hrf-stat,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .hist-summary-grid,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .hist-prompt,
+html.app-mode body.dlo-app-subpage:not(.light-mode) .about-feature,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #causeListContent > div:not([style*="background:var(--navy)"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) #calendar .container > .reveal:has(.cal-header) {
+  background-color:var(--dlo-panel-bg) !important;
+  color:var(--dlo-page-text) !important;
+  border-color:var(--dlo-border) !important
+}
+html[data-theme="dark"]:not(.app-mode) body thead tr,
+html[data-theme="dark"]:not(.app-mode) body [style*="background:#F9F6EF" i],
+html[data-theme="dark"]:not(.app-mode) body :is(.dept-table,.results-table,.courts-table) tr:nth-child(even) td,
+html.app-mode body.dlo-app-subpage:not(.light-mode) thead tr,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="background:#F9F6EF" i],
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(.dept-table,.results-table,.courts-table) tr:nth-child(even) td {
+  background-color:var(--dlo-panel-raised) !important
+}
+html[data-theme="dark"]:not(.app-mode) body :is(.dept-table,.results-table,.courts-table) td,
+html.app-mode body.dlo-app-subpage:not(.light-mode) :is(.dept-table,.results-table,.courts-table) td {
+  color:var(--dlo-page-text) !important
+}
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--navy-mid)"],
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--navy)"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#13315C"],
+html[data-theme="dark"]:not(.app-mode) body #perfSummaryTotal,
+html[data-theme="dark"]:not(.app-mode) body #histStatTotal,
+html[data-theme="dark"]:not(.app-mode) body #calMonthLabel,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--navy-mid)"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--navy)"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#13315C"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) #perfSummaryTotal,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #histStatTotal,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #calMonthLabel {
+  color:var(--dlo-heading) !important
+}
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#8B1A1A"],
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--disposed-fg)"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#C81E1E"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body #hrfNotFiled,
+html[data-theme="dark"]:not(.app-mode) body #perfSummaryExparte,
+html[data-theme="dark"]:not(.app-mode) body #histStatExparte,
+html[data-theme="dark"]:not(.app-mode) body #histStatNotAttended,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#8B1A1A"],
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--disposed-fg)"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#C81E1E"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) #hrfNotFiled,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #perfSummaryExparte,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #histStatExparte,
+html.app-mode body.dlo-app-subpage:not(.light-mode) #histStatNotAttended {
+  color:#ff9a9a !important
+}
+html[data-theme="dark"]:not(.app-mode) body [style*="color:#1E6B45"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body [style*="color:var(--active-fg)"]:not([style*="background"]),
+html[data-theme="dark"]:not(.app-mode) body td.hist-business-date,
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:#1E6B45"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) [style*="color:var(--active-fg)"]:not([style*="background"]),
+html.app-mode body.dlo-app-subpage:not(.light-mode) td.hist-business-date {
+  color:#6ee7a8 !important
+}
+/* App dashboard (app.html, light): alert and gold arrows were still dark-theme values. */
+html.app-mode body.light-mode .app-home-alert { color:#7a1b25; border-color:rgba(139,35,45,.35); background:rgba(139,35,45,.1); }
+html.app-mode body.light-mode .app-group-heading > p span { color:#8a6516; }
+html.app-mode body.light-mode .app-action-featured .app-action-arrow { color:#8a6516; border-color:rgba(138,101,22,.4); }
+html.app-mode body.light-mode .app-action-metrics > span { color:#4d6580; }
+html.app-mode body.light-mode .app-action-metrics b { color:#066a7e; }
+html.app-mode body.light-mode .app-action-metrics > span:nth-child(2) b { color:#136c42; }
+html.app-mode body.light-mode .app-action-metrics > span:nth-child(3) b { color:#80600f; }
+/* App dashboard (light): near-threshold stat colours and arrows. */
+html.app-mode body.light-mode #appMainActive { color: #0a5d6e; }
+html.app-mode body.light-mode #appMainPending { color: #7a5a14; }
+html.app-mode body.light-mode .app-action-metrics > span { color: #46597a !important; }
+html.app-mode body.light-mode .app-action-card .app-action-arrow { color: #7d5a12 !important; }
+/* Placeholder text was invisible on light inputs inside navy filter panels (light theme). */
+html[data-theme="light"]:not(.app-mode) body :is(input, textarea)::placeholder,
+html.app-mode body.light-mode :is(input, textarea)::placeholder { color: #66758b !important; opacity: 1; }
+html[data-theme="dark"]:not(.app-mode) body :is(input, textarea)::placeholder,
+html.app-mode body:not(.light-mode) :is(input, textarea)::placeholder { color: #9fb0c6 !important; opacity: 1; }
+/* Analytics disposal bar: white label on the green fill was 3.8:1; darker text of the same weight/size. */
+html[data-theme] body .progress-label,
+html.app-mode body.dlo-app-subpage .progress-label { color: #04210f !important; }

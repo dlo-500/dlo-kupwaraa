@@ -1,0 +1,11 @@
+# District Litigation Office Kupwara
+User-agent: *
+Allow: /
+
+# Prefer the canonical production host when available
+Sitemap: https://dlokupwara.in/sitemap.xml
+Sitemap: https://dlo-500.github.io/dlo-design/sitemap.xml
+
+# Do not index staff / operator surfaces
+Disallow: /operator.html
+Disallow: /department.html

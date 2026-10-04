@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' https: data:; object-src 'none'; base-uri 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta name="description" content="Areas of Legal Practice — District Litigation Office Kupwara">
+<meta name="theme-color" content="#0B2545">
+<title>Areas of Legal Practice | DLO Kupwara</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;600;700&family=Roboto:wght@300;400;500&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="common.js"></script>
+<style>
+:root{--navy:#0A1F3D;--navy-mid:#123059;--gold:#C6A358;}
+.section-title{font-family:'Playfair Display',serif!important}
+.service-card-top{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 100%)!important}
+</style>
+<meta property="og:title" content="Areas of Legal Practice | DLO Kupwara">
+<meta property="og:description" content="What we do — legal practice areas of the District Litigation Office Kupwara">
+<meta property="og:type" content="website">
+<meta name="robots" content="index,follow">
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <span>Government of Jammu &amp; Kashmir | Department of Law, Justice &amp; Parliamentary Affairs</span>
+  </div>
+</div>
+
+<section class="services" id="services" style="padding-top:60px">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px">
+      <span class="section-eyebrow">What We Do</span>
+      <h2 class="section-title" style="margin:0 auto">Areas of Legal Practice</h2>
+      <div class="divider" style="margin:20px auto 0"></div>
+    </div>
+
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="service-card-top chess-bg"><span class="service-icon">🏠</span></div>
+        <div class="service-card-body">
+          <h3>Civil Litigation</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6">Property disputes, land acquisition, mutation challenges and civil suits against government departments.</p>
+          <span class="service-tag">Revenue · PWD · Forest</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-card-top chess-bg"><span class="service-icon">👷</span></div>
+        <div class="service-card-body">
+          <h3>Labour &amp; Service Matters</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6">Service disputes, labour claims and related proceedings involving government employees and departments.</p>
+          <span class="service-tag">Labour · Education · Health</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-card-top chess-bg"><span class="service-icon">🚗</span></div>
+        <div class="service-card-body">
+          <h3>MACT &amp; Motor Claims</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6">Motor Accident Claims Tribunal matters and related insurance / government liability cases.</p>
+          <span class="service-tag">MACT · Insurance · PWD</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-card-top chess-bg"><span class="service-icon">🌲</span></div>
+        <div class="service-card-body">
+          <h3>Forest &amp; Environment</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6">Cases involving forest land, environmental clearances and related statutory proceedings.</p>
+          <span class="service-tag">Forest · Environment</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-card-top chess-bg"><span class="service-icon">📜</span></div>
+        <div class="service-card-body">
+          <h3>Revenue Matters</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6">Land revenue, mutation, tenancy and related proceedings before revenue authorities and courts.</p>
+          <span class="service-tag">Revenue · Patwari · Tehsildar</span>
+        </div>
+      </div>
+
+      <div class="service-card">
+        <div class="service-card-top chess-bg"><span class="service-icon">🏛️</span></div>
+        <div class="service-card-body">
+          <h3>Court Coordination</h3>
+          <p style="font-size:13px;color:var(--muted);line-height:1.6">Coordinating timely representation and compliance across all 12+ courts in the district.</p>
+          <span class="service-tag">All Courts</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>© 2026 District Litigation Office Kupwara. All rights reserved.</div>
+    <div class="footer-dept">Department of Law, Justice &amp; Parliamentary Affairs</div>
+  </div>
+</footer>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  if (window.DLO) {
+    DLO.registerSW();
+    var rb = document.getElementById("resultsBody") || document.getElementById("deptPerfBody") || document.getElementById("statsGrid");
+    if (rb && DLO.showSkeleton && (!rb.children.length || rb.innerHTML.trim() === "")) {
+      DLO.showSkeleton(rb, 5);
+    }
+  }
+});
+</script>
+
+</body>
+</html>

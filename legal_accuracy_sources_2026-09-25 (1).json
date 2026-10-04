@@ -1,0 +1,58 @@
+{
+  "cpc": {
+    "title": "Code of Civil Procedure, 1908",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/2191/1/A1908-05.pdf",
+    "verified": "2026-09-25"
+  },
+  "commercial_courts": {
+    "title": "Commercial Courts Act, 2015",
+    "url": "https://www.indiacode.nic.in/handle/123456789/2156?view_type=browse",
+    "verified": "2026-09-25"
+  },
+  "consumer": {
+    "title": "Consumer Protection Act, 2019",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/15256/5/A2019-35.pdf",
+    "verified": "2026-09-25"
+  },
+  "bsa": {
+    "title": "Bharatiya Sakshya Adhiniyam, 2023",
+    "url": "https://www.indiacode.nic.in/indiacode/bitstream/123456789/20063/1/aa202347.pdf",
+    "verified": "2026-09-25"
+  },
+  "arbitration": {
+    "title": "Arbitration and Conciliation Act, 1996 including J&K/Ladakh adaptations",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/1978/3/a1996-26.pdf",
+    "verified": "2026-09-25"
+  },
+  "specific_relief": {
+    "title": "Specific Relief Act, 1963",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/1583/7/A1963-47.pdf",
+    "verified": "2026-09-25"
+  },
+  "mediation": {
+    "title": "Mediation Act, 2023",
+    "url": "https://upload.indiacode.nic.in/view-casepdf?id=AC_CEN_3_46_00011_A2023-32_1697800640677&type=act",
+    "verified": "2026-09-25"
+  },
+  "limitation": {
+    "title": "Limitation Act, 1963",
+    "url": "https://www.indiacode.nic.in/indiacode/handle/123456789/1565?col=123456789%2F1362&view_type=search",
+    "verified": "2026-09-25"
+  },
+  "public_premises": {
+    "title": "Public Premises (Eviction of Unauthorised Occupants) Act, 1971",
+    "url": "https://www.indiacode.nic.in/bitstream/123456789/1609/1/A1971-40.pdf",
+    "verified": "2026-09-25"
+  },
+  "legal_services": {
+    "title": "Legal Services Authorities Act, 1987",
+    "url": "https://www.indiacode.nic.in/handle/123456789/12883?view_type=browse",
+    "verified": "2026-09-25"
+  },
+  "sc_ai_citation_warning": {
+    "title": "Supreme Court of India — Pooja Ramesh Singh v. Jammu and Kashmir Bank Ltd. landmark summary",
+    "url": "https://www.sci.gov.in/landmark-judgment-summaries/",
+    "verified": "2026-09-25",
+    "note": "Source registry reminder: do not invent or rely on unverified citations."
+  }
+}

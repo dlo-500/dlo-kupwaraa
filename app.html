@@ -2922,48 +2922,5 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <script src="assistant-bridge.js"></script>
 <script src="assistant.js"></script>
-</script>
-  // ── Force users to reopen from home screen after major PWA update ──
-(function () {
-  const UPDATE_KEY = 'dlo-pwa-update-v2-seen';
-  if (localStorage.getItem(UPDATE_KEY)) return;
-
-  // Only show when running as installed PWA
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
-                       window.navigator.standalone === true;
-  if (!isStandalone) return;
-
-  // Wait a moment so the page settles
-  setTimeout(() => {
-    const banner = document.createElement('div');
-    banner.id = 'dlo-update-banner';
-    banner.innerHTML = `
-      <div style="
-        position:fixed; bottom:0; left:0; right:0; z-index:99999;
-        background:#0B2545; color:#f3f1eb; padding:14px 18px;
-        font-family:system-ui,sans-serif; font-size:14px; line-height:1.4;
-        box-shadow:0 -4px 20px rgba(0,0,0,0.35);
-        display:flex; align-items:center; gap:12px;
-      ">
-        <div style="flex:1">
-          <strong>App updated</strong><br>
-          Please close this window and open the app again from your home-screen icon
-          for the new icon and full-screen experience.
-        </div>
-        <button id="dlo-update-ok" style="
-          background:#c5a059; color:#0B2545; border:none;
-          padding:8px 14px; border-radius:6px; font-weight:600; cursor:pointer;
-        ">Got it</button>
-      </div>
-    `;
-    document.body.appendChild(banner);
-
-    document.getElementById('dlo-update-ok').addEventListener('click', () => {
-      localStorage.setItem(UPDATE_KEY, '1');
-      banner.remove();
-    });
-  }, 1800);
-})();
-</script>
 </body>
 </html>

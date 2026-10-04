@@ -12,16 +12,22 @@
   "lang": "en-IN",
   "icons": [
     {
-      "src": "icons/dlo-kupwara-app-icon-512.png",
+      "src": "icons/dlo-kupwara-app-icon-512-v2.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/dlo-kupwara-app-icon-192.png",
+      "src": "icons/dlo-kupwara-app-icon-192-v2.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "icons/dlo-kupwara-app-icon-maskable-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icons/dlo-kupwara-app-icon.jpeg",
@@ -34,31 +40,31 @@
     {
       "name": "Search Cases",
       "short_name": "Search",
-      "url": "./search-filter-cases.html",
+      "url": "./search-filter-cases.html?app=1",
       "icons": [{ "src": "icons/shortcut-cases.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Upcoming Hearings",
       "short_name": "Hearings",
-      "url": "./hearings.html",
+      "url": "./hearings.html?app=1",
       "icons": [{ "src": "icons/shortcut-hearings.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Performance",
       "short_name": "Performance",
-      "url": "./performance.html",
+      "url": "./performance.html?app=1",
       "icons": [{ "src": "icons/shortcut-performance.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Analytics",
       "short_name": "Analytics",
-      "url": "./analytics.html",
+      "url": "./analytics.html?app=1",
       "icons": [{ "src": "icons/shortcut-analytics.svg", "sizes": "any", "type": "image/svg+xml" }]
     },
     {
       "name": "Department Login",
       "short_name": "Department",
-      "url": "./department.html",
+      "url": "./department.html?app=1",
       "icons": [{ "src": "icons/shortcut-department.svg", "sizes": "any", "type": "image/svg+xml" }]
     }
   ]

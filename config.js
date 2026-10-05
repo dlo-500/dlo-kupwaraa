@@ -103,3 +103,12 @@ window.DLO_CONFIG = {
     themeToggle: true
   }
 };
+window.addEventListener('load', function () {
+  try {
+    var p = location.pathname;
+    if (/\.html$/.test(p)) {
+      var clean = p.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+      history.replaceState(null, '', clean + location.search + location.hash);
+    }
+  } catch (e) {}
+});

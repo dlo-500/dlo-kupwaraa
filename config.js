@@ -112,3 +112,67 @@ window.addEventListener('load', function () {
     }
   } catch (e) {}
 });
+/* Breadcrumb bar */
+(function () {
+  var CSS =
+    '#dloCrumbs{background:linear-gradient(90deg,#0A1F3D,#123059);border-bottom:1px solid rgba(198,163,88,.45);' +
+    'box-shadow:0 2px 10px rgba(0,0,0,.18);font-family:"Roboto Condensed","Roboto",system-ui,sans-serif;animation:dloCrumbIn .35s ease both}' +
+    '#dloCrumbs ol{list-style:none;margin:0 auto;padding:10px 20px;max-width:1200px;display:flex;align-items:center;flex-wrap:wrap;gap:2px 0;font-size:13px;letter-spacing:.04em}' +
+    '#dloCrumbs li{display:flex;align-items:center;min-width:0}' +
+    '#dloCrumbs li+li::before{content:"";width:6px;height:6px;margin:0 12px;border-top:1.5px solid #C6A358;border-right:1.5px solid #C6A358;transform:rotate(45deg);opacity:.8}' +
+    '#dloCrumbs a{color:rgba(255,255,255,.78);text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:3px 8px;border-radius:999px;transition:background .2s,color .2s}' +
+    '#dloCrumbs a:hover,#dloCrumbs a:focus-visible{color:#fff;background:rgba(198,163,88,.18);outline:none}' +
+    '#dloCrumbs [aria-current]{color:#E0C083;font-weight:600;padding:3px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw}' +
+    '#dloCrumbs svg{width:14px;height:14px;fill:currentColor}' +
+    '@keyframes dloCrumbIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}' +
+    '@media (prefers-reduced-motion:reduce){#dloCrumbs{animation:none}}' +
+    '@media print{#dloCrumbs{display:none}}';
+
+  function build() {
+    if (document.getElementById('dloCrumbs')) return;
+    var path = location.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+    if (path === '/' || path === '' || /\/app$/.test(path)) return;
+
+    var title = (document.title || '').split('|')[0].trim();
+    if (!title) {
+      title = decodeURIComponent(path.split('/').pop() || '')
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
+
+    var style = document.createElement('style');
+    style.textContent = CSS;
+    document.head.appendChild(style);
+
+    var nav = document.createElement('nav');
+    nav.id = 'dloCrumbs';
+    nav.setAttribute('aria-label', 'Breadcrumb');
+    var ol = document.createElement('ol');
+
+    var li1 = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '/';
+    a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 12h3v8h5v-5h4v5h5v-8h3z"/></svg>';
+    var home = document.createElement('span');
+    home.textContent = 'Home';
+    a.appendChild(home);
+    li1.appendChild(a);
+
+    var li2 = document.createElement('li');
+    var cur = document.createElement('span');
+    cur.setAttribute('aria-current', 'page');
+    cur.textContent = title;
+    li2.appendChild(cur);
+
+    ol.appendChild(li1);
+    ol.appendChild(li2);
+    nav.appendChild(ol);
+
+    var top = document.querySelector('.topbar');
+    if (top && top.parentNode) top.parentNode.insertBefore(nav, top.nextSibling);
+    else document.body.insertBefore(nav, document.body.firstChild);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', build);
+  else build();
+})();

@@ -48,8 +48,8 @@
     weekHearings: 0
   };
   // Fallback connection (used only if the page's own client/constants are not present). Public anon key — same as index.html.
-  const EMBED_URL = "https://ibicsdsehxlsaygjnefk.supabase.co";
-  const EMBED_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU";
+  const EMBED_URL = "https://case-portal-proxy.dlokupwara.workers.dev";
+  const EMBED_KEY = "public-placeholder";
   const CFG = Object.assign(
     { supabaseUrl: "", supabaseKey: "", table: "case_diary", client: null, maxRows: 5000,
       refreshMs: 300000, staffPageSize: 6, publicPageSize: 1, isStaff: null, logTable: "", pages: {} },

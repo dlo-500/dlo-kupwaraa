@@ -21,8 +21,8 @@ window.DLO_CONFIG = {
    * exactly one line, in exactly one file.
    */
   supabase: {
-    url: 'https://ibicsdsehxlsaygjnefk.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaWNzZHNlaHhsc2F5Z2puZWZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM0MjQxOTgsImV4cCI6MjA5OTAwMDE5OH0.VzI27sIsfb5AOOhF1zOmaeJPuoE0AnrzeavxWCWElsU'
+    url: 'https://case-portal-proxy.dlokupwara.workers.dev',
+    anonKey: 'public-placeholder'
   },
 
   /**

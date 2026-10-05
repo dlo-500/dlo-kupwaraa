@@ -112,7 +112,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  if (url.hostname.endsWith('supabase.co')) {
+  if ((url.hostname.endsWith('supabase.co') || url.hostname.endsWith('.workers.dev'))) {
     event.respondWith(fetch(request).catch(() => new Response('{"error":"offline"}', {
       status: 503, headers: { 'Content-Type': 'application/json' }
     })));

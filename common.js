@@ -722,7 +722,7 @@
     if (_translationPromise) return _translationPromise;
     _translationPromise = new Promise(resolve => {
       const s = document.createElement('script');
-      s.src = TRANSLATION_SCRIPT + '?v=20261004';
+      s.src = TRANSLATION_SCRIPT + '?v=20261006';
       s.onload = () => resolve(!!window.DLO_TRANSLATIONS);
       s.onerror = () => { console.error('[DLO] translations.js could not be loaded'); resolve(false); };
       document.head.appendChild(s);

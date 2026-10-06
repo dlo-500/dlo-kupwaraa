@@ -442,57 +442,267 @@ window.DLO_TRANSLATIONS = {
       'with columns': {hi:'इन कॉलमों के साथ',ur:'ان کالموں کے ساتھ'}
     },
 
-    'index': {
-      'District Litigation Office Kupwara | Official Legal Registry': {hi:'जिला वाद कार्यालय कुपवाड़ा | आधिकारिक विधिक रजिस्ट्री',ur:'ضلعی دفترِ مقدمات کپواڑہ | سرکاری قانونی رجسٹری'},
-      /* Carousel category labels (gold eyebrow text on each slide) */
-      'Dept. of Law, Justice & Parliamentary Affairs': {hi:'विधि, न्याय एवं संसदीय कार्य विभाग',ur:'محکمہ قانون، انصاف و پارلیمانی امور'},
-      'DC Office Complex · Kupwara': {hi:'DC कार्यालय परिसर · कुपवाड़ा',ur:'DC آفس کمپلیکس · کپواڑہ'},
-      'Administrative Registry · Kupwara': {hi:'प्रशासनिक रजिस्ट्री · कुपवाड़ा',ur:'انتظامی رجسٹری · کپواڑہ'},
-      'Litigation Scrutiny Registry': {hi:'वाद जांच रजिस्ट्री',ur:'مقدمات جانچ رجسٹری'},
-      'Legal Consultation Chamber': {hi:'विधिक परामर्श कक्ष',ur:'قانونی مشاورت چیمبر'},
-      'Law Library & Legal Archives': {hi:'विधि पुस्तकालय एवं विधिक अभिलेखागार',ur:'قانون کی لائبریری اور قانونی محفوظہ'},
-      'Administrative Team · DLO Kupwara': {hi:'प्रशासनिक टीम · जिला वाद कार्यालय कुपवाड़ा',ur:'انتظامی ٹیم · ضلعی دفترِ مقدمات کپواڑہ'},
-      'Case Management Registry': {hi:'मामला प्रबंधन रजिस्ट्री',ur:'مقدمات انتظام رجسٹری'},
-      /* Image alt text for hero slides */
-      'DC Office Complex Kupwara': {hi:'DC कार्यालय परिसर कुपवाड़ा',ur:'DC آفس کمپلیکس کپواڑہ'},
-      'Administrative Wing Kupwara': {hi:'प्रशासनिक विंग कुपवाड़ा',ur:'انتظامی ونگ کپواڑہ'},
-      'District Litigation Office Signage': {hi:'जिला वाद कार्यालय का साइनेज',ur:'ضلعی دفترِ مقدمات کا نشان'},
-      'Litigation Registry & Verification Desk': {hi:'वाद रजिस्ट्री एवं सत्यापन डेस्क',ur:'مقدمات رجسٹری اور تصدیقی میز'},
-      'Executive Legal Consultation Chamber': {hi:'कार्यकारी विधिक परामर्श कक्ष',ur:'انتظامی قانونی مشاورت چیمبر'},
-      'Law Library & Legal Reference Archive': {hi:'विधि पुस्तकालय एवं विधिक संदर्भ अभिलेखागार',ur:'قانون کی لائبریری اور قانونی حوالہ جاتی محفوظہ'},
-      'Administrative Legal Staff': {hi:'प्रशासनिक विधिक कर्मचारी',ur:'انتظامی قانونی عملہ'},
-      'Litigation Coordination Team': {hi:'वाद समन्वय टीम',ur:'مقدمات رابطہ کاری ٹیم'},
-      /* Carousel description text */
-      'Safeguarding government interest and directing statutory compliance across 12 designated judicial forums in Kupwara district.': {hi:'कुपवाड़ा जिले के 12 निर्दिष्ट न्यायिक मंचों में सरकारी हितों की रक्षा तथा वैधानिक अनुपालन का मार्गदर्शन।',ur:'ضلع کپواڑہ کے 12 مقررہ عدالتی فورمز میں سرکاری مفادات کا تحفظ اور قانونی تعمیل کی رہنمائی۔'},
-      'Coordinating timely government defense, objections, and legal representation from district headquarters.': {hi:'जिला मुख्यालय से समयबद्ध सरकारी प्रतिरक्षा, आपत्तियों एवं विधिक प्रतिनिधित्व का समन्वय।',ur:'ضلعی صدر مقام سے بروقت سرکاری دفاع، اعتراضات اور قانونی نمائندگی کی رابطہ کاری۔'},
-      'Ensuring government objections, parawise replies, and compliance reports are thoroughly vetted prior to listed hearings.': {hi:'यह सुनिश्चित करना कि सूचीबद्ध सुनवाइयों से पूर्व सरकारी आपत्तियों, पैरा-वार जवाबों और अनुपालन रिपोर्टों की गहन जांच हो।',ur:'یہ یقینی بنانا کہ مقررہ سماعتوں سے قبل سرکاری اعتراضات، پیرا وار جوابات اور تعمیلی رپورٹس کی مکمل جانچ ہو۔'},
-      'Multi-layered vetting of department submissions to prevent adverse judicial orders and contempt proceedings.': {hi:'प्रतिकूल न्यायिक आदेशों और अवमानना कार्यवाहियों से बचाव हेतु विभागीय प्रस्तुतियों की बहु-स्तरीय जांच।',ur:'ناموافق عدالتی احکامات اور توہینِ عدالت کی کارروائی سے بچاؤ کے لیے محکمانہ پیشکشوں کی متعدد سطحوں پر جانچ۔'},
-      'Directing strategic legal guidance for revenue, municipal, forest, and service law administration.': {hi:'राजस्व, नगरपालिका, वन एवं सेवा विधि प्रशासन के लिए रणनीतिक विधिक मार्गदर्शन प्रदान करना।',ur:'محصولات، بلدیاتی، جنگلاتی اور ملازمت کے قانون کے انتظام کے لیے حکمتِ عملی پر مبنی قانونی رہنمائی فراہم کرنا۔'},
-      'Curated repository of constitutional rulings, law reports, and Jammu & Kashmir legislative gazettes.': {hi:'संवैधानिक निर्णयों, विधि रिपोर्टों और जम्मू-कश्मीर विधायी राजपत्रों का संकलित भंडार।',ur:'آئینی فیصلوں، قانونی رپورٹوں اور جموں و کشمیر قانون سازی کے گزٹ کا منتخب ذخیرہ۔'},
-      'Diligent tracking of daily case dockets, cause lists, and communication across all subordinate courts.': {hi:'सभी अधीनस्थ न्यायालयों में दैनिक मामला डॉकेट, वाद सूचियों और संचार की परिश्रमपूर्वक निगरानी।',ur:'تمام ماتحت عدالتوں میں روزانہ مقدمات کی ڈاکٹ، فہرستِ مقدمات اور ابلاغ کی محنت سے نگرانی۔'},
-      'Systematic monitoring of active government suits, appeal timelines, and court compliance mandates.': {hi:'सक्रिय सरकारी वादों, अपील समयसीमाओं और न्यायालय अनुपालन अधिदेशों की व्यवस्थित निगरानी।',ur:'زیرِ سماعت سرکاری مقدمات، اپیل کی مدتوں اور عدالتی تعمیل کے احکامات کی منظم نگرانی۔'},
-      /* Footer */
-      '© 2026 District Litigation Office Kupwara. UT of Jammu & Kashmir. All rights reserved.': {hi:'© 2026 जिला वाद कार्यालय कुपवाड़ा। जम्मू और कश्मीर केंद्र शासित प्रदेश। सर्वाधिकार सुरक्षित।',ur:'© 2026 ضلعی دفترِ مقدمات کپواڑہ۔ مرکز کے زیرِ انتظام خطہ جموں و کشمیر۔ جملہ حقوق محفوظ ہیں۔'},
-      'Quick Access': {hi:'त्वरित अभिगम',ur:'فوری رسائی'},
-      'My Cases': {hi:'मेरे मामले',ur:'میرے مقدمات'},
-      'Strategic State Representation with Institutional Precision': {hi:'संस्थागत सटीकता के साथ रणनीतिक सरकारी प्रतिनिधित्व',ur:'ادارتی درستگی کے ساتھ حکمتِ عملی پر مبنی سرکاری نمائندگی'},
-      'Safeguarding government interest and directing statutory compliance across 12 designated judicial forums in Kupwara district.': {hi:'कुपवाड़ा जिले के 12 निर्दिष्ट न्यायिक मंचों में सरकारी हितों की रक्षा तथा वैधानिक अनुपालन का मार्गदर्शन।',ur:'ضلع کپواڑہ کے 12 مقررہ عدالتی فورمز میں سرکاری مفادات کا تحفظ اور قانونی تعمیل کی رہنمائی۔'},
-      'Administrative Vigilance & Judicial Coordination': {hi:'प्रशासनिक सतर्कता एवं न्यायिक समन्वय',ur:'انتظامی نگرانی اور عدالتی رابطہ کاری'},
-      'Coordinating timely government defense, objections, and legal representation from district headquarters.': {hi:'जिला मुख्यालय से समयबद्ध सरकारी प्रतिरक्षा, आपत्तियों एवं विधिक प्रतिनिधित्व का समन्वय।',ur:'ضلعی صدر مقام سے بروقت سرکاری دفاع، اعتراضات اور قانونی نمائندگی کی رابطہ کاری۔'},
-      'Rigorous Scrutiny & Timely Compliance': {hi:'कठोर जांच एवं समयबद्ध अनुपालन',ur:'سخت جانچ اور بروقت تعمیل'},
-      'Ensuring government objections, parawise replies, and compliance reports are thoroughly vetted prior to listed hearings.': {hi:'यह सुनिश्चित करना कि सूचीबद्ध सुनवाइयों से पूर्व सरकारी आपत्तियों, पैरा-वार जवाबों और अनुपालन रिपोर्टों की गहन जांच हो।',ur:'یہ یقینی بنانا کہ مقررہ سماعتوں سے قبل سرکاری اعتراضات، پیرا وار جوابات اور تعمیلی رپورٹس کی مکمل جانچ ہو۔'},
-      'Deliberate Strategy & Pleading Scrutiny': {hi:'सुनियोजित रणनीति एवं अभिवचन की जांच',ur:'سوچی سمجھی حکمتِ عملی اور عرضِ دعویٰ کی جانچ'},
-      'Multi-layered vetting of department submissions to prevent adverse judicial orders and contempt proceedings.': {hi:'प्रतिकूल न्यायिक आदेशों और अवमानना कार्यवाहियों से बचाव हेतु विभागीय प्रस्तुतियों की बहु-स्तरीय जांच।',ur:'ناموافق عدالتی احکامات اور توہینِ عدالت کی کارروائی سے بچاؤ کے لیے محکمانہ پیشکشوں کی متعدد سطحوں پر جانچ۔'},
-      'Departmental Advisory & Pre-Litigation Counsel': {hi:'विभागीय परामर्श एवं वाद-पूर्व विधिक सलाह',ur:'محکمانہ مشاورت اور مقدمہ سے قبل قانونی مشورہ'},
-      'Judicial Precedent & Statutory Authority': {hi:'न्यायिक दृष्टांत एवं वैधानिक प्राधिकार',ur:'عدالتی نظیر اور قانونی اختیار'},
-      'Dedicated Legal Cadre & Public Integrity': {hi:'समर्पित विधिक संवर्ग एवं लोकनिष्ठा',ur:'وقف قانونی عملہ اور عوامی دیانت داری'},
-      'Transparent Governance Through Digital Precision': {hi:'डिजिटल सटीकता के माध्यम से पारदर्शी शासन',ur:'ڈیجیٹل درستگی کے ذریعے شفاف حکمرانی'},
-      'Departmental Portal Gateway': {hi:'विभागीय पोर्टल प्रवेशद्वार',ur:'محکمانہ پورٹل گیٹ وے'},
-      'Authenticate & Open Submissions': {hi:'प्रमाणित करें एवं प्रस्तुतियां खोलें',ur:'توثیق کریں اور جمع شدہ دستاویزات کھولیں'}
-    }
-  }
-};
+        'index': {
+      'District Litigation Office Kupwara | Official Legal Registry': {
+        hi: 'जिला वाद कार्यालय कुपवाड़ा | आधिकारिक विधिक रजिस्ट्री',
+        ur: 'ضلعی دفترِ مقدمات کپواڑہ | سرکاری قانونی رجسٹری'
+      },
+      'Kupwara District Jurisdiction': {
+        hi: 'कुपवाड़ा जिला क्षेत्राधिकार',
+        ur: 'ضلع کپواڑہ کا دائرہ اختیار'
+      },
+      'Dept. of Law, Justice & Parliamentary Affairs': {
+        hi: 'विधि, न्याय एवं संसदीय कार्य विभाग',
+        ur: 'محکمہ قانون، انصاف و پارلیمانی امور'
+      },
+      'DC Office Complex · Kupwara': {
+        hi: 'डीसी कार्यालय परिसर · कुपवाड़ा',
+        ur: 'ڈی سی آفس کمپلیکس · کپواڑہ'
+      },
+      'Administrative Registry · Kupwara': {
+        hi: 'प्रशासनिक रजिस्ट्री · कुपवाड़ा',
+        ur: 'انتظامی رجسٹری · کپواڑہ'
+      },
+      'Litigation Scrutiny Registry': {
+        hi: 'वाद जांच रजिस्ट्री',
+        ur: 'مقدمات جانچ رجسٹری'
+      },
+      'Legal Consultation Chamber': {
+        hi: 'विधिक परामर्श कक्ष',
+        ur: 'قانونی مشاورت چیمبر'
+      },
+      'Law Library & Legal Archives': {
+        hi: 'विधि पुस्तकालय एवं विधिक अभिलेखागार',
+        ur: 'قانون کی لائبریری اور قانونی محفوظہ'
+      },
+      'Administrative Team · DLO Kupwara': {
+        hi: 'प्रशासनिक टीम · जिला वाद कार्यालय कुपवाड़ा',
+        ur: 'انتظامی ٹیم · ضلعی دفترِ مقدمات کپواڑہ'
+      },
+      'Case Management Registry': {
+        hi: 'मामला प्रबंधन रजिस्ट्री',
+        ur: 'مقدمات انتظام رجسٹری'
+      },
 
+      /* Hero slide headlines & body (exact current index.html copy) */
+      'Strategic State Representation with': {
+        hi: 'रणनीतिक सरकारी प्रतिनिधित्व के साथ',
+        ur: 'حکمتِ عملی پر مبنی سرکاری نمائندگی کے ساتھ'
+      },
+      'Institutional Precision': {
+        hi: 'संस्थागत सटीकता',
+        ur: 'ادارتی درستگی'
+      },
+      'Safeguarding government interest and supporting statutory compliance across designated judicial forums in Kupwara district.': {
+        hi: 'कुपवाड़ा जिले के निर्दिष्ट न्यायिक मंचों में सरकारी हितों की रक्षा तथा वैधानिक अनुपालन का समर्थन।',
+        ur: 'ضلع کپواڑہ کے مقررہ عدالتی فورمز میں سرکاری مفادات کا تحفظ اور قانونی تعمیل کی حمایت۔'
+      },
+
+      'Administrative Vigilance &': {
+        hi: 'प्रशासनिक सतर्कता एवं',
+        ur: 'انتظامی نگرانی اور'
+      },
+      'Litigation Coordination': {
+        hi: 'वाद समन्वय',
+        ur: 'مقدمات کی رابطہ کاری'
+      },
+      'Coordinating timely government defense, objections, and legal representation from district headquarters.': {
+        hi: 'जिला मुख्यालय से समयबद्ध सरकारी प्रतिरक्षा, आपत्तियों एवं विधिक प्रतिनिधित्व का समन्वय।',
+        ur: 'ضلعی صدر مقام سے بروقت سرکاری دفاع، اعتراضات اور قانونی نمائندگی کی رابطہ کاری۔'
+      },
+
+      'Working To Ensure': {
+        hi: 'यह सुनिश्चित करने हेतु',
+        ur: 'اس بات کو یقینی بنانے کے لیے'
+      },
+      'Rigorous Scrutiny & Timely Compliance': {
+        hi: 'कठोर जांच एवं समयबद्ध अनुपालन',
+        ur: 'سخت جانچ اور بروقت تعمیل'
+      },
+      'Ensuring government objections, parawise replies, and compliance reports are thoroughly vetted prior to listed hearings.': {
+        hi: 'यह सुनिश्चित करना कि सूचीबद्ध सुनवाइयों से पूर्व सरकारी आपत्तियों, पैरा-वार जवाबों और अनुपालन रिपोर्टों की गहन जांच हो।',
+        ur: 'یہ یقینی بنانا کہ مقررہ سماعتوں سے قبل سرکاری اعتراضات، پیرا وار جوابات اور تعمیلی رپورٹس کی مکمل جانچ ہو۔'
+      },
+
+      'Deliberate Strategy &': {
+        hi: 'सुनियोजित रणनीति एवं',
+        ur: 'سوچی سمجھی حکمتِ عملی اور'
+      },
+      'Pleading Scrutiny': {
+        hi: 'अभिवचन की जांच',
+        ur: 'عرضِ دعویٰ کی جانچ'
+      },
+      'Multi-level vetting of departmental submissions to support accurate filings and timely compliance with court directions.': {
+        hi: 'सटीक दाखिलों और न्यायालय के निर्देशों के समयबद्ध अनुपालन हेतु विभागीय प्रस्तुतियों की बहु-स्तरीय जांच।',
+        ur: 'درست داخلگیوں اور عدالتی ہدایات کی بروقت تعمیل کی حمایت کے لیے محکمانہ پیشکشوں کی متعدد سطحوں پر جانچ۔'
+      },
+
+      'Departmental Coordination &': {
+        hi: 'विभागीय समन्वय एवं',
+        ur: 'محکمانہ رابطہ کاری اور'
+      },
+      'Legal Support.': {
+        hi: 'विधिक सहायता।',
+        ur: 'قانونی معاونت۔'
+      },
+      'Directing strategic legal guidance for revenue, municipal, forest, and service law administration.': {
+        hi: 'राजस्व, नगरपालिका, वन एवं सेवा विधि प्रशासन हेतु रणनीतिक विधिक मार्गदर्शन।',
+        ur: 'محصولات، بلدیہ، جنگلات اور ملازمت کے قانون کے انتظام کے لیے حکمتِ عملی پر مبنی قانونی رہنمائی۔'
+      },
+
+      'Judicial Precedents &': {
+        hi: 'न्यायिक दृष्टांत एवं',
+        ur: 'عدالتی نظائر اور'
+      },
+      'Legislative References.': {
+        hi: 'विधायी संदर्भ।',
+        ur: 'قانونی حوالہ جات۔'
+      },
+      'Curated repository of constitutional rulings, law reports, and Jammu & Kashmir legislative gazettes.': {
+        hi: 'संवैधानिक निर्णयों, विधि रिपोर्टों तथा जम्मू एवं कश्मीर विधायी राजपत्रों का चयनित भंडार।',
+        ur: 'آئینی فیصلوں، قانونی رپورٹس اور جموں و کشمیر کے قانونی گزٹوں کا منتخب ذخیرہ۔'
+      },
+
+      'Dedicated Team&': {
+        hi: 'समर्पित टीम एवं',
+        ur: 'وقف ٹیم اور'
+      },
+      'Public Service': {
+        hi: 'लोक सेवा',
+        ur: 'عوامی خدمت'
+      },
+      'Diligent tracking of daily case dockets, cause lists, and communication across subordinate courts.': {
+        hi: 'अधीनस्थ न्यायालयों में दैनिक मामला पंजिकाओं, वाद सूचियों एवं संचार का सतर्क अनुसरण।',
+        ur: 'ماتحت عدالتوں میں روزانہ مقدمات کی فہرستوں، فہرستِ مقدمات اور مواصلات کا محتاط سراغ۔'
+      },
+
+      'Working towards': {
+        hi: 'इस दिशा में कार्य',
+        ur: 'اس جانب کام'
+      },
+      'Greater Accuracy': {
+        hi: 'अधिक सटीकता',
+        ur: 'زیادہ درستگی'
+      },
+      'Systematic monitoring of active government suits, appeal timelines, and court compliance mandates.': {
+        hi: 'सक्रिय सरकारी वादों, अपील की समय-सीमाओं एवं न्यायालय अनुपालन आज्ञाओं की व्यवस्थित निगरानी।',
+        ur: 'زیرِ سماعت سرکاری مقدمات، اپیل کی میعادوں اور عدالتی تعمیلی ہدایات کی منظم نگرانی۔'
+      },
+
+      /* Updates panel */
+      'More Updates': {
+        hi: 'और अद्यतन',
+        ur: 'مزید تازہ ترین'
+      },
+      'DLO Kupwara — Latest Updates': {
+        hi: 'जिला वाद कार्यालय कुपवाड़ा — नवीनतम अद्यतन',
+        ur: 'ضلعی دفترِ مقدمات کپواڑہ — تازہ ترین معلومات'
+      },
+      'Loading updates…': {
+        hi: 'अद्यतन लोड हो रहे हैं…',
+        ur: 'تازہ ترین معلومات لوڈ ہو رہی ہیں…'
+      },
+      'No updates are available right now. The homepage messages remain in place.': {
+        hi: 'इस समय कोई अद्यतन उपलब्ध नहीं है। मुख्य पृष्ठ के संदेश यथावत हैं।',
+        ur: 'اس وقت کوئی تازہ ترین معلومات دستیاب نہیں۔ مرکزی صفحے کے پیغامات برقرار ہیں۔'
+      },
+      'Further Updates & Circulars →': {
+        hi: 'अधिक अद्यतन एवं परिपत्र →',
+        ur: 'مزید تازہ ترین معلومات اور سرکلر →'
+      },
+
+      /* Departmental auth modal */
+      'Departmental Portal Gateway': {
+        hi: 'विभागीय पोर्टल प्रवेशद्वार',
+        ur: 'محکمانہ پورٹل گیٹ وے'
+      },
+      'Authenticate to upload compliance reports, parawise replies, or submit requests for legal scrutiny.': {
+        hi: 'अनुपालन रिपोर्ट, पैरा-वार जवाब अपलोड करने या विधिक जांच हेतु अनुरोध प्रस्तुत करने के लिए प्रमाणित करें।',
+        ur: 'تعمیلی رپورٹس، پیرا وار جوابات اپ لوڈ کرنے یا قانونی جانچ کی درخواست جمع کرانے کے لیے توثیق کریں۔'
+      },
+      'Stakeholder Department': {
+        hi: 'हितधारक विभाग',
+        ur: 'متعلقہ محکمہ'
+      },
+      'Revenue Department': {
+        hi: 'राजस्व विभाग',
+        ur: 'محکمہ محصولات'
+      },
+      'Urban Local Bodies (ULB)': {
+        hi: 'नगरीय स्थानीय निकाय (ULB)',
+        ur: 'شہری مقامی ادارے (ULB)'
+      },
+      'Power Development Department (PDD)': {
+        hi: 'विद्युत विकास विभाग (PDD)',
+        ur: 'محکمہ بجلی کی ترقی (PDD)'
+      },
+      'Public Works Department (R&B)': {
+        hi: 'लोक निर्माण विभाग (R&B)',
+        ur: 'محکمہ تعمیراتِ عامہ (R&B)'
+      },
+      'Rural Development Department': {
+        hi: 'ग्रामीण विकास विभाग',
+        ur: 'محکمہ دیہی ترقی'
+      },
+      'School Education': {
+        hi: 'स्कूल शिक्षा',
+        ur: 'اسکول تعلیم'
+      },
+      'Jal Shakti / PHE': {
+        hi: 'जल शक्ति / PHE',
+        ur: 'جل شکتی / PHE'
+      },
+      'Forest & Environment': {
+        hi: 'वन एवं पर्यावरण',
+        ur: 'جنگلات اور ماحولیات'
+      },
+      'Department Nodal Code': {
+        hi: 'विभागीय नोडल कोड',
+        ur: 'محکمانہ نوڈل کوڈ'
+      },
+      'Security Passcode': {
+        hi: 'सुरक्षा पासकोड',
+        ur: 'سیکیورٹی پاس کوڈ'
+      },
+      'Authenticate & Open Submissions': {
+        hi: 'प्रमाणित करें एवं प्रस्तुतियां खोलें',
+        ur: 'توثیق کریں اور جمع شدہ دستاویزات کھولیں'
+      },
+
+      /* Image alt texts (keep consistent with current slides) */
+      'DC Office Complex Kupwara': {
+        hi: 'डीसी कार्यालय परिसर कुपवाड़ा',
+        ur: 'ڈی سی آفس کمپلیکس کپواڑہ'
+      },
+      'Administrative Wing Kupwara': {
+        hi: 'प्रशासनिक विंग कुपवाड़ा',
+        ur: 'انتظامی ونگ کپواڑہ'
+      },
+      'District Litigation Office Signage': {
+        hi: 'जिला वाद कार्यालय का साइनेज',
+        ur: 'ضلعی دفترِ مقدمات کا نشان'
+      },
+      'Litigation Registry & Verification Desk': {
+        hi: 'वाद रजिस्ट्री एवं सत्यापन डेस्क',
+        ur: 'مقدمات رجسٹری اور تصدیقی میز'
+      },
+      'Executive Legal Consultation Chamber': {
+        hi: 'कार्यकारी विधिक परामर्श कक्ष',
+        ur: 'انتظامی قانونی مشاورت چیمبر'
+      },
+      'Law Library & Legal Reference Archive': {
+        hi: 'विधि पुस्तकालय एवं विधिक संदर्भ अभिलेखागार',
+        ur: 'قانون کی لائبریری اور قانونی حوالہ جاتی محفوظہ'
+      },
+      'Administrative Legal Staff': {
+        hi: 'प्रशासनिक विधिक कर्मचारी',
+        ur: 'انتظامی قانونی عملہ'
+      },
+      'Litigation Coordination Team': {
+        hi: 'वाद समन्वय टीम',
+        ur: 'مقدمات رابطہ کاری ٹیم'
+      }
+    },
 // Dictionary-only accessors. These do not modify the existing site architecture.
 /* Exact institutional vocabulary: courts, judicial forums and departments. */
 (function(T){

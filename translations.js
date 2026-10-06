@@ -698,11 +698,13 @@ window.DLO_TRANSLATIONS = {
         hi: 'प्रशासनिक विधिक कर्मचारी',
         ur: 'انتظامی قانونی عملہ'
       },
-      'Litigation Coordination Team': {
+            'Litigation Coordination Team': {
         hi: 'वाद समन्वय टीम',
         ur: 'مقدمات رابطہ کاری ٹیم'
       }
-    },
+    }
+  }
+};
 // Dictionary-only accessors. These do not modify the existing site architecture.
 /* Exact institutional vocabulary: courts, judicial forums and departments. */
 (function(T){

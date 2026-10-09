@@ -2965,7 +2965,7 @@ document.addEventListener('DOMContentLoaded', function () {
   async function initDloMascot() {
     try {
       // Absolute path – works even with clean URLs (/app)
-      const res = await fetch('/assets/my-mascot.avatar.json');
+      const res = await fetch('/assets/avatar/my-mascot.avatar.json');
       if (!res.ok) throw new Error('Avatar JSON not found (HTTP ' + res.status + ')');
       const definition = await res.json();
 

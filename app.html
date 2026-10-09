@@ -1900,26 +1900,25 @@ html.app-mode body.light-mode .app-topbar .at-brand-text small { color:#637991; 
   html.app-mode .app-action-card,
   html.app-mode .app-glance-item { animation:none !important; transition:none !important; }
 }
-  /* ── DLO Mascot ─────────────────────────────────────────── */
-/* ── DLO Mascot ─────────────────────────────────────────── */
-/* ── DLO Mascot ─────────────────────────────────────────── */
-/* ── DLO Professional Mascot ─────────────────────────────── */
+ /* ── DLO Grok-style Mascot ──────────────────────────────── */
 #dlo-mascot {
   position: fixed;
   bottom: 88px;
   right: 14px;
-  width: 78px;
-  height: 78px;
+  width: 82px;
+  height: 82px;
   z-index: 1300;
   cursor: pointer;
   border-radius: 50%;
-  overflow: visible;
-  transition: transform 0.25s ease;
-  filter: drop-shadow(0 6px 16px rgba(0,0,0,0.35));
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 #dlo-mascot:hover {
-  transform: scale(1.08);
+  transform: scale(1.07);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.55);
 }
 
 .mascot-svg {
@@ -1928,122 +1927,84 @@ html.app-mode body.light-mode .app-topbar .at-brand-text small { color:#637991; 
   display: block;
 }
 
-/* Head */
+/* Head – pure black */
 .mascot-head {
-  fill: #0f1c2e;
-  stroke: #c5a059;
-  stroke-width: 2.5;
+  fill: #000000;
 }
 
-body.light-mode .mascot-head {
-  fill: #f8fafc;
-  stroke: #967433;
-}
-
-/* Soft glow */
-.mascot-glow {
-  fill: rgba(197, 160, 89, 0.12);
-}
-
-body.light-mode .mascot-glow {
-  fill: rgba(150, 116, 51, 0.10);
-}
-
-/* Eyes */
+/* Eyes – pure white */
 .eye {
-  fill: #e2e8f0;
-  transition: all 0.3s ease;
-}
-body.light-mode .eye {
-  fill: #1e293b;
+  fill: #ffffff;
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pupil {
-  fill: #0f172a;
-  transition: all 0.3s ease;
-}
-body.light-mode .pupil {
-  fill: #f8fafc;
-}
-
-/* Mouth */
-.mascot-mouth {
-  stroke: #94a3b8;
-  transition: all 0.3s ease;
-}
-body.light-mode .mascot-mouth {
-  stroke: #64748b;
-}
-
-/* ── Animations ── */
+/* ── Idle breathing + blink ── */
 @keyframes mascot-breathe {
   0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.03); }
+  50%      { transform: scale(1.025); }
 }
-
 @keyframes mascot-blink {
-  0%, 42%, 100% { transform: scaleY(1); }
-  45%, 50%     { transform: scaleY(0.1); }
+  0%, 40%, 100% { transform: scaleY(1); }
+  44%, 48%     { transform: scaleY(0.08); }
 }
 
 #dlo-mascot.idle .mascot-svg {
-  animation: mascot-breathe 4s ease-in-out infinite;
+  animation: mascot-breathe 3.8s ease-in-out infinite;
 }
 #dlo-mascot.idle .eye {
-  animation: mascot-blink 5s ease-in-out infinite;
+  animation: mascot-blink 4.8s ease-in-out infinite;
 }
 
-/* Thinking – eyes look up slightly */
-#dlo-mascot.thinking .pupil.left  { cx: 34; cy: 40; }
-#dlo-mascot.thinking .pupil.right { cx: 62; cy: 40; }
-#dlo-mascot.thinking .mascot-mouth {
-  d: path("M42 64 Q50 62 58 64");
-}
+/* ── Thinking (eyes look upward) ── */
+#dlo-mascot.thinking .eye.left  { cy: 44; ry: 12; }
+#dlo-mascot.thinking .eye.right { cy: 44; ry: 12; }
 
-/* Happy */
+/* ── Happy (wider, slightly squished) ── */
 #dlo-mascot.happy .eye {
-  ry: 6;
-}
-#dlo-mascot.happy .mascot-mouth {
-  d: path("M38 60 Q50 72 62 60");
-  stroke: #c5a059;
+  ry: 9;
+  rx: 13;
 }
 
-/* Celebrate – bigger smile + slight bounce */
+/* ── Celebrate (big wide eyes + bounce) ── */
 #dlo-mascot.celebrate .mascot-svg {
-  animation: mascot-breathe 0.8s ease-in-out infinite;
+  animation: mascot-breathe 0.7s ease-in-out infinite;
 }
-#dlo-mascot.celebrate .eye { ry: 5.5; }
-#dlo-mascot.celebrate .mascot-mouth {
-  d: path("M36 58 Q50 74 64 58");
-  stroke: #c5a059;
-  stroke-width: 3;
-}
-
-/* Confused */
-#dlo-mascot.confused .pupil.left  { cx: 38; cy: 46; }
-#dlo-mascot.confused .pupil.right { cx: 66; cy: 42; }
-#dlo-mascot.confused .mascot-mouth {
-  d: path("M42 66 Q50 62 58 66");
+#dlo-mascot.celebrate .eye {
+  ry: 16;
+  rx: 13;
+  cy: 50;
 }
 
-/* Sad / no results */
-#dlo-mascot.sad .eye { ry: 6; }
-#dlo-mascot.sad .pupil { cy: 48; }
-#dlo-mascot.sad .mascot-mouth {
-  d: path("M40 68 Q50 62 60 68");
+/* ── Confused (asymmetric) ── */
+#dlo-mascot.confused .eye.left  { cy: 56; rx: 9;  ry: 11; }
+#dlo-mascot.confused .eye.right { cy: 48; rx: 12; ry: 14; }
+
+/* ── Sad / no results (half-closed) ── */
+#dlo-mascot.sad .eye {
+  ry: 6;
+  cy: 56;
+}
+
+/* ── Sleepy ── */
+#dlo-mascot.sleepy .eye {
+  ry: 3.5;
+  cy: 54;
+}
+
+/* Light mode – keep black head for the classic Grok look */
+body.light-mode #dlo-mascot {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
 }
 
 /* Mobile */
 @media (max-width: 400px) {
   #dlo-mascot {
-    width: 68px;
-    height: 68px;
+    width: 70px;
+    height: 70px;
     bottom: 80px;
     right: 10px;
   }
-}
-</style>
+}</style>
 </head>
 <body>
 <script>if (!document.documentElement.classList.contains('app-mode')) DLO.injectMenu();</script>
@@ -3102,30 +3063,62 @@ document.addEventListener('DOMContentLoaded', function () {
   el.addEventListener('click', () => window.dloMascot.play('celebrate'));
 })();
 </script>
-  
-<!-- DLO Professional Mascot -->
+  <!-- DLO Grok-style Mascot -->
 <div id="dlo-mascot" aria-hidden="true" title="DLO Assistant">
-  <svg viewBox="0 0 100 100" class="mascot-svg">
-    <!-- Soft outer glow circle -->
-    <circle class="mascot-glow" cx="50" cy="50" r="46"/>
-    
-    <!-- Main head -->
-    <circle class="mascot-head" cx="50" cy="50" r="42"/>
-    
-    <!-- Eyes group -->
+  <svg class="mascot-svg" viewBox="0 0 120 120">
+    <!-- Head -->
+    <circle class="mascot-head" cx="60" cy="60" r="52"/>
+
+    <!-- Eyes -->
     <g class="mascot-eyes">
       <!-- Left eye -->
-      <ellipse class="eye left" cx="36" cy="44" rx="7" ry="9"/>
-      <circle class="pupil left" cx="36" cy="45" r="3.2"/>
-      
+      <ellipse class="eye left" cx="42" cy="52" rx="11" ry="15"/>
       <!-- Right eye -->
-      <ellipse class="eye right" cx="64" cy="44" rx="7" ry="9"/>
-      <circle class="pupil right" cx="64" cy="45" r="3.2"/>
+      <ellipse class="eye right" cx="78" cy="52" rx="11" ry="15"/>
     </g>
-    
-    <!-- Subtle mouth (changes with expression) -->
-    <path class="mascot-mouth" d="M40 62 Q50 68 60 62" fill="none" stroke-width="2.5" stroke-linecap="round"/>
   </svg>
 </div>
+  <script>
+(function () {
+  const el = document.getElementById('dlo-mascot');
+  if (!el) return;
+
+  const states = ['idle', 'thinking', 'happy', 'celebrate', 'confused', 'sad', 'sleepy'];
+  let timer = null;
+
+  function setState(name) {
+    states.forEach(s => el.classList.remove(s));
+    el.classList.add(name || 'idle');
+  }
+
+  window.dloMascot = {
+    play: function (name) {
+      if (!states.includes(name)) name = 'idle';
+      setState(name);
+
+      // Auto return to idle (except when already idle)
+      clearTimeout(timer);
+      if (name !== 'idle') {
+        timer = setTimeout(() => setState('idle'), 3400);
+      }
+    },
+    idle:      function () { this.play('idle'); },
+    thinking:  function () { this.play('thinking'); },
+    happy:     function () { this.play('happy'); },
+    celebrate: function () { this.play('celebrate'); },
+    confused:  function () { this.play('confused'); },
+    sad:       function () { this.play('sad'); },
+    sleepy:    function () { this.play('sleepy'); }
+  };
+
+  // Start idle
+  setState('idle');
+
+  // Click → celebrate
+  el.addEventListener('click', () => window.dloMascot.play('celebrate'));
+})();
+</script>
+<script src="assistant-bridge.js"></script>
+<script src="assistant.js"></script>
 </body>
 </html>

@@ -2959,43 +2959,188 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 </script>
   <script type="module">
-  import { createAvatar } from 'https://cdn.jsdelivr.net/npm/@bible-strong/avatar-web@0.1.0/+esm';
+/**
+ * CSP-safe DLO mascot — uses avatar-core playback/render only.
+ * Does NOT call validateAvatarDefinition (AJV / unsafe-eval).
+ * JSON is first-party; treat updates as trusted.
+ */
+import {
+  renderAvatarDefinition,
+  createAvatarPlaybackState,
+  playAvatarAnimation,
+  advanceAvatarPlayback,
+  sampleAvatarFrame,
+  renderAvatarFrame,
+  resolveAnimation,
+} from 'https://cdn.jsdelivr.net/npm/@bible-strong/avatar-core@0.1.0/+esm';
 
-  async function initDloMascot() {
-    try {
-      const res = await fetch('./assets/my-mascot.avatar.json');
-      if (!res.ok) throw new Error('Avatar JSON not found');
-      const definition = await res.json();
+const NS = 'http://www.w3.org/2000/svg';
+const SIZE = 110; // match #dlo-mascot box
 
-      const avatar = createAvatar('#dlo-mascot', {
-        definition,
-        defaultAnimation: 'idle'   // change later if your export uses a different name
-      });
+function el(name) {
+  return document.createElementNS(NS, name);
+}
 
-      // Make it globally available so we can control it later from assistant.js
-      window.dloMascot = avatar;
+function mountSvg(host, size) {
+  host.replaceChildren();
+  const wrap = document.createElement('span');
+  wrap.className = 'bs-avatar';
+  Object.assign(wrap.style, {
+    display: 'block',
+    width: size + 'px',
+    height: size + 'px',
+  });
+  wrap.setAttribute('role', 'img');
+  wrap.setAttribute('aria-label', 'DLO assistant mascot');
 
-      // Optional: gentle click reaction
-      document.getElementById('dlo-mascot').addEventListener('click', () => {
-        // Try a few common animation names – the library will ignore unknown ones
-        avatar.play('celebrate') || avatar.play('happy') || avatar.play('joyful-wide');
-      });
+  const svg = el('svg');
+  svg.setAttribute('viewBox', '-150 -150 300 300');
+  svg.setAttribute('aria-hidden', 'true');
+  Object.assign(svg.style, { display: 'block', width: '100%', height: '100%' });
 
-      console.log('DLO Mascot ready');
-    } catch (err) {
-      console.warn('Mascot failed to load:', err);
+  const defs = el('defs');
+  const clip = el('clipPath');
+  const clipId = 'dlo-mascot-clip';
+  clip.id = clipId;
+  const clipPath = el('path');
+  clip.append(clipPath);
+  defs.append(clip);
+
+  const back = [el('path'), el('path')];
+  const head = el('path');
+  const eyesG = el('g');
+  eyesG.setAttribute('clip-path', `url(#${clipId})`);
+  const left = el('path');
+  const right = el('path');
+  eyesG.append(left, right);
+  const front = [el('path'), el('path')];
+
+  svg.append(defs, ...back, head, eyesG, ...front);
+  wrap.append(svg);
+  host.append(wrap);
+
+  return { clipPath, head, left, right, back, front };
+}
+
+function paint(nodes, scene) {
+  const g = scene.geometry;
+  const c = scene.colors;
+  nodes.clipPath.setAttribute('d', g.headPath);
+  nodes.head.setAttribute('d', g.headPath);
+  nodes.head.setAttribute('fill', c.body);
+  nodes.left.setAttribute('d', g.leftPath);
+  nodes.left.setAttribute('fill', c.eyes);
+  nodes.left.setAttribute('opacity', g.leftVisible ? '1' : '0');
+  nodes.right.setAttribute('d', g.rightPath);
+  nodes.right.setAttribute('fill', c.eyes);
+  nodes.right.setAttribute('opacity', g.rightVisible ? '1' : '0');
+  nodes.back.forEach((p, i) => {
+    p.setAttribute('d', g.backPaths[i] || '');
+    p.setAttribute('fill', c.body);
+  });
+  nodes.front.forEach((p, i) => {
+    p.setAttribute('d', g.frontPaths[i] || '');
+    p.setAttribute('fill', c.body);
+  });
+}
+
+function createCspSafeAvatar(host, definition, defaultAnimation = 'idle') {
+  const nodes = mountSvg(host, SIZE);
+  let state = createAvatarPlaybackState();
+  let raf = null;
+  let dead = false;
+  let sample = null;
+
+  const env = () => ({
+    random: Math.random,
+    reduceMotion: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+  });
+
+  const draw = (t) => {
+    sample = sampleAvatarFrame(definition, state, t, env());
+    paint(nodes, renderAvatarFrame(definition, state, t, env()));
+  };
+
+  const tick = (t) => {
+    if (dead) return;
+    raf = null;
+    const wasPlaying = state.status === 'playing';
+    const anim = state.activeAnimation;
+    state = advanceAvatarPlayback(definition, state, t, {
+      random: Math.random,
+      reduceMotion: env().reduceMotion,
+    });
+    draw(t);
+    if (wasPlaying && state.status === 'stopped' && anim) {
+      // optional: loop idle after one-shot anims
+      if (anim !== 'idle') controller.play('idle');
     }
-  }
+    if (state.status === 'playing') raf = requestAnimationFrame(tick);
+  };
 
-  // Start after the page is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDloMascot);
-  } else {
-    initDloMascot();
+  const startLoop = () => {
+    if (raf == null && !dead) raf = requestAnimationFrame(tick);
+  };
+
+  const controller = {
+    play(name) {
+      const t = performance.now();
+      const frame = sample ?? sampleAvatarFrame(definition, state, t, env());
+      const next = playAvatarAnimation(definition, name, t, frame);
+      if (!next.ok) return false;
+      state = next.value;
+      draw(performance.now());
+      startLoop();
+      return true;
+    },
+    stop() {
+      state = createAvatarPlaybackState();
+      if (raf != null) cancelAnimationFrame(raf);
+      raf = null;
+      paint(nodes, renderAvatarDefinition(definition));
+    },
+    destroy() {
+      dead = true;
+      if (raf != null) cancelAnimationFrame(raf);
+      host.replaceChildren();
+    },
+  };
+
+  // Initial neutral / idle
+  paint(nodes, renderAvatarDefinition(definition));
+  if (defaultAnimation && resolveAnimation(definition, defaultAnimation).ok) {
+    controller.play(defaultAnimation);
   }
+  return controller;
+}
+
+async function initDloMascot() {
+  const host = document.getElementById('dlo-mascot');
+  if (!host) return;
+  try {
+    const res = await fetch('./assets/my-mascot.avatar.json', { cache: 'force-cache' });
+    if (!res.ok) throw new Error('Avatar JSON not found');
+    const definition = await res.json();
+
+    // Trust first-party JSON only — never load definitions from untrusted URLs
+    const avatar = createCspSafeAvatar(host, definition, 'idle');
+    window.dloMascot = avatar;
+
+    host.addEventListener('click', () => {
+      avatar.play('celebrate') || avatar.play('happy') || avatar.play('joyful-wide');
+    });
+    console.log('DLO Mascot ready (CSP-safe)');
+  } catch (err) {
+    console.warn('Mascot failed to load:', err);
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDloMascot);
+} else {
+  initDloMascot();
+}
 </script>
-<script src="assistant-bridge.js"></script>
-<script src="assistant.js"></script>
   <!-- DLO Mascot -->
 <div id="dlo-mascot" aria-hidden="true"></div>
 </body>

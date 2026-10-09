@@ -3025,60 +3025,68 @@ document.addEventListener('DOMContentLoaded', function () {
 })();
 </script>
   <script>
+<script>
 (function () {
   const el = document.getElementById('dlo-mascot');
   if (!el) return;
 
-  const states = ['idle', 'thinking', 'happy', 'celebrate', 'confused', 'sad'];
+  const states = [
+    'idle', 'thinking', 'searching', 'listening',
+    'happy', 'celebrate', 'confused', 'sad', 'sleepy', 'error'
+  ];
+  let timer = null;
 
   function setState(name) {
     states.forEach(s => el.classList.remove(s));
     el.classList.add(name || 'idle');
   }
 
-  // Public API (same style as before)
   window.dloMascot = {
     play: function (name) {
-      if (states.includes(name)) {
-        setState(name);
-        // Auto return to idle after a while (except idle itself)
-        if (name !== 'idle') {
-          clearTimeout(window.__mascotTimer);
-          window.__mascotTimer = setTimeout(() => setState('idle'), 3200);
-        }
+      if (!states.includes(name)) name = 'idle';
+      setState(name);
+
+      clearTimeout(timer);
+      if (name !== 'idle') {
+        // different durations for different reactions
+        const duration = (name === 'celebrate') ? 2800 :
+                         (name === 'thinking' || name === 'searching') ? 5000 : 3200;
+        timer = setTimeout(() => setState('idle'), duration);
       }
     },
-    idle: function () { setState('idle'); },
-    thinking: function () { setState('thinking'); },
-    happy: function () { setState('happy'); },
-    celebrate: function () { setState('celebrate'); },
-    confused: function () { setState('confused'); },
-    sad: function () { setState('sad'); }
+
+    // convenient shortcuts
+    idle:      function () { this.play('idle'); },
+    thinking:  function () { this.play('thinking'); },
+    searching: function () { this.play('searching'); },
+    listening: function () { this.play('listening'); },
+    happy:     function () { this.play('happy'); },
+    celebrate: function () { this.play('celebrate'); },
+    confused:  function () { this.play('confused'); },
+    sad:       function () { this.play('sad'); },
+    sleepy:    function () { this.play('sleepy'); },
+    error:     function () { this.play('error'); }
   };
 
-  // Start in idle
+  // start idle
   setState('idle');
 
-  // Click = celebrate
+  // click = celebrate
   el.addEventListener('click', () => window.dloMascot.play('celebrate'));
 })();
-</script>
+</script></script>
   <!-- DLO Grok-style Mascot -->
+<!-- DLO Grok-style Mascot (smaller) -->
 <div id="dlo-mascot" aria-hidden="true" title="DLO Assistant">
   <svg class="mascot-svg" viewBox="0 0 120 120">
-    <!-- Head -->
     <circle class="mascot-head" cx="60" cy="60" r="52"/>
-
-    <!-- Eyes -->
     <g class="mascot-eyes">
-      <!-- Left eye -->
-      <ellipse class="eye left" cx="42" cy="52" rx="11" ry="15"/>
-      <!-- Right eye -->
+      <ellipse class="eye left"  cx="42" cy="52" rx="11" ry="15"/>
       <ellipse class="eye right" cx="78" cy="52" rx="11" ry="15"/>
     </g>
   </svg>
 </div>
-  <script>
+<script>
 (function () {
   const el = document.getElementById('dlo-mascot');
   if (!el) return;

@@ -18,7 +18,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com https://docs.google.com https://case-portal-proxy.dlokupwara.workers.dev; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com https://docs.google.com https://case-portal-proxy.dlokupwara.workers.dev; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
 <meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
@@ -2958,6 +2958,8 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 })();
 </script>
+  
+<div id="dlo-mascot" aria-hidden="true"></div>
   <script type="module">
   import { createAvatar } from 'https://cdn.jsdelivr.net/npm/@bible-strong/avatar-web@0.1.0/+esm';
 
@@ -2995,6 +2997,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 </script>
   <!-- DLO Mascot -->
-<div id="dlo-mascot" aria-hidden="true"></div>
+<script src="assistant-bridge.js"></script>
+<script src="assistant.js"></script>
 </body>
 </html>

@@ -1902,11 +1902,12 @@ html.app-mode body.light-mode .app-topbar .at-brand-text small { color:#637991; 
 }
   /* ── DLO Mascot ─────────────────────────────────────────── */
 /* ── DLO Mascot ─────────────────────────────────────────── */
+/* ── DLO Mascot ─────────────────────────────────────────── */
 #dlo-mascot {
   position: fixed;
-  bottom: 88px;          /* above the tab bar */
+  bottom: 88px;
   right: 14px;
-  width: 86px;           /* smaller – was 110px */
+  width: 86px;
   height: 86px;
   z-index: 1300;
   pointer-events: auto;
@@ -1917,6 +1918,20 @@ html.app-mode body.light-mode .app-topbar .at-brand-text small { color:#637991; 
   backdrop-filter: blur(8px);
   transition: transform 0.22s ease, box-shadow 0.22s ease;
   cursor: pointer;
+
+  /* Critical: force the library’s 240px avatar to fit inside our circle */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#dlo-mascot .bs-avatar,
+#dlo-mascot .bs-avatar svg {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
 }
 
 #dlo-mascot:hover {
@@ -1936,8 +1951,7 @@ body.light-mode #dlo-mascot {
     bottom: 80px;
     right: 10px;
   }
-}
-</style>
+}</style>
 </head>
 <body>
 <script>if (!document.documentElement.classList.contains('app-mode')) DLO.injectMenu();</script>

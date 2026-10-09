@@ -1900,44 +1900,57 @@ html.app-mode body.light-mode .app-topbar .at-brand-text small { color:#637991; 
   html.app-mode .app-action-card,
   html.app-mode .app-glance-item { animation:none !important; transition:none !important; }
 }
- /* ── DLO Grok-style Mascot ──────────────────────────────── */
+/* ── DLO Grok Mascot (upgraded) ─────────────────────────── */
 #dlo-mascot {
   position: fixed;
-  bottom: 88px;
-  right: 14px;
-  width: 82px;
-  height: 82px;
+  bottom: 86px;
+  right: 12px;
+  width: 56px;
+  height: 56px;
   z-index: 1300;
   cursor: pointer;
   border-radius: 50%;
   overflow: hidden;
   background: #000;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
 #dlo-mascot:hover {
-  transform: scale(1.07);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.55);
+  transform: scale(1.1);
 }
-
-.mascot-svg {
+#dlo-mascot svg {
   width: 100%;
   height: 100%;
   display: block;
 }
-
-/* Head – pure black */
-.mascot-head {
-  fill: #000000;
+#dlo-mascot .head {
+  fill: #000;
+}
+#dlo-mascot .eye {
+  fill: #fff;
+  transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* Eyes – pure white */
-.eye {
-  fill: #ffffff;
-  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+/* Idle breathe */
+@keyframes dlo-breathe {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.04); }
+}
+#dlo-mascot.idle {
+  animation: dlo-breathe 3.4s ease-in-out infinite;
 }
 
+@media (max-width: 400px) {
+  #dlo-mascot {
+    width: 50px;
+    height: 50px;
+    bottom: 78px;
+    right: 10px;
+  }
+}
 /* ── Idle breathing + blink ── */
 @keyframes mascot-breathe {
   0%, 100% { transform: scale(1); }
@@ -3087,44 +3100,103 @@ document.addEventListener('DOMContentLoaded', function () {
   </svg>
 </div>
 <script>
+<script>
 (function () {
-  const el = document.getElementById('dlo-mascot');
-  if (!el) return;
+  const box = document.getElementById('dlo-mascot');
+  if (!box) return;
 
-  const states = ['idle', 'thinking', 'happy', 'celebrate', 'confused', 'sad', 'sleepy'];
+  const left  = box.querySelector('.eye.left');
+  const right = box.querySelector('.eye.right');
+
+  // All emotions with real eye shapes
+  const faces = {
+    idle: {
+      left:  { cx:35, cy:44, rx:9,  ry:13 },
+      right: { cx:65, cy:44, rx:9,  ry:13 }
+    },
+    thinking: {
+      left:  { cx:35, cy:36, rx:8,  ry:11 },
+      right: { cx:65, cy:36, rx:8,  ry:11 }
+    },
+    searching: {
+      left:  { cx:32, cy:44, rx:8,  ry:12 },
+      right: { cx:68, cy:44, rx:8,  ry:12 }
+    },
+    listening: {
+      left:  { cx:35, cy:42, rx:9,  ry:14 },
+      right: { cx:65, cy:42, rx:9,  ry:14 }
+    },
+    happy: {
+      left:  { cx:35, cy:46, rx:11, ry:8  },
+      right: { cx:65, cy:46, rx:11, ry:8  }
+    },
+    celebrate: {
+      left:  { cx:35, cy:40, rx:11, ry:15 },
+      right: { cx:65, cy:40, rx:11, ry:15 }
+    },
+    confused: {
+      left:  { cx:37, cy:48, rx:7,  ry:9  },
+      right: { cx:67, cy:40, rx:10, ry:13 }
+    },
+    sad: {
+      left:  { cx:35, cy:50, rx:9,  ry:5  },
+      right: { cx:65, cy:50, rx:9,  ry:5  }
+    },
+    sleepy: {
+      left:  { cx:35, cy:48, rx:10, ry:3  },
+      right: { cx:65, cy:48, rx:10, ry:3  }
+    },
+    error: {
+      left:  { cx:35, cy:44, rx:8,  ry:7  },
+      right: { cx:65, cy:44, rx:8,  ry:7  }
+    }
+  };
+
   let timer = null;
 
-  function setState(name) {
-    states.forEach(s => el.classList.remove(s));
-    el.classList.add(name || 'idle');
+  function apply(face) {
+    const f = faces[face] || faces.idle;
+    left.setAttribute('cx', f.left.cx);
+    left.setAttribute('cy', f.left.cy);
+    left.setAttribute('rx', f.left.rx);
+    left.setAttribute('ry', f.left.ry);
+    right.setAttribute('cx', f.right.cx);
+    right.setAttribute('cy', f.right.cy);
+    right.setAttribute('rx', f.right.rx);
+    right.setAttribute('ry', f.right.ry);
+
+    box.className = face;          // for breathe animation on idle
   }
 
   window.dloMascot = {
     play: function (name) {
-      if (!states.includes(name)) name = 'idle';
-      setState(name);
-
-      // Auto return to idle (except when already idle)
+      apply(name);
       clearTimeout(timer);
       if (name !== 'idle') {
-        timer = setTimeout(() => setState('idle'), 3400);
+        const delay = (name === 'celebrate') ? 2600 :
+                      (name === 'thinking' || name === 'searching') ? 4500 : 3000;
+        timer = setTimeout(() => apply('idle'), delay);
       }
     },
     idle:      function () { this.play('idle'); },
     thinking:  function () { this.play('thinking'); },
+    searching: function () { this.play('searching'); },
+    listening: function () { this.play('listening'); },
     happy:     function () { this.play('happy'); },
     celebrate: function () { this.play('celebrate'); },
     confused:  function () { this.play('confused'); },
     sad:       function () { this.play('sad'); },
-    sleepy:    function () { this.play('sleepy'); }
+    sleepy:    function () { this.play('sleepy'); },
+    error:     function () { this.play('error'); }
   };
 
-  // Start idle
-  setState('idle');
+  // start
+  apply('idle');
 
-  // Click → celebrate
-  el.addEventListener('click', () => window.dloMascot.play('celebrate'));
+  // click test
+  box.addEventListener('click', () => window.dloMascot.play('celebrate'));
 })();
+</script>
 </script>
 <script src="assistant-bridge.js"></script>
 <script src="assistant.js"></script>

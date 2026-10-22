@@ -1,0 +1,101 @@
+{
+  "id": "./index.html?app=1&v=3",
+  "name": "District Litigation Office Kupwara",
+  "short_name": "DLO Kupwara",
+  "description": "Official portal of the District Litigation Office Kupwara \u2014 case search, hearings, performance and analytics.",
+  "start_url": "./app.html?app=1",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B2545",
+  "theme_color": "#0B2545",
+  "lang": "en-IN",
+  "icons": [
+    {
+      "src": "icons/dlo-kupwara-app-icon-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/dlo-kupwara-app-icon.jpeg",
+      "sizes": "426x426",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/dlo-kupwara-app-icon-maskable-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/dlo-kupwara-app-icon.jpeg",
+      "sizes": "426x426",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Search Cases",
+      "short_name": "Search",
+      "url": "./search-filter-cases.html?app=1",
+      "icons": [
+        {
+          "src": "icons/shortcut-cases.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Upcoming Hearings",
+      "short_name": "Hearings",
+      "url": "./hearings.html?app=1",
+      "icons": [
+        {
+          "src": "icons/shortcut-hearings.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Performance",
+      "short_name": "Performance",
+      "url": "./performance.html?app=1",
+      "icons": [
+        {
+          "src": "icons/shortcut-performance.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "url": "./analytics.html?app=1",
+      "icons": [
+        {
+          "src": "icons/shortcut-analytics.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Department Login",
+      "short_name": "Department",
+      "url": "./department.html?app=1",
+      "icons": [
+        {
+          "src": "icons/shortcut-department.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

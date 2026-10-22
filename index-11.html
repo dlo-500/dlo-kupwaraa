@@ -1,0 +1,2529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<script>
+/* Preserve the original public homepage; route legacy installed-app URLs to the app shell. */
+(function(){
+  try {
+    var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+    var appRequested = /(?:\?|&)app=1(?:&|$)/.test(location.search || '');
+    var isHome = /(?:^|\/)(?:index\.html)?$/.test(location.pathname || '/');
+    if (isHome && (standalone || appRequested)) {
+      location.replace(new URL('./app.html?app=1', location.href).href);
+    }
+  } catch (e) {}
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https:; connect-src 'self' https://cloudflareinsights.com https://docs.google.com https://case-portal-proxy.dlokupwara.workers.dev; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;"><meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+<meta http-equiv="Permissions-Policy" content="geolocation=(), camera=(), microphone=()">
+<meta name="description" content="District Litigation Office Kupwara — Official Portal. Department of Law, Justice & Parliamentary Affairs, Government of Jammu & Kashmir.">
+<meta name="theme-color" content="#020408">
+<link rel="manifest" href="manifest.json?v=2">
+<link rel="apple-touch-icon" href="icons/dlo-kupwara-app-icon-192-v2.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DLO Kupwara">
+
+<title>District Litigation Office Kupwara | Official Legal Registry</title>
+
+<!-- Cloudflare Web Analytics -->
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "13c9c451d4a0426ab17029262ad729db"}'></script>
+
+<!-- Editorial Typography Stack -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="menu.css">
+<script src="config.js"></script>
+<script src="supabase.min.js" onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js'"></script>
+<script src="common.js"></script>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   1. DUAL THEME ENGINE (DARK OBSIDIAN / LIGHT IVORY PARCHMENT)
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --bg-black: #020408;
+  --bg-deep: #050811;
+  --k-curtain-bg: #040814;
+  --k-panel: #070b16;
+  --k-gold: #c5a059;
+  --k-gold-light: #e5cb93;
+  --k-gold-hairline: rgba(197, 160, 89, 0.45);
+  --k-border: rgba(255, 255, 255, 0.08);
+  --k-text: #ffffff;
+  --k-text-silver: #cbd5e1;
+  --k-text-muted: #94a3b8;
+  --k-text-dim: #64748b;
+  --topbar-bg: #010204;
+  --header-bg: rgba(2, 4, 8, 0.96);
+  --dock-bg: #010307;
+  --dock-hover: #060914;
+  --moon-fill: #000000;
+  --moon-btn-bg: #ffffff;
+  --page-shadow: rgba(0, 0, 0, 0.55);
+}
+
+body.light-mode {
+  --bg-black: #f8fafc;
+  --bg-deep: #f1f5f9;
+  --k-curtain-bg: #f5f7fb;
+  --k-panel: #ffffff;
+  --k-gold: #967433;
+  --k-gold-light: #7c5e26;
+  --k-gold-hairline: rgba(150, 116, 51, 0.4);
+  --k-border: rgba(15, 23, 42, 0.12);
+  --k-text: #090e1a;
+  --k-text-silver: #334155;
+  --k-text-muted: #64748b;
+  --k-text-dim: #94a3b8;
+  --topbar-bg: #e2e8f0;
+  --header-bg: rgba(248, 250, 252, 0.96);
+  --dock-bg: #ffffff;
+  --dock-hover: #f1f5f9;
+  --moon-fill: #000000;
+  --moon-btn-bg: rgba(15, 23, 42, 0.08);
+  --page-shadow: rgba(150, 116, 51, 0.18);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg-black);
+  color: var(--k-text);
+  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   TOP INSTITUTIONAL BAR
+   ───────────────────────────────────────────────────────────── */
+.topbar {
+  display: none;
+}
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #10b981;
+  font-weight: 600;
+}
+.pulse-dot {
+  width: 5px;
+  height: 5px;
+  background: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SITE HEADER & CONTROLS
+   ───────────────────────────────────────────────────────────── */
+header.site-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;           /* below k-toolbar (z-index 1200) so it never intercepts clicks */
+  background: transparent;
+  backdrop-filter: none;
+  border-bottom: none;
+  padding: 1.25rem 2.75rem;
+  padding-top: max(1.25rem, env(safe-area-inset-top));
+  pointer-events: none;   /* header box itself is click-through */
+}
+.brand-lockup {
+  pointer-events: auto;   /* only the logo is interactive; header-inner is NOT */
+}
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;   /* explicit: full-width container must not eat toolbar clicks */
+}
+.brand-lockup {
+  text-decoration: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.85rem;
+}
+.brand-emblem {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.brand-lockup h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.22rem;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: var(--k-text);
+  text-transform: uppercase;
+}
+.brand-lockup p {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   HERO: FLUSH-LEFT IMAGE + ANGLED RIGHT EDGE MEETING TEXT PANEL
+   ───────────────────────────────────────────────────────────── */
+.hero-minimal {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  position: relative;
+  padding: 0;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.hero-layout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  gap: 0;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* ── Image stage: flush left, fills full height ── */
+.geometric-stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 480px;
+  display: flex;
+  align-items: stretch;
+  margin: 0;
+  /* Push flush against left viewport edge by cancelling any grid padding */
+  margin-left: calc(-1 * var(--hero-gutter, 0px));
+}
+.geometric-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Clip right edge only: straight left + angled right meeting the text panel */
+.geometric-clip-box {
+  position: absolute;
+  inset: 0;
+  /* Left: straight edge. Right: diagonal notch angled inward ~7% */
+  clip-path: polygon(0% 0%, 93% 0%, 100% 50%, 93% 100%, 0% 100%);
+  background: var(--bg-deep);
+  overflow: hidden;
+}
+
+.hero-slide-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;   /* default; overridden per slide below */
+  opacity: 0;
+  z-index: 0;
+  transform: scale(1.02);
+  transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1), transform 11s cubic-bezier(0.1, 0.8, 0.3, 1);
+  filter: contrast(106%) brightness(88%);
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+/* Per-slide object-position so the main subject stays in frame */
+.hero-slide-img:nth-child(1) { object-position: center 35%; }   /* courthouse exterior */
+.hero-slide-img:nth-child(2) { object-position: center 25%; }   /* administrative wing */
+.hero-slide-img:nth-child(3) { object-position: center 50%; }   /* office entrance */
+.hero-slide-img:nth-child(4) { object-position: 40% 50%; }      /* interior desk */
+.hero-slide-img:nth-child(5) { object-position: 55% 45%; }      /* consultation chamber */
+.hero-slide-img:nth-child(6) { object-position: center 40%; }   /* law library */
+.hero-slide-img:nth-child(7) { object-position: center 30%; }   /* staff group */
+.hero-slide-img:nth-child(8) { object-position: 45% 35%; }      /* coordination team */
+
+.hero-slide-img.active {
+  opacity: 1;
+  z-index: 2;
+  transform: scale(1.07);
+}
+
+.hero-slide-img.prev-active {
+  opacity: 1;
+  z-index: 1;
+  transform: scale(1.07);
+  transition: none;
+}
+
+/* Masthead protection: subtle dark gradient at top-left for crest/title legibility */
+.geometric-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(2,4,8,0.52) 0%, rgba(2,4,8,0.12) 28%, transparent 55%),
+    linear-gradient(90deg, transparent 60%, rgba(2,4,8,0.35) 100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+body.light-mode .geometric-vignette {
+  background:
+    linear-gradient(180deg, rgba(8,17,31,0.42) 0%, rgba(8,17,31,0.08) 28%, transparent 55%),
+    linear-gradient(90deg, transparent 60%, rgba(248,250,252,0.4) 100%);
+}
+
+/* Timed website notice, kept inside the hero photograph */
+.site-notice-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  place-items: center;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background: rgba(2, 5, 9, 0.48);
+}
+.site-notice-overlay[hidden] { display: none !important; }
+.site-notice-card {
+  position: relative;
+  width: min(100%, 560px);
+  max-height: calc(100% - 1.5rem);
+  overflow-y: auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  box-sizing: border-box;
+  color: #f3f1eb;
+  background: rgba(7, 12, 19, 0.96);
+  border-left: 2px solid var(--k-gold, #c5a059);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.42);
+  text-align: left;
+}
+.site-notice-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(232, 236, 241, 0.25);
+  border-radius: 50%;
+  color: #f3f1eb;
+  background: transparent;
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.site-notice-close:hover,
+.site-notice-close:focus-visible {
+  border-color: var(--k-gold, #c5a059);
+  color: var(--k-gold-light, #e5cb93);
+}
+.site-notice-eyebrow {
+  margin: 0 2.5rem 0.65rem 0;
+  color: var(--k-gold, #c5a059);
+  font: 700 0.62rem/1.5 'Plus Jakarta Sans', system-ui, sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.site-notice-heading {
+  margin: 0 2rem 0.8rem 0;
+  color: #f5f0e5;
+  font: 500 clamp(1.25rem, 2.2vw, 1.7rem)/1.25 'Cinzel', Georgia, serif;
+}
+.site-notice-copy {
+  margin: 0;
+  color: rgba(243, 241, 235, 0.84);
+  font: 400 0.84rem/1.7 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+.site-notice-acknowledge {
+  margin-top: 1.15rem;
+  padding: 0.55rem 0;
+  border: 0;
+  color: var(--k-gold-light, #e5cb93);
+  background: transparent;
+  font: 700 0.65rem/1.4 'Plus Jakarta Sans', system-ui, sans-serif;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.site-notice-acknowledge:hover { color: #fff; }
+.site-notice-acknowledge:focus-visible,
+.site-notice-close:focus-visible {
+  outline: 2px solid var(--k-gold, #c5a059);
+  outline-offset: 3px;
+}
+
+/* Border overlay removed — no gold outline around the image */
+.geometric-border-overlay { display: none; }
+
+/* ── Text panel: sits to the right, clear dark background ── */
+.hero-editorial-panel {
+  padding: 5.5rem 2.75rem 6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  text-align: center;
+  /* Ensure panel is always readable regardless of slide content */
+  z-index: 10;
+}
+
+.quote-book-stage {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  perspective: 1400px;
+  perspective-origin: 50% 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.quote-page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transform: rotateY(55deg) translateZ(0);
+  transition: transform 1.25s cubic-bezier(0.25, 1, 0.4, 1), 
+              opacity 0.95s cubic-bezier(0.25, 1, 0.4, 1), 
+              filter 1.25s ease;
+  filter: blur(1px) brightness(0.6);
+  will-change: transform, opacity;
+}
+
+.quote-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--page-shadow), transparent 35%);
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  pointer-events: none;
+}
+
+.quote-page.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: rotateY(0deg) translateZ(0);
+  filter: blur(0px) brightness(1);
+  z-index: 5;
+}
+.quote-page.active::after {
+  opacity: 0;
+}
+
+.quote-page.flipped-forward {
+  opacity: 0;
+  transform: rotateY(-85deg) translateZ(0);
+  filter: blur(2px) brightness(0.3);
+  z-index: 1;
+}
+.quote-page.flipped-forward::after {
+  opacity: 1;
+}
+
+.quote-page.incoming-forward {
+  opacity: 0;
+  transform: rotateY(55deg) translateZ(0);
+  filter: blur(2px) brightness(0.5);
+  transition: none !important;
+  z-index: 4;
+}
+
+.quote-page.flipped-backward {
+  opacity: 0;
+  transform: rotateY(85deg) translateZ(0);
+  filter: blur(2px) brightness(0.3);
+  z-index: 1;
+}
+.quote-page.incoming-backward {
+  opacity: 0;
+  transform: rotateY(-55deg) translateZ(0);
+  filter: blur(2px) brightness(0.5);
+  transition: none !important;
+  z-index: 4;
+}
+
+.gold-category-label {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+
+.hero-serif-headline {
+  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  font-size: clamp(1.2rem, 1.85vw, 1.55rem);
+  line-height: 1.38;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--k-text);
+  margin-bottom: 0.85rem;
+  text-align: center;
+  max-width: 22em;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-serif-headline em {
+  font-style: italic;
+  font-weight: 400;
+  background: linear-gradient(135deg, var(--k-text) 15%, var(--k-gold-light) 70%, var(--k-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-description {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.65;
+  font-weight: 400;
+  color: var(--k-text-silver);
+  max-width: 28em;
+  letter-spacing: 0.01em;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-navigation-row {
+  position: absolute;
+  left: 57.5%;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(0.65rem, 1.25vw, 1.2rem);
+  padding: 1rem clamp(1rem, 2vw, 2rem);
+  background: transparent;
+}
+.hero-progress-track {
+  position: relative;
+  width: 100%;
+  min-width: 100px;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(214, 223, 234, 0.32);
+}
+.hero-progress-segment {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 18%;
+  height: 4px;
+  border-radius: inherit;
+  transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent, #d8c27c 28%, #ffe39a 50%, #d8c27c 72%, transparent);
+  box-shadow: 0 0 10px rgba(244, 210, 119, 0.72);
+  transition: left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.circular-arrows-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.btn-circle-arrow {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(226, 234, 243, 0.25);
+  background: rgba(4, 8, 13, 0.55);
+  color: #edf0f3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+  backdrop-filter: blur(8px);
+}
+.carousel-pause-btn {
+  width: 30px;
+  height: 30px;
+  color: rgba(237, 240, 243, 0.72);
+}
+.btn-circle-arrow svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  fill: none;
+  transition: transform 0.2s ease;
+}
+.btn-circle-arrow:hover {
+  border-color: var(--k-gold, #c5a059);
+  color: var(--k-gold-light, #e5cb93);
+  background: rgba(197, 160, 89, 0.12);
+  transform: translateY(-2px);
+}
+.btn-circle-arrow:hover svg {
+  transform: scale(1.08);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   BOTTOM NOTICES, CIRCULARS & ORDERS DOCK TOGGLE
+   ───────────────────────────────────────────────────────────── */
+.news-dock-strip {
+  background: var(--dock-bg);
+  border-top: 1px solid var(--k-border);
+  border-bottom: 1px solid var(--k-border);
+  padding: 0.75rem 3.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+  z-index: 100;
+}
+.news-dock-strip:hover {
+  background: var(--dock-hover);
+  border-color: var(--k-gold-hairline);
+}
+.news-dock-left {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  overflow: hidden;
+}
+.news-live-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  background: rgba(197, 160, 89, 0.12);
+  border: 1px solid var(--k-gold-hairline);
+  color: var(--k-gold);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.news-preview-headline {
+  font-size: 0.8rem;
+  color: var(--k-text-silver);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.news-preview-headline strong {
+  color: var(--k-text);
+  margin-right: 6px;
+}
+.news-dock-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--k-gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.news-chevron-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--k-gold-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+.news-dock-strip:hover .news-chevron-icon {
+  transform: translateY(-2px);
+  background: var(--k-gold);
+  color: #fff;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SLIDE-IN UPDATES DRAWER (ORDERS, NOTICES & ARTICLES)
+   ───────────────────────────────────────────────────────────── */
+.news-dramatic-portal {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 5, 10, 0.64);
+  backdrop-filter: blur(4px);
+  z-index: 12000;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: stretch;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: none;
+  transition: opacity 0.38s ease, visibility 0s linear 0.48s;
+}
+.news-dramatic-portal.open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition-delay: 0s;
+}
+.updates-drawer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(50vw, 760px);
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  color: var(--k-text);
+  background: var(--k-curtain-bg);
+  box-shadow: -28px 0 80px rgba(0, 0, 0, 0.38);
+  transform: translateX(100%);
+  transition: transform 0.48s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+.news-dramatic-portal.open .updates-drawer {
+  transform: translateX(0);
+}
+.gazette-header {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  padding: 1.35rem 2rem;
+  border-bottom: 1px solid var(--k-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--header-bg);
+}
+.gazette-body {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.gazette-filter-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--k-border);
+  padding-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+.gazette-tab-btn {
+  background: transparent;
+  border: 1px solid var(--k-border);
+  color: var(--k-text-muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.gazette-tab-btn.active, .gazette-tab-btn:hover {
+  border-color: var(--k-gold);
+  color: var(--k-text);
+  background: rgba(197, 160, 89, 0.1);
+}
+
+.gazette-cards-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+.gazette-cards-grid[hidden],
+.gazette-loading[hidden],
+.gazette-empty[hidden],
+.update-detail-attachments[hidden] { display: none !important; }
+.gazette-card {
+  background: var(--k-panel);
+  border: 1px solid var(--k-border);
+  padding: 1.35rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 150px;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.gazette-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--k-gold-hairline);
+}
+.gazette-meta-tag {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  margin-bottom: 1rem;
+}
+.gazette-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  line-height: 1.3;
+  color: var(--k-text);
+  margin-bottom: 0.8rem;
+}
+.gazette-snippet {
+  font-size: 0.84rem;
+  color: var(--k-text-muted);
+  line-height: 1.6;
+}
+.gazette-action-link {
+  margin-top: 1.6rem;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DEPARTMENTAL AUTHENTICATION MODAL
+   ───────────────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 4, 8, 0.92);
+  backdrop-filter: blur(16px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+.modal-card {
+  background: var(--k-panel);
+  border: 1px solid var(--k-gold-hairline);
+  max-width: 480px;
+  width: 100%;
+  padding: 2.8rem;
+  position: relative;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.85);
+}
+.modal-close-btn {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  background: transparent;
+  border: none;
+  color: var(--k-text-muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.field-item {
+  margin-bottom: 1.4rem;
+}
+.field-item label {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+}
+.field-item select, .field-item input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--bg-black);
+  border: 1px solid var(--k-border);
+  color: var(--k-text);
+  outline: none;
+  font-size: 0.9rem;
+}
+.field-item select:focus, .field-item input:focus {
+  border-color: var(--k-gold);
+}
+.btn-modal-action {
+  background: linear-gradient(135deg, var(--k-gold), #967433);
+  border: none;
+  color: #fff;
+  padding: 0.95rem 1.6rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.6rem;
+  transition: opacity 0.2s ease;
+}
+.btn-modal-action:hover {
+  opacity: 0.92;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DEVELOPER MODAL
+   ───────────────────────────────────────────────────────────── */
+.dev-modal-card {
+  text-align: center;
+}
+.dev-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--k-gold), var(--k-gold-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 16px;
+  color: #070b14;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LATEST UPDATES — right-side drawer (opened by the existing arrow)
+   Reuses the site's own .news-dramatic-portal / .gazette-* classes
+   already defined above; this block only adds what they were missing.
+   ───────────────────────────────────────────────────────────── */
+/* The updates experience is a right-side drawer with a dimmed page behind it. */
+
+.gazette-brand {
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--k-text);
+}
+.gazette-close-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: var(--k-gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.4rem 0;
+}
+.gazette-close-icon {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 1px solid var(--k-gold-hairline);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  flex-shrink: 0;
+}
+.gazette-close-btn::after {
+  content: '';
+  display: inline-block;
+  width: 40px;
+  height: 1px;
+  background: var(--k-gold-hairline);
+}
+.gazette-close-btn:hover { color: var(--k-gold-light); }
+.gazette-close-btn:hover .gazette-close-icon { border-color: var(--k-gold); }
+.gazette-close-btn:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 3px; }
+
+/* Decorative left rail, desktop only — DLO's own gold diagonal-line motif
+   (CSS-generated, no photo asset), echoing the hero's diagonal notch. */
+.gazette-rail {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 42px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  display: none;
+  background:
+    repeating-linear-gradient(115deg, rgba(197,160,89,0.16) 0px, rgba(197,160,89,0.16) 2px, transparent 2px, transparent 22px),
+    var(--bg-deep);
+  clip-path: polygon(0 0, 100% 0, 74% 100%, 0 100%);
+}
+@media (min-width: 1024px) { .gazette-rail { display: block; } }
+
+.gazette-loading,
+.gazette-empty {
+  font-size: 0.85rem;
+  color: var(--k-text-muted);
+  font-style: italic;
+  padding: 3rem 0;
+  text-align: center;
+}
+
+/* Cards are rendered as <button>s so they're natively keyboard-operable;
+   reset button chrome, .gazette-card already supplies the visual style. */
+button.gazette-card {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.gazette-card:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 3px; }
+
+.gazette-portal-viewall {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2.5rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--k-gold);
+  text-decoration: none;
+}
+.gazette-portal-viewall:hover { color: var(--k-gold-light); }
+.gazette-portal-viewall:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 3px; }
+
+@media (max-width: 1024px) {
+  .gazette-header { padding: 1.2rem 1.5rem; }
+  .gazette-body { padding: 2rem 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .news-dramatic-portal,
+  .updates-drawer { transition: none !important; }
+}
+
+@media (max-width: 680px) {
+  .updates-drawer { width: 100vw; }
+  .gazette-header { padding: 1rem 1.1rem; }
+  .gazette-body { padding: 1.2rem; }
+  .gazette-rail { display: none !important; }
+}
+
+/* Carousel slides that are currently showing a live update (vs. an
+   original quote) become a single click/keyboard target. Only the
+   active slide has pointer-events, per the existing .quote-page rules. */
+.quote-page.is-update { cursor: pointer; }
+.quote-page.is-update .hero-description { display: none; }
+.quote-page.is-update .hero-serif-headline { transition: color 0.2s ease; }
+.quote-page.is-update:hover .hero-serif-headline,
+.quote-page.is-update:focus-visible .hero-serif-headline { color: var(--k-gold-light); }
+.quote-page.is-update:focus-visible { outline: 2px solid var(--k-gold); outline-offset: 8px; }
+
+/* Update detail modal — reuses .modal-overlay / .modal-card */
+#updateDetailModal { z-index: 12010; }
+.update-detail-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--k-gold);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.update-detail-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  color: var(--k-text);
+  margin: 0 0 1rem;
+}
+.update-detail-body {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--k-text-silver);
+  white-space: pre-wrap;
+  margin-bottom: 1.2rem;
+}
+.update-detail-attachments { display: flex; flex-direction: column; gap: 0.5rem; }
+.update-detail-attachments a {
+  color: var(--k-gold);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.update-detail-attachments a:hover { color: var(--k-gold-light); text-decoration: underline; }
+
+/* ─────────────────────────────────────────────────────────────
+   MINIMAL FOOTER
+   ───────────────────────────────────────────────────────────── */
+footer.site-footer {
+  background: var(--topbar-bg);
+  padding: 1.6rem 3.5rem;
+  font-size: 0.72rem;
+  color: var(--k-text-dim);
+  border-top: 1px solid var(--k-border);
+}
+.footer-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 1024px) {
+  .topbar, header.site-header, footer.site-footer, .news-dock-strip {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  /* Stack on tablet/mobile: image on top, text below */
+  .hero-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0;
+  }
+  main.hero-minimal { overflow: visible; }
+  .geometric-stage {
+    height: min(50vh, 440px);
+    min-height: 280px;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+  }
+  /* On mobile: straight edges both sides (image full width) */
+  .geometric-clip-box {
+    clip-path: none;
+    border-radius: 0;
+  }
+  .hero-editorial-panel {
+    padding: 2rem 1.5rem 1rem;
+  }
+  .quote-book-stage {
+    min-height: 240px;
+  }
+  .hero-serif-headline {
+    font-size: 1.3rem;
+  }
+  .hero-navigation-row {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    box-sizing: border-box;
+    grid-column: 1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "progress progress" "controls more";
+    gap: 0.85rem 1rem;
+    padding: 1rem 1.1rem max(1rem, env(safe-area-inset-bottom));
+    background: rgba(4, 8, 13, 0.96);
+  }
+  .hero-progress-track { grid-area: progress; }
+  .circular-arrows-group { grid-area: controls; gap: 0.45rem; }
+  .orders-arrow-link { grid-area: more; }
+  .btn-circle-arrow { width: 38px; height: 38px; }
+  .carousel-pause-btn { width: 27px; height: 27px; }
+  .orders-arrow-link { min-height: 42px; padding: 0.6rem 0.85rem; font-size: 0.61rem; }
+  .orders-arrow-mark { font-size: 1rem; }
+  .orders-arrow-end { width: 15px; height: 15px; }
+  .curtain-split-container {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2rem 1.5rem;
+  }
+  .curtain-empty-stage {
+    display: none;
+  }
+  .gazette-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   APP MODE (installed PWA) — classic mobile home ONLY
+   ═══════════════════════════════════════════════════════════ */
+html.app-mode,
+html.app-mode body {
+  background: #f4f6f9 !important;
+  color: #1e293b !important;
+  overflow-x: hidden;
+}
+
+html.app-mode .topbar,
+html.app-mode header.site-header,
+html.app-mode .site-header,
+html.app-mode .fullscreen-curtain,
+html.app-mode main.hero-minimal,
+html.app-mode .hero-minimal,
+html.app-mode .hero-layout,
+html.app-mode .geometric-stage,
+html.app-mode .hero-editorial-panel,
+html.app-mode #editorialPanel,
+html.app-mode .news-dock-strip,
+html.app-mode footer.site-footer,
+html.app-mode .site-footer,
+html.app-mode .btn-menu-trigger,
+html.app-mode .menu-label {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+.app-topbar,
+.app-home,
+.app-tabbar {
+  display: none;
+}
+html.app-mode .app-topbar {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: #0B2545 !important;
+  padding: 10px 14px;
+  padding-top: max(10px, env(safe-area-inset-top));
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+html.app-mode .app-topbar .at-brand {
+  display: flex; align-items: center; gap: 10px; min-width: 0;
+}
+html.app-mode .app-topbar .at-brand img {
+  width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(201,162,74,0.55);
+}
+html.app-mode .app-topbar .at-brand span {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 700; font-size: 16px; color: #E8C96A; white-space: nowrap;
+}
+html.app-mode .app-topbar .at-actions { display: flex; gap: 6px; }
+html.app-mode .app-topbar .at-actions a,
+html.app-mode .app-topbar .at-actions button {
+  width: 34px; height: 34px; border-radius: 16px;
+  background: rgba(201,162,74,0.12);
+  border: 1px solid rgba(201,162,74,0.35);
+  color: #E8C96A;
+  display: flex; align-items: center; justify-content: center;
+  text-decoration: none; cursor: pointer; padding: 0;
+}
+html.app-mode .app-topbar .at-actions svg {
+  width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 2.2;
+}
+
+html.app-mode .app-home {
+  display: block !important;
+  padding: 18px 16px 100px;
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: #f4f6f9;
+}
+html.app-mode .app-home-greeting {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 4px;
+}
+html.app-mode .app-home-greeting span {
+  display: block; font-size: 11px; font-weight: 600; color: #C9A84C;
+  letter-spacing: 1.4px; text-transform: uppercase; margin-bottom: 4px;
+}
+html.app-mode .app-home-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 12px;
+}
+html.app-mode .app-home-stats .tile {
+  background: #fff; border-radius: 16px; padding: 12px 6px; text-align: center;
+  box-shadow: 0 2px 10px rgba(15,23,42,0.06); border: 1px solid rgba(15,23,42,0.04);
+}
+html.app-mode .app-home-stats .tile b {
+  display: block; font-size: 18px; font-weight: 700; color: #C9A84C;
+}
+html.app-mode .app-home-stats .tile small {
+  display: block; font-size: 9px; color: #64748b; text-transform: uppercase;
+  letter-spacing: 0.4px; margin-top: 2px; font-weight: 600;
+}
+html.app-mode .app-home-alert {
+  display: none; background: #fef2f2; color: #991b1b; border-radius: 999px;
+  padding: 10px 14px; font-size: 13px; font-weight: 600; margin: 8px 0 16px;
+  align-items: center; gap: 8px;
+}
+html.app-mode .app-home-alert.is-visible { display: flex !important; }
+html.app-mode .app-home-section-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: #94a3b8; margin: 8px 0 12px;
+}
+html.app-mode .app-home-actions {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 10px;
+}
+html.app-mode .app-home-actions a {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  text-decoration: none; color: #334155; font-size: 11px; font-weight: 700; text-align: center;
+}
+html.app-mode .app-home-actions a .ic {
+  width: 52px; height: 52px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; box-shadow: 0 8px 18px rgba(0,0,0,0.12); color: #fff;
+}
+html.app-mode .app-home-actions a:nth-child(1)  .ic { background: linear-gradient(145deg,#5b7bab,#0B2545 70%); }
+html.app-mode .app-home-actions a:nth-child(2)  .ic { background: linear-gradient(145deg,#E0C083,#C6A358 65%); }
+html.app-mode .app-home-actions a:nth-child(3)  .ic { background: linear-gradient(145deg,#ff9a6c,#d9622a 70%); }
+html.app-mode .app-home-actions a:nth-child(4)  .ic { background: linear-gradient(145deg,#4fd8c9,#177a70 70%); }
+html.app-mode .app-home-actions a:nth-child(5)  .ic { background: linear-gradient(145deg,#b09bfa,#6d28d9 70%); }
+html.app-mode .app-home-actions a:nth-child(6)  .ic { background: linear-gradient(145deg,#f18a8a,#a11d1d 70%); }
+html.app-mode .app-home-actions a:nth-child(7)  .ic { background: linear-gradient(145deg,#7de3b3,#1E6B45 70%); }
+html.app-mode .app-home-actions a:nth-child(8)  .ic { background: linear-gradient(145deg,#ffe08a,#c9861a 70%); }
+html.app-mode .app-home-actions a:nth-child(9)  .ic { background: linear-gradient(145deg,#97a3f7,#3730a3 70%); }
+html.app-mode .app-home-actions a:nth-child(10) .ic { background: linear-gradient(145deg,#f472b6,#be185d 70%); }
+html.app-mode .app-home-actions a:nth-child(11) .ic { background: linear-gradient(145deg,#64748b,#1e293b 70%); }
+html.app-mode .app-home-actions a:nth-child(12) .ic { background: linear-gradient(145deg,#60a5fa,#1d4ed8 70%); }
+
+html.app-mode .app-tabbar {
+  display: flex !important;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 600;
+  background: #0B2545 !important;
+  border-top: 2px solid #C9A84C;
+  padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+  justify-content: space-around; align-items: center;
+}
+html.app-mode .app-tabbar a {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  text-decoration: none; color: rgba(255,255,255,0.55);
+  font-size: 10px; font-weight: 600; padding: 4px 0;
+}
+html.app-mode .app-tabbar a svg {
+  width: 24px; height: 24px; stroke: currentColor; fill: none; stroke-width: 2;
+}
+html.app-mode .app-tabbar a.active { color: #E8C96A; }
+html.app-mode .app-tabbar a.active svg { stroke: #E8C96A; }
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .topbar,
+  header.site-header,
+  .fullscreen-curtain,
+  main.hero-minimal,
+  .hero-minimal,
+  .news-dock-strip,
+  footer.site-footer {
+    display: none !important;
+  }
+  .app-topbar {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: #0B2545 !important;
+    padding: 10px 14px;
+    padding-top: max(10px, env(safe-area-inset-top));
+  }
+  .app-home {
+    display: block !important;
+    padding: 18px 16px 100px;
+    max-width: 560px;
+    margin: 0 auto;
+    background: #f4f6f9;
+    min-height: 100vh;
+  }
+  .app-tabbar {
+    display: flex !important;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 600;
+    background: #0B2545 !important;
+    border-top: 2px solid #C9A84C;
+    padding: 6px 4px max(8px, env(safe-area-inset-bottom));
+    justify-content: space-around;
+  }
+  body { background: #f4f6f9 !important; }
+}
+
+/* Updates entry point */
+.orders-arrow-link {
+  position: static;
+  z-index: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 38px;
+  padding: 0.45rem 0.2rem;
+  border: 0;
+  background: transparent;
+  color: var(--k-gold, #c5a059);
+  text-decoration: none;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.25s ease;
+}
+.orders-arrow-mark {
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+}
+.orders-arrow-end {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
+}
+.orders-arrow-link:hover {
+  transform: none;
+  background: transparent;
+  color: var(--k-gold-light, #e5cb93);
+}
+.orders-arrow-link:hover .orders-arrow-end { transform: translateX(3px); }
+.orders-arrow-link:focus-visible {
+  outline: 2px solid var(--k-gold, #c5a059);
+  outline-offset: 3px;
+}
+@media (max-width: 1024px) {
+  .orders-arrow-link { min-height: 42px; padding: 0.6rem 0.85rem; gap: 0.45rem; font-size: 0.61rem; }
+  .orders-arrow-mark { font-size: 1rem; }
+  .orders-arrow-end { width: 15px; height: 15px; }
+}
+html.app-mode .orders-arrow-link {
+  display: none !important;
+}
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .orders-arrow-link { display: none !important; }
+}
+
+/* When menu is open: avoid double header */
+html.menu-open header.site-header .brand-lockup {
+  opacity: 0;
+  pointer-events: none;
+}
+html.menu-open header.site-header {
+  background: transparent;
+  border-bottom: none;
+}
+
+/* Editorial homepage finish: full-bleed split hero with quiet controls. */
+:root {
+  --bg-black: #000000;
+  --bg-deep: #0a0a0a;
+  --k-curtain-bg: #0a0a0a;
+  --k-panel: #0a0a0a;
+  --k-text: #ffffff;
+  --k-text-silver: #d5d5d5;
+  --k-text-muted: #a6a6a6;
+  --k-text-dim: #777777;
+  --topbar-bg: #000000;
+  --header-bg: rgba(0, 0, 0, 0.97);
+  --page-shadow: rgba(0, 0, 0, 0.58);
+}
+body:not(.app-mode) { background: #000000; }
+
+@media (min-width: 1025px) {
+  body:not(.app-mode) .hero-layout { grid-template-columns: 1fr 1fr; }
+  body:not(.app-mode) .hero-navigation-row { left: 50%; }
+}
+html:not(.app-mode) body:not(.app-mode):not(.light-mode) .hero-layout { background: #000000 !important; }
+html:not(.app-mode) body:not(.app-mode):not(.light-mode) #editorialPanel { background: #000000 !important; }
+
+/* The shared toolbar sits over the hero while it is being moved into the
+   editorial panel during page initialization; it never paints a full-width bar. */
+body:not(.app-mode) .k-toolbar {
+  position: fixed;
+  top: max(1.2rem, env(safe-area-inset-top));
+  right: clamp(1rem, 3vw, 3rem);
+  z-index: 1200;
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  gap: 0.45rem;
+  flex-wrap: nowrap;
+  background: transparent;
+  border: 0;
+}
+body:not(.app-mode) .hero-editorial-panel {
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 8rem clamp(2rem, 5.2vw, 5rem) 7rem;
+  align-items: center;
+  justify-content: center;
+  text-align: left;
+}
+body:not(.app-mode):not(.light-mode) .hero-editorial-panel { background: #000000 !important; }
+body:not(.app-mode) .hero-editorial-panel > .k-toolbar {
+  position: absolute;
+  top: max(1.4rem, env(safe-area-inset-top));
+  right: clamp(1.25rem, 3vw, 3rem);
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  background: transparent;
+  border: 0;
+}
+body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn {
+  width: 34px;
+  height: 34px;
+  color: #f4f4f4;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn:hover {
+  color: #e3d1a6;
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(227, 209, 166, 0.62);
+  transform: none;
+}
+body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn svg { width: 16px; height: 16px; }
+body:not(.app-mode) .hero-editorial-panel .k-menu-trigger {
+  width: auto;
+  height: 34px;
+  padding: 0 0 0 0.35rem;
+  gap: 0.55rem;
+  color: #f4f4f4;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+body:not(.app-mode) .hero-editorial-panel .k-menu-trigger:hover {
+  color: #e3d1a6;
+  border: 0;
+  transform: none;
+}
+body:not(.app-mode) .hero-editorial-panel .k-menu-label { color: currentColor; }
+body:not(.app-mode) .hero-editorial-panel .k-menu-lines { width: 17px; height: 11px; }
+body:not(.app-mode) .quote-book-stage {
+  width: min(100%, 31rem);
+  align-items: flex-start;
+}
+body:not(.app-mode) .quote-page,
+body:not(.app-mode) .gold-category-label,
+body:not(.app-mode) .hero-serif-headline,
+body:not(.app-mode) .hero-description { text-align: left; }
+body:not(.app-mode) .gold-category-label {
+  margin-bottom: 1rem;
+  color: #b8b8b8;
+}
+body:not(.app-mode) .hero-serif-headline {
+  max-width: 20em;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0.9rem;
+  font-size: clamp(1.35rem, 2.35vw, 1.9rem);
+  line-height: 1.35;
+  letter-spacing: -0.02em;
+}
+body:not(.app-mode) .hero-serif-headline em {
+  background: none;
+  color: #ffffff;
+  -webkit-text-fill-color: currentColor;
+}
+body:not(.app-mode) .hero-description {
+  max-width: 29em;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: clamp(0.82rem, 0.95vw, 0.9rem);
+  line-height: 1.7;
+  color: #d0d0d0;
+}
+
+@media (max-width: 1024px) {
+  body:not(.app-mode):not(.light-mode) .hero-editorial-panel {
+    min-height: 360px;
+    padding: 5.75rem 1.5rem 4.5rem;
+  }
+  body:not(.app-mode):not(.light-mode) .hero-editorial-panel { background: #000000 !important; }
+  body:not(.app-mode) .hero-editorial-panel > .k-toolbar {
+    top: max(0.85rem, env(safe-area-inset-top));
+    right: 1rem;
+    gap: 0.25rem;
+  }
+  body:not(.app-mode) .hero-editorial-panel .k-toolbar-btn {
+    width: 32px;
+    height: 32px;
+  }
+  body:not(.app-mode) .hero-editorial-panel .k-menu-trigger { height: 32px; }
+  body:not(.app-mode) .hero-serif-headline { font-size: clamp(1.3rem, 4vw, 1.6rem); }
+}
+
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel {
+  background: #ffffff !important;
+  color: #171717 !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .hero-serif-headline {
+  color: #171717 !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .hero-serif-headline em {
+  color: #8b7446 !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .gold-category-label {
+  color: #626262 !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .hero-description {
+  color: #454545 !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-toolbar-btn,
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-menu-trigger {
+  color: #202020 !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-toolbar-btn {
+  border-color: rgba(0, 0, 0, 0.22) !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) #editorialPanel .k-menu-lines span {
+  background-color: #8b7446 !important;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .hero-navigation-row .btn-circle-arrow {
+  color: #303030;
+  border-color: rgba(20, 20, 20, 0.28);
+  background: rgba(0, 0, 0, 0.035);
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .hero-navigation-row .carousel-pause-btn {
+  color: #555555;
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .brand-lockup h1 {
+  color: #ffffff !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.58);
+}
+html[data-theme="light"]:not(.app-mode) body:not(.app-mode) .brand-lockup p {
+  color: #f0dfb7 !important;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.58);
+}
+</style>
+</head>
+<body>
+<script>DLO.injectMenu();</script>
+
+<!-- ═══ APP SHELL (visible only when installed as PWA) ═══ -->
+<div class="app-topbar" id="appTopbar" aria-hidden="true">
+  <div class="at-brand">
+    <img src="logo.png" alt="DLO Kupwara" onerror="this.style.display='none'">
+    <span>DLO Kupwara</span>
+  </div>
+  <div class="at-actions">
+    <a href="search-filter-cases.html" title="Search cases" aria-label="Search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </a>
+    <a href="latest-updates.html" title="Updates" aria-label="Updates">
+      <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg>
+    </a>
+    <button type="button" onclick="if(typeof openDeveloperModal==='function')openDeveloperModal();" title="About" aria-label="About">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+
+<div class="app-home" id="appHome" aria-hidden="true">
+  <div class="app-home-greeting">
+    <span>District Litigation Office</span>
+    Welcome back
+  </div>
+
+  <div class="app-home-stats">
+    <div class="tile"><b id="appHomeTotal">—</b><small>Total</small></div>
+    <div class="tile"><b id="appHomeActive">—</b><small>Active</small></div>
+    <div class="tile"><b id="appHomeCourts">13+</b><small>Courts</small></div>
+    <div class="tile"><b id="appHomeDisposed">—</b><small>Disposed</small></div>
+    <div class="tile"><b id="appHomeReplyFiled">—</b><small>Reply Filed</small></div>
+    <div class="tile"><b id="appHomeReplyPending">—</b><small>Reply Pending</small></div>
+    <div class="tile"><b id="appHomeExparte">—</b><small>Ex-parte</small></div>
+  </div>
+
+  <div class="app-home-alert" id="appHomeAlert">
+    <span aria-hidden="true">⚠️</span>
+    <span id="appHomeAlertText"></span>
+  </div>
+
+  <div class="app-home-section-label">Quick Access</div>
+  <div class="app-home-actions">
+    <a href="about-office.html"><div class="ic">🏛️</div>About</a>
+    <a href="search-filter-cases.html"><div class="ic">📁</div>My Cases</a>
+    <a href="hearings.html"><div class="ic">📅</div>Hearings</a>
+    <a href="court-wise-distribution.html"><div class="ic">⚖️</div>Courts</a>
+    <a href="analytics.html"><div class="ic">📊</div>Analytics</a>
+    <a href="causelist.html"><div class="ic">📋</div>Cause List</a>
+    <a href="latest-updates.html"><div class="ic">🔔</div>Updates</a>
+    <a href="performance.html"><div class="ic">⭐</div>Performance</a>
+    <a href="history.html"><div class="ic">📖</div>Case History</a>
+    <a href="our-officials.html"><div class="ic">👥</div>Team</a>
+    <a href="operator.html"><div class="ic">🔐</div>Staff Login</a>
+    <a href="contact.html"><div class="ic">✉️</div>Contact</a>
+  </div>
+</div>
+
+<nav class="app-tabbar" id="appTabbar" aria-label="App navigation" aria-hidden="true">
+  <a href="index.html" class="active">
+    <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+    Home
+  </a>
+  <a href="search-filter-cases.html">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    Cases
+  </a>
+  <a href="hearings.html">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+    Hearings
+  </a>
+  <a href="history.html">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2"/></svg>
+    History
+  </a>
+  <a href="contact.html">
+    <svg viewBox="0 0 24 24"><path d="M4 4h16v12H7l-3 3z"/></svg>
+    Contact
+  </a>
+</nav>
+<!-- ═══ END APP SHELL ═══ -->
+
+<!-- TOP INSTITUTIONAL STRIP -->
+<div class="topbar">
+  <span>Government of Jammu &amp; Kashmir &nbsp;|&nbsp; Department of Law, Justice &amp; Parliamentary Affairs</span>
+  <div style="display:flex; align-items:center; gap: 1.5rem;">
+    <span>Kupwara District Jurisdiction</span>
+  </div>
+</div>
+
+<!-- HEADER — brand lockup only. Theme toggle is now in the k-toolbar row (common.js).
+     pointer-events:none on header/header-inner means only the brand lockup is interactive. -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="brand-lockup">
+      <img src="emblem.png" alt="Emblem of Jammu &amp; Kashmir" class="brand-emblem" onerror="this.style.display='none'">
+      <div class="brand-text">
+        <h1>District Litigation Office Kupwara</h1>
+        <p>Dept. of Law, Justice &amp; Parliamentary Affairs</p>
+      </div>
+    </a>
+  </div>
+</header>
+
+<!-- HERO: ARCHITECTURAL PHOTO SHOWCASE & 3D BOOK-PAGE QUOTE ROTATOR -->
+<main class="hero-minimal">
+  <div class="hero-layout">
+    
+    <!-- LEFT: Geometric Hexagon Frame with Hairline Gold Border -->
+    <div class="geometric-stage">
+      <div class="geometric-frame">
+        <div class="geometric-clip-box">
+          <img src="assets/images/hero/building-1.webp" alt="DC Office Complex Kupwara" class="hero-slide-img active" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/building-2.webp" alt="Administrative Wing Kupwara" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/office-entrance.webp" alt="District Litigation Office Signage" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
+          <img src="assets/images/hero/office-interior-1.webp" alt="Litigation Registry & Verification Desk" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/office-interior-2.webp" alt="Executive Legal Consultation Chamber" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
+          <img src="assets/images/hero/law-library.webp" alt="Law Library & Legal Reference Archive" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          <img src="assets/images/hero/staff-1.webp" alt="Administrative Legal Staff" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/signage-detail.webp';" />
+          <img src="assets/images/hero/staff-2.webp" alt="Litigation Coordination Team" class="hero-slide-img" onerror="this.onerror=null; this.src='assets/images/hero-entrance.webp';" />
+          
+          <div class="geometric-vignette"></div>
+          <div class="site-notice-overlay" id="siteNoticeOverlay" hidden aria-hidden="true">
+            <section class="site-notice-card" role="dialog" aria-modal="false" aria-labelledby="siteNoticeHeading" aria-describedby="siteNoticeCopy">
+              <button type="button" class="site-notice-close" id="siteNoticeClose" aria-label="Close website notice">×</button>
+              <p class="site-notice-eyebrow">District Litigation Office · Kupwara</p>
+              <h2 class="site-notice-heading" id="siteNoticeHeading">Website Notice</h2>
+              <p class="site-notice-copy" id="siteNoticeCopy">This website has been created temporarily by the District Litigation Office, Kupwara, solely to coordinate with its staff. It is not intended for public dissemination of information and is not an official source of records. All visitors, whether stakeholders or otherwise, should independently verify the information and obtain official records directly from the District Litigation Office, Kupwara. The material is provided for coordination and general reference only; it should not be relied upon as a basis for any legal, administrative or other purpose.</p>
+              <button type="button" class="site-notice-acknowledge" id="siteNoticeAcknowledge">I Understand</button>
+            </section>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: 3D BOOK-PAGE QUOTE STAGE -->
+    <div class="hero-editorial-panel" id="editorialPanel">
+      <div class="quote-book-stage" id="quoteBookStage">
+        
+        <div class="quote-page active" data-page="0">
+          <span class="gold-category-label">Dept. of Law, Justice &amp; Parliamentary Affairs</span>
+          <h2 class="hero-serif-headline">Strategic State Representation with <em>Institutional Precision</em>.</h2>
+          <p class="hero-description">Safeguarding government interest and supporting statutory compliance across designated judicial forums in Kupwara district.</p>
+        </div>
+
+        <div class="quote-page" data-page="1">
+          <span class="gold-category-label">DC Office Complex · Kupwara</span>
+          <h2 class="hero-serif-headline">Administrative Vigilance &amp; <em>Litigation Coordination</em>.</h2>
+          <p class="hero-description">Coordinating timely government defense, objections, and legal representation from district headquarters.</p>
+        </div>
+
+        <div class="quote-page" data-page="2">
+          <span class="gold-category-label">Administrative Registry · Kupwara</span>
+          <h2 class="hero-serif-headline">Working To Ensure <em>Rigorous Scrutiny & Timely Compliance</em>.</h2>
+          <p class="hero-description">Ensuring government objections, parawise replies, and compliance reports are thoroughly vetted prior to listed hearings.</p>
+        </div>
+
+        <div class="quote-page" data-page="3">
+          <span class="gold-category-label">Litigation Scrutiny Registry</span>
+          <h2 class="hero-serif-headline">Deliberate Strategy &amp; <em>Pleading Scrutiny</em>.</h2>
+          <p class="hero-description">Multi-level vetting of departmental submissions to support accurate filings and timely compliance with court directions.</p>
+        </div>
+
+        <div class="quote-page" data-page="4">
+          <span class="gold-category-label">Legal Consultation Chamber</span>
+          <h2 class="hero-serif-headline">Departmental Coordination &amp; <em>Legal Support.</em>.</h2>
+          <p class="hero-description">Directing strategic legal guidance for revenue, municipal, forest, and service law administration.</p>
+        </div>
+
+        <div class="quote-page" data-page="5">
+          <span class="gold-category-label">Law Library &amp; Legal Archives</span>
+          <h2 class="hero-serif-headline">Judicial Precedents &amp; <em>Legislative References.</em>.</h2>
+          <p class="hero-description">Curated repository of constitutional rulings, law reports, and Jammu &amp; Kashmir legislative gazettes.</p>
+        </div>
+
+        <div class="quote-page" data-page="6">
+          <span class="gold-category-label">Administrative Team · DLO Kupwara</span>
+          <h2 class="hero-serif-headline">Dedicated Team&amp; <em>Public Service</em>.</h2>
+          <p class="hero-description">Diligent tracking of daily case dockets, cause lists, and communication across subordinate courts.</p>
+        </div>
+
+        <div class="quote-page" data-page="7">
+          <span class="gold-category-label">Case Management Registry</span>
+          <h2 class="hero-serif-headline">Working towards<em>Greater Accuracy</em>.</h2>
+          <p class="hero-description">Systematic monitoring of active government suits, appeal timelines, and court compliance mandates.</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="hero-navigation-row" role="group" aria-label="Homepage carousel controls">
+      <div class="hero-progress-track" id="carouselProgressTrack" role="progressbar" aria-label="Carousel slide" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1" aria-valuetext="Slide 1 of 8">
+        <span class="hero-progress-segment" id="carouselProgress" aria-hidden="true"></span>
+      </div>
+
+      <div class="circular-arrows-group">
+        <button class="btn-circle-arrow carousel-pause-btn" id="carouselPauseBtn"
+                aria-label="Pause slideshow" title="Pause slideshow"
+                aria-pressed="false">
+          <svg id="carouselPauseIcon" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor" stroke="none"/>
+            <rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor" stroke="none"/>
+          </svg>
+          <svg id="carouselPlayIcon" viewBox="0 0 24 24" aria-hidden="true" style="display:none">
+            <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" stroke="none"/>
+          </svg>
+        </button>
+        <button class="btn-circle-arrow" id="carouselPrevBtn" aria-label="Previous slide">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button class="btn-circle-arrow" id="carouselNextBtn" aria-label="Next slide">
+          <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      <a href="latest-updates.html" id="ordersArrowLink" class="orders-arrow-link" aria-label="More updates" title="More updates" aria-haspopup="dialog" aria-expanded="false" aria-controls="updatesPortal">
+        <span class="orders-arrow-mark" aria-hidden="true">+</span>
+        <span>More Updates</span>
+        <svg class="orders-arrow-end" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+
+  </div>
+</main>
+
+<!-- LATEST UPDATES — right-side drawer, opened by the More Updates control above. -->
+<div class="news-dramatic-portal" id="updatesPortal" role="dialog" aria-modal="true" aria-label="Latest Updates" aria-hidden="true">
+  <div class="updates-drawer">
+    <div class="gazette-rail" aria-hidden="true"></div>
+    <div class="gazette-header">
+      <span class="gazette-brand">DLO Kupwara — Latest Updates</span>
+      <button type="button" class="gazette-close-btn" id="updatesPortalClose" aria-label="Close latest updates">
+        <span class="gazette-close-icon" aria-hidden="true">✕</span> Close
+      </button>
+    </div>
+    <div class="gazette-body">
+      <p class="gazette-loading" id="updatesPortalLoading">Loading updates…</p>
+      <div class="gazette-cards-grid" id="updatesPortalGrid" hidden></div>
+      <p class="gazette-empty" id="updatesPortalEmpty" hidden>No updates are available right now. The homepage messages remain in place.</p>
+      <a href="latest-updates.html" class="gazette-portal-viewall">Further Updates &amp; Circulars →</a>
+    </div>
+  </div>
+</div>
+
+<!-- UPDATE DETAIL MODAL — opened from a carousel slide or a portal card.
+     Reuses the existing .modal-overlay / .modal-card pattern. -->
+<div class="modal-overlay" id="updateDetailModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="updateDetailHeading" aria-describedby="updateDetailBody">
+  <div class="modal-card">
+    <button class="modal-close-btn" id="updateDetailClose" aria-label="Close">✕</button>
+    <div class="update-detail-eyebrow" id="updateDetailDate"></div>
+    <h3 class="update-detail-heading" id="updateDetailHeading"></h3>
+    <div class="update-detail-body" id="updateDetailBody"></div>
+    <div class="update-detail-attachments" id="updateDetailAttachments"></div>
+  </div>
+</div>
+
+<!-- DEPARTMENTAL AUTHENTICATION MODAL -->
+<div class="modal-overlay" id="deptModal">
+  <div class="modal-card">
+    <button class="modal-close-btn" onclick="closeDeptModal()">✕</button>
+    <h3 style="font-family:'Cinzel',serif; font-size:1.25rem; color:var(--k-text); margin-bottom:0.4rem;">Departmental Portal Gateway</h3>
+    <p style="font-size:0.8rem; color:var(--k-text-muted); margin-bottom:1.6rem;">Authenticate to upload compliance reports, parawise replies, or submit requests for legal scrutiny.</p>
+
+    <div class="field-item">
+      <label>Stakeholder Department</label>
+      <select id="modalDeptSelect">
+        <option value="Revenue">Revenue Department</option>
+        <option value="ULB">Urban Local Bodies (ULB)</option>
+        <option value="PDD">Power Development Department (PDD)</option>
+        <option value="PWD">Public Works Department (R&amp;B)</option>
+        <option value="RDD">Rural Development Department</option>
+        <option value="Education">School Education</option>
+        <option value="JalShakti">Jal Shakti / PHE</option>
+        <option value="Forest">Forest &amp; Environment</option>
+      </select>
+    </div>
+
+    <div class="field-item">
+      <label>Department Nodal Code</label>
+      <input type="text" id="modalNodalCode" placeholder="e.g. REV-KUP-01" autocomplete="off" />
+    </div>
+
+    <div class="field-item">
+      <label>Security Passcode</label>
+      <input type="password" id="modalPasscode" placeholder="••••••••••••" autocomplete="off" />
+    </div>
+
+    <button class="btn-modal-action" onclick="dispatchToDepartmentGoogleForm()">
+      Authenticate &amp; Open Submissions
+    </button>
+  </div>
+</div>
+
+<!-- MINIMAL FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      © 2026 District Litigation Office Kupwara. UT of Jammu &amp; Kashmir. All rights reserved.
+    </div>
+    <div style="font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--k-gold);">
+      Dept. of Law, Justice &amp; Parliamentary Affairs
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Departmental Login Modal ─────────────────────────────────
+function openDeptModal() {
+  document.getElementById('deptModal').style.display = 'flex';
+}
+function closeDeptModal() {
+  document.getElementById('deptModal').style.display = 'none';
+}
+function dispatchToDepartmentGoogleForm() {
+  const dept = document.getElementById('modalDeptSelect').value;
+  const code = document.getElementById('modalNodalCode').value.trim();
+  const pass = document.getElementById('modalPasscode').value.trim();
+  if (!code || !pass) {
+    alert('Please enter your designated Department Nodal Code and Passcode.');
+    return;
+  }
+  // TODO: Replace with real Google Form ID when available
+  alert('Department portal submissions are not yet configured. Please contact the DLO office directly.');
+  closeDeptModal();
+}
+
+// ── Service worker registration ───────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+  if (window.DLO) {
+    DLO.registerSW();
+  }
+});
+
+// ── SYNCHRONIZED SLIDE & 3D BOOK-PAGE TRANSITION ENGINE ──────
+// Runs inside DOMContentLoaded so querySelectorAll finds the elements.
+document.addEventListener('DOMContentLoaded', function () {
+  var slides = document.querySelectorAll('.hero-slide-img');
+  var pages  = document.querySelectorAll('.quote-page');
+  var progressTrackEl = document.getElementById('carouselProgressTrack');
+  var progressSegmentEl = document.getElementById('carouselProgress');
+  var siteNotice = document.getElementById('siteNoticeOverlay');
+  var siteNoticeClose = document.getElementById('siteNoticeClose');
+  var siteNoticeAck = document.getElementById('siteNoticeAcknowledge');
+  var totalSlides = slides.length;
+  if (!totalSlides) return;
+
+  var activeIdx   = 0;
+  var slideTimer  = null;
+  var isAnimating = false;
+  var userPaused  = false;   // true when the visitor explicitly paused
+  var siteNoticeTimer = null;
+  var siteNoticeReturnFocus = null;
+
+  function showSiteNotice() {
+    if (!siteNotice || !siteNotice.hidden) return;
+    var detailModal = document.getElementById('updateDetailModal');
+    var anotherOverlayOpen = document.documentElement.classList.contains('menu-open') ||
+      document.body.classList.contains('updates-open') ||
+      (detailModal && detailModal.getAttribute('aria-hidden') === 'false');
+    if (anotherOverlayOpen) {
+      siteNoticeTimer = setTimeout(showSiteNotice, 10000);
+      return;
+    }
+    siteNoticeReturnFocus = document.activeElement;
+    siteNotice.hidden = false;
+    siteNotice.setAttribute('aria-hidden', 'false');
+    if (typeof window.slideTimerPause === 'function') window.slideTimerPause();
+    if (document.activeElement === document.body && siteNoticeAck) siteNoticeAck.focus();
+  }
+
+  function scheduleSiteNotice() {
+    clearTimeout(siteNoticeTimer);
+    siteNoticeTimer = setTimeout(showSiteNotice, 60000);
+  }
+
+  function dismissSiteNotice() {
+    if (!siteNotice || siteNotice.hidden) return;
+    siteNotice.hidden = true;
+    siteNotice.setAttribute('aria-hidden', 'true');
+    if (siteNotice.contains(document.activeElement) && siteNoticeReturnFocus && siteNoticeReturnFocus.isConnected) {
+      siteNoticeReturnFocus.focus();
+    }
+    siteNoticeReturnFocus = null;
+    if (typeof window.slideTimerResume === 'function') window.slideTimerResume();
+    scheduleSiteNotice();
+  }
+
+  if (siteNoticeClose) siteNoticeClose.addEventListener('click', dismissSiteNotice);
+  if (siteNoticeAck) siteNoticeAck.addEventListener('click', dismissSiteNotice);
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && siteNotice && !siteNotice.hidden) dismissSiteNotice();
+  });
+  scheduleSiteNotice();
+
+  function updateCarouselProgress(index) {
+    if (progressTrackEl) {
+      progressTrackEl.setAttribute('aria-valuenow', String(index + 1));
+      progressTrackEl.setAttribute('aria-valuetext', 'Slide ' + (index + 1) + ' of ' + totalSlides);
+    }
+    if (progressSegmentEl) {
+      var travel = 82; // keep the glowing segment fully inside the rail
+      var position = totalSlides > 1 ? (index / (totalSlides - 1)) * travel : 0;
+      progressSegmentEl.style.left = position + '%';
+    }
+  }
+
+  function renderSlide(index, direction) {
+    if (isAnimating) return;
+    if (index === activeIdx) return;
+    isAnimating = true;
+
+    var prevSlideEl = slides[activeIdx];
+    var nextSlideEl = slides[index];
+    var prevPage    = pages[activeIdx];
+    var nextPage    = pages[index];
+
+    slides.forEach(function (s) { s.classList.remove('prev-active'); });
+    prevSlideEl.classList.remove('active');
+    prevSlideEl.classList.add('prev-active');
+    nextSlideEl.classList.remove('prev-active');
+    nextSlideEl.classList.add('active');
+
+    pages.forEach(function (p) {
+      p.classList.remove('flipped-forward', 'flipped-backward', 'incoming-forward', 'incoming-backward');
+    });
+
+    if (direction === 'next') {
+      prevPage.classList.remove('active');
+      prevPage.classList.add('flipped-forward');
+      nextPage.classList.add('incoming-forward');
+      void nextPage.offsetWidth; // force reflow
+      nextPage.classList.remove('incoming-forward');
+      nextPage.classList.add('active');
+    } else {
+      prevPage.classList.remove('active');
+      prevPage.classList.add('flipped-backward');
+      nextPage.classList.add('incoming-backward');
+      void nextPage.offsetWidth; // force reflow
+      nextPage.classList.remove('incoming-backward');
+      nextPage.classList.add('active');
+    }
+
+    updateCarouselProgress(index);
+
+    setTimeout(function () {
+      prevSlideEl.classList.remove('prev-active');
+      prevPage.classList.remove('flipped-forward', 'flipped-backward');
+      isAnimating = false;
+    }, 1300);
+
+    activeIdx = index;
+    updateCarouselProgress(activeIdx);
+    document.dispatchEvent(new CustomEvent('dlo:slide-changed', { detail: { index: index } }));
+  }
+
+  window.nextSlide = function () {
+    var next = (activeIdx + 1) % totalSlides;
+    renderSlide(next, 'next');
+    if (!userPaused) resetTimer();
+  };
+  window.prevSlide = function () {
+    var prev = (activeIdx - 1 + totalSlides) % totalSlides;
+    renderSlide(prev, 'backward');
+    if (!userPaused) resetTimer();
+  };
+
+  function resetTimer() {
+    clearInterval(slideTimer);
+    slideTimer = setInterval(window.nextSlide, 8500);
+  }
+
+  // ── Accessible pause/resume button ──
+  var pauseBtn   = document.getElementById('carouselPauseBtn');
+  var pauseIcon  = document.getElementById('carouselPauseIcon');
+  var playIcon   = document.getElementById('carouselPlayIcon');
+
+  function setPausedState(paused) {
+    userPaused = paused;
+    if (pauseBtn) {
+      pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+      pauseBtn.setAttribute('aria-label', paused ? 'Resume slideshow' : 'Pause slideshow');
+      pauseBtn.setAttribute('title', paused ? 'Resume slideshow' : 'Pause slideshow');
+    }
+    if (pauseIcon) pauseIcon.style.display = paused ? 'none' : '';
+    if (playIcon)  playIcon.style.display  = paused ? '' : 'none';
+  }
+
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', function () {
+      if (userPaused) {
+        setPausedState(false);
+        resetTimer();
+      } else {
+        setPausedState(true);
+        clearInterval(slideTimer);
+        slideTimer = null;
+      }
+    });
+  }
+
+  // Wire prev/next buttons (IDs rather than inline onclick)
+  var prevBtn = document.getElementById('carouselPrevBtn');
+  var nextBtn = document.getElementById('carouselNextBtn');
+  if (prevBtn) prevBtn.addEventListener('click', function () { window.prevSlide(); });
+  if (nextBtn) nextBtn.addEventListener('click', function () { window.nextSlide(); });
+
+  // Pause on interaction with controls; resume after short delay if not user-paused
+  var interactionTimer = null;
+  function pauseOnInteraction() {
+    clearInterval(slideTimer);
+    slideTimer = null;
+    clearTimeout(interactionTimer);
+    if (!userPaused) {
+      interactionTimer = setTimeout(function () { resetTimer(); }, 4000);
+    }
+  }
+  if (prevBtn) prevBtn.addEventListener('mouseenter', pauseOnInteraction);
+  if (nextBtn) nextBtn.addEventListener('mouseenter', pauseOnInteraction);
+
+  // Expose pause/resume for common.js (menu open/close, lang popover open/close)
+  window.slideTimerPause  = function () {
+    clearInterval(slideTimer); slideTimer = null;
+  };
+  window.slideTimerResume = function () {
+    if (!userPaused && !slideTimer) slideTimer = setInterval(window.nextSlide, 8500);
+  };
+
+  // Language change must not shift the active slide — re-apply after dom mutations
+  document.addEventListener('dlo:language-applied', function () {
+    // Re-ensure active classes are correct (translation observer may have rebuilt nodes)
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === activeIdx);
+    });
+    pages.forEach(function (p, i) {
+      var shouldBeActive = (i === activeIdx);
+      p.classList.toggle('active', shouldBeActive);
+      if (!shouldBeActive) {
+        p.classList.remove('flipped-forward','flipped-backward','incoming-forward','incoming-backward');
+      }
+    });
+    updateCarouselProgress(activeIdx);
+  });
+
+  updateCarouselProgress(activeIdx);
+  slideTimer = setInterval(window.nextSlide, 8500);
+
+  // ── Populate app-home stats tiles from Supabase ───────────
+  if (window.DLO && typeof DLO.fetchCaseDiary === 'function') {
+    DLO.fetchCaseDiary().then(function (rows) {
+      var stats = DLO.calculateStats(rows);
+      function set(id, val) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = val !== undefined ? val : '—';
+      }
+      set('appHomeTotal',        stats.total);
+      set('appHomeActive',       stats.active);
+      set('appHomeDisposed',     stats.disposed);
+      set('appHomeReplyFiled',   stats.replyFiled);
+      set('appHomeReplyPending', stats.replyPending);
+      set('appHomeExparte',      stats.exparte);
+
+      // Show overdue alert if any
+      if (stats.overdue > 0) {
+        var alert = document.getElementById('appHomeAlert');
+        var alertText = document.getElementById('appHomeAlertText');
+        if (alert && alertText) {
+          alertText.textContent = stats.overdue + ' case' + (stats.overdue > 1 ? 's have' : ' has') + ' an overdue hearing date.';
+          alert.classList.add('is-visible');
+        }
+      }
+    }).catch(function () {});
+  }
+});
+</script>
+
+<script>
+// ── Latest Updates: homepage headlines + right-side drawer ───────────
+// Updates are read from the published Google Sheet configured in config.js.
+// The original homepage copy is saved and restored for every empty carousel
+// slot, so removing a sheet row brings that slot's original message back.
+document.addEventListener('DOMContentLoaded', function () {
+  if (!window.DLO || typeof DLO.fetchSiteUpdates !== 'function') return;
+
+  var quotePages   = Array.prototype.slice.call(document.querySelectorAll('.quote-page'));
+  var arrowTrigger = document.getElementById('ordersArrowLink');
+  var portal        = document.getElementById('updatesPortal');
+  var portalClose    = document.getElementById('updatesPortalClose');
+  var portalGrid     = document.getElementById('updatesPortalGrid');
+  var portalLoading  = document.getElementById('updatesPortalLoading');
+  var portalEmpty    = document.getElementById('updatesPortalEmpty');
+
+  var detailModal   = document.getElementById('updateDetailModal');
+  var detailClose   = document.getElementById('updateDetailClose');
+  var detailDate    = document.getElementById('updateDetailDate');
+  var detailHeading = document.getElementById('updateDetailHeading');
+  var detailBody    = document.getElementById('updateDetailBody');
+  var detailAttach  = document.getElementById('updateDetailAttachments');
+  if (!arrowTrigger || !portal || !portalClose || !portalGrid || !portalLoading || !portalEmpty || !detailModal || !detailClose || !detailDate || !detailHeading || !detailBody || !detailAttach) return;
+
+  var originalCopy = quotePages.map(function (page) {
+    var label = page.querySelector('.gold-category-label');
+    var heading = page.querySelector('.hero-serif-headline');
+    return {
+      label: label ? label.innerHTML : '',
+      heading: heading ? heading.innerHTML : ''
+    };
+  });
+  var updatesForPage = [];
+  var lastDetailTrigger = null;
+  var bodyOverflowBeforePortal = '';
+  var bodyOverflowBeforeDetail = '';
+  var lastUpdatesFetchAt = 0;
+
+  function fmtDate(d) {
+    var value = String(d || '').trim();
+    var iso = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) return iso[3] + '-' + iso[2] + '-' + iso[1];
+    return value && DLO.formatDDMMYYYY ? DLO.formatDDMMYYYY(value) : value;
+  }
+
+  // ── Update detail modal (heading + full body + attachments) ──
+  function isDetailOpen() { return detailModal.style.display === 'flex'; }
+  function openUpdateDetail(update, trigger) {
+    lastDetailTrigger = trigger || document.activeElement;
+    if (typeof window.slideTimerPause === 'function') window.slideTimerPause();
+    detailDate.textContent    = fmtDate(update.date) || 'Date not provided';
+    detailHeading.textContent = update.heading;
+    detailBody.textContent    = update.body || 'No further details are available for this update.';
+    detailAttach.innerHTML = '';
+    (update.attachments || []).forEach(function (a) {
+      var safeHref;
+      try {
+        var parsed = new URL(a.url, window.location.href);
+        if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return;
+        safeHref = parsed.href;
+      } catch (e) { return; }
+      var link = document.createElement('a');
+      link.href = safeHref;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = '📄 ' + a.label;
+      detailAttach.appendChild(link);
+    });
+    detailAttach.hidden = !detailAttach.children.length;
+    bodyOverflowBeforeDetail = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    detailModal.setAttribute('aria-hidden', 'false');
+    detailModal.style.display = 'flex';
+    setTimeout(function () { detailClose.focus(); }, 30);
+  }
+  function closeUpdateDetail() {
+    detailModal.style.display = 'none';
+    detailModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = bodyOverflowBeforeDetail;
+    if (lastDetailTrigger && lastDetailTrigger.isConnected) lastDetailTrigger.focus();
+    if (!isPortalOpen() && typeof window.slideTimerResume === 'function') window.slideTimerResume();
+  }
+  if (detailClose) detailClose.addEventListener('click', closeUpdateDetail);
+  detailModal.addEventListener('click', function (e) {
+    if (e.target === detailModal) closeUpdateDetail();
+  });
+  detailModal.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab') return;
+    var focusable = Array.prototype.slice.call(detailModal.querySelectorAll('button:not([disabled]), a[href]'));
+    if (!focusable.length) { e.preventDefault(); detailClose.focus(); return; }
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  // ── Updates drawer, opened by the existing arrow ──
+  function isPortalOpen() { return portal.classList.contains('open'); }
+
+  function buildCard(u) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'gazette-card';
+    card.setAttribute('aria-label', 'Read update: ' + u.heading);
+
+    var meta = document.createElement('div');
+    meta.className = 'gazette-meta-tag';
+    var dateSpan = document.createElement('span');
+    dateSpan.textContent = fmtDate(u.date);
+    var typeSpan = document.createElement('span');
+    typeSpan.textContent = 'Update';
+    meta.appendChild(dateSpan);
+    meta.appendChild(typeSpan);
+
+    var title = document.createElement('div');
+    title.className = 'gazette-title';
+    title.textContent = u.heading;
+
+    var action = document.createElement('span');
+    action.className = 'gazette-action-link';
+    action.textContent = 'Read Update →';
+
+    card.appendChild(meta);
+    card.appendChild(title);
+    card.appendChild(action);
+    card.addEventListener('click', function () { openUpdateDetail(u); });
+    return card;
+  }
+
+  function renderPortalGrid(updates) {
+    portalGrid.innerHTML = '';
+    updates.forEach(function (u) { portalGrid.appendChild(buildCard(u)); });
+  }
+
+  function openPortal() {
+    bodyOverflowBeforePortal = document.body.style.overflow;
+    portal.setAttribute('aria-hidden', 'false');
+    portal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('updates-open');
+    arrowTrigger.setAttribute('aria-expanded', 'true');
+    if (typeof window.slideTimerPause === 'function') window.slideTimerPause();
+    setTimeout(function () { portalClose.focus(); }, 60);
+  }
+  function closePortal() {
+    portal.classList.remove('open');
+    portal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = bodyOverflowBeforePortal;
+    document.body.classList.remove('updates-open');
+    arrowTrigger.setAttribute('aria-expanded', 'false');
+    arrowTrigger.focus();
+    if (typeof window.slideTimerResume === 'function') window.slideTimerResume();
+  }
+
+  // Reuse the existing arrow/control — no second trigger is added.
+  arrowTrigger.addEventListener('click', function (e) {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) return; // let open-in-new-tab work
+    e.preventDefault();
+    isPortalOpen() ? closePortal() : openPortal();
+  });
+  portalClose.addEventListener('click', closePortal);
+  portal.addEventListener('click', function (e) {
+    if (e.target === portal) closePortal();
+  });
+
+  // Escape-to-close: detail modal takes priority over the portal.
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (isDetailOpen()) { closeUpdateDetail(); return; }
+    if (isPortalOpen()) closePortal();
+  });
+
+  // Keep keyboard focus inside the portal while it's open.
+  portal.addEventListener('keydown', function (e) {
+    if (e.key !== 'Tab' || !isPortalOpen()) return;
+    var focusable = portal.querySelectorAll('a[href], button:not([disabled])');
+    if (!focusable.length) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  function syncUpdatePageFocus() {
+    quotePages.forEach(function (page, index) {
+      if (updatesForPage[index]) page.tabIndex = page.classList.contains('active') ? 0 : -1;
+    });
+  }
+  document.addEventListener('dlo:slide-changed', syncUpdatePageFocus);
+
+  function renderCarouselUpdates(updates) {
+    updatesForPage = [];
+    quotePages.forEach(function (page, index) {
+      var label = page.querySelector('.gold-category-label');
+      var heading = page.querySelector('.hero-serif-headline');
+      if (label) label.innerHTML = originalCopy[index].label;
+      if (heading) heading.innerHTML = originalCopy[index].heading;
+      page.classList.remove('is-update');
+      page.removeAttribute('tabindex');
+      page.removeAttribute('role');
+      page.removeAttribute('aria-haspopup');
+      page.removeAttribute('aria-controls');
+      page.removeAttribute('aria-label');
+    });
+
+    updates.slice(0, Math.min(8, quotePages.length)).forEach(function (update, index) {
+      var page = quotePages[index];
+      var label = page.querySelector('.gold-category-label');
+      var heading = page.querySelector('.hero-serif-headline');
+      if (!page || !label || !heading) return;
+      updatesForPage[index] = update;
+      page.classList.add('is-update');
+      page.setAttribute('role', 'button');
+      page.setAttribute('aria-haspopup', 'dialog');
+      page.setAttribute('aria-controls', 'updateDetailModal');
+      page.setAttribute('aria-label', 'Read full update: ' + update.heading);
+      page.tabIndex = page.classList.contains('active') ? 0 : -1;
+      label.textContent = fmtDate(update.date) || 'Official Update';
+      heading.textContent = update.heading;
+    });
+    syncUpdatePageFocus();
+  }
+
+  quotePages.forEach(function (page, index) {
+    page.addEventListener('click', function () {
+      if (updatesForPage[index] && page.classList.contains('active')) openUpdateDetail(updatesForPage[index], page);
+    });
+    page.addEventListener('keydown', function (e) {
+      if (!updatesForPage[index] || !page.classList.contains('active')) return;
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      openUpdateDetail(updatesForPage[index], page);
+    });
+  });
+
+  // Also available after publishing a sheet edit, so the page can refresh its
+  // carousel and drawer without a full reload if needed.
+  function loadAndRenderUpdates(force) {
+    lastUpdatesFetchAt = Date.now();
+    portalLoading.hidden = false;
+    portalGrid.hidden = true;
+    portalEmpty.hidden = true;
+    return DLO.fetchSiteUpdates(force).then(function (updates) {
+      updates = Array.isArray(updates) ? updates : [];
+      portalLoading.hidden = true;
+      if (updates.length) {
+        portalGrid.hidden = false;
+        renderPortalGrid(updates);
+      } else {
+        portalGrid.innerHTML = '';
+        portalEmpty.textContent = 'No updates are available right now. The homepage messages remain in place.';
+        portalEmpty.hidden = false;
+      }
+      renderCarouselUpdates(updates);
+      return updates;
+    }).catch(function (err) {
+      console.error('[DLO] Failed to load site updates:', err);
+      portalLoading.hidden = true;
+      portalEmpty.textContent = 'Updates could not be loaded. Please try again later.';
+      portalEmpty.hidden = false;
+      portalGrid.hidden = true;
+      return [];
+    });
+  }
+  window.refreshDLOHomepageUpdates = function () { return loadAndRenderUpdates(true); };
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && Date.now() - lastUpdatesFetchAt > 60000) {
+      window.refreshDLOHomepageUpdates();
+    }
+  });
+
+  // ── Fetch updates: latest eight fill the home carousel; all rows stay in the drawer ──
+  loadAndRenderUpdates(false);
+});
+</script>
+
+<script>
+(function activateAppMode() {
+  function isApp() {
+    try {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) return true;
+      if (window.matchMedia && window.matchMedia('(display-mode: fullscreen)').matches) return true;
+      if (window.navigator.standalone === true) return true;
+      if (/(?:\?|&)app=1(?:&|$)/.test(location.search || '')) return true;
+      if (document.referrer && document.referrer.indexOf('android-app://') === 0) return true;
+    } catch (e) {}
+    return false;
+  }
+  if (!isApp()) return;
+
+  document.documentElement.classList.add('app-mode');
+  document.body.classList.add('app-mode');
+
+  ['appTopbar','appHome','appTabbar'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.setAttribute('aria-hidden', 'false');
+      el.style.display = '';
+    }
+  });
+
+  ['.topbar','header.site-header','main.hero-minimal','.fullscreen-curtain',
+    '.news-dock-strip','footer.site-footer',
+   '.k-menu-trigger','.k-curtain'].forEach(function(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.style.display = 'none';
+    });
+  });
+})();
+</script>
+<script src="assistant-bridge.js"></script>
+<script src="assistant.js"></script>
+</body>
+</html>
